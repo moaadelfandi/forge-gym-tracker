@@ -11,13 +11,112 @@ const RANKS = [
 ]
 
 const MUSCLE_GROUPS = [
-  { id: 'chest',     name: 'Chest',     icon: '🫁', exercises: ['Bench Press', 'Incline Bench', 'Dumbbell Fly', 'Cable Fly', 'Push-up'] },
-  { id: 'back',      name: 'Back',      icon: '🔱', exercises: ['Deadlift', 'Barbell Row', 'Pull-ups', 'Lat Pulldown', 'Seated Row'] },
-  { id: 'legs',      name: 'Legs',      icon: '⚡', exercises: ['Squat', 'Leg Press', 'Romanian Deadlift', 'Hack Squat', 'Lunges'] },
-  { id: 'shoulders', name: 'Shoulders', icon: '△',  exercises: ['Overhead Press', 'Arnold Press', 'Lateral Raise', 'Face Pull', 'Front Raise'] },
-  { id: 'arms',      name: 'Arms',      icon: '◎',  exercises: ['Barbell Curl', 'Tricep Dip', 'Hammer Curl', 'Skull Crusher', 'Cable Curl'] },
-  { id: 'core',      name: 'Core',      icon: '◇',  exercises: ['Plank', 'Ab Wheel', 'Hanging Leg Raise', 'Cable Crunch', 'Dragon Flag'] },
+  { id: 'chest', name: 'Chest', icon: '🫁', exercises: [
+    'Bench Press', 'Incline Bench Press', 'Decline Bench Press',
+    'Dumbbell Fly', 'Incline Dumbbell Fly', 'Cable Fly',
+    'Cable Crossover', 'Chest Dip', 'Push-up', 'Pec Deck Machine',
+    'Smith Machine Bench', 'Landmine Press'
+  ]},
+  { id: 'back', name: 'Back', icon: '🔱', exercises: [
+    'Deadlift', 'Barbell Row', 'Pull-ups', 'Chin-ups',
+    'Lat Pulldown', 'Seated Cable Row', 'Single Arm Dumbbell Row',
+    'T-Bar Row', 'Face Pull', 'Straight Arm Pulldown',
+    'Rack Pull', 'Meadows Row', 'Cable Pull-over'
+  ]},
+  { id: 'legs', name: 'Legs', icon: '⚡', exercises: [
+    'Squat', 'Front Squat', 'Leg Press', 'Romanian Deadlift',
+    'Hack Squat', 'Lunges', 'Bulgarian Split Squat',
+    'Leg Extension', 'Leg Curl', 'Calf Raise',
+    'Goblet Squat', 'Hip Thrust', 'Sumo Deadlift', 'Step-ups'
+  ]},
+  { id: 'shoulders', name: 'Shoulders', icon: '△', exercises: [
+    'Overhead Press', 'Arnold Press', 'Lateral Raise',
+    'Face Pull', 'Front Raise', 'Rear Delt Fly',
+    'Cable Lateral Raise', 'Dumbbell Shoulder Press',
+    'Machine Shoulder Press', 'Upright Row',
+    'Shrugs', 'Cable Face Pull', 'Reverse Pec Deck'
+  ]},
+  { id: 'arms', name: 'Arms', icon: '◎', exercises: [
+    'Barbell Curl', 'Dumbbell Curl', 'Hammer Curl',
+    'Incline Dumbbell Curl', 'Cable Curl', 'Preacher Curl',
+    'Tricep Dip', 'Skull Crusher', 'Tricep Pushdown',
+    'Overhead Tricep Extension', 'Close Grip Bench Press',
+    'Cable Overhead Tricep Extension', 'Diamond Push-up', 'Concentration Curl'
+  ]},
+  { id: 'core', name: 'Core', icon: '◇', exercises: [
+    'Plank', 'Ab Wheel', 'Hanging Leg Raise', 'Cable Crunch',
+    'Dragon Flag', 'Decline Sit-up', 'Russian Twist',
+    'Hollow Body Hold', 'L-sit', 'Weighted Crunch',
+    'Landmine Twist', 'Pallof Press', 'Dead Bug', 'Bicycle Crunch'
+  ]},
 ]
+
+const WEEKLY_PLAN = [
+  {
+    day: 'Day 1', label: 'PUSH',
+    focus: 'Chest · Shoulders · Triceps',
+    muscles: ['chest', 'shoulders', 'arms'],
+    davidTip: 'David Laid prioritizes heavy incline work for upper chest thickness and strict lateral raises for 3D shoulder caps. Go heavy on compound, strict on isolation.',
+    exercises: [
+      { name: 'Incline Bench Press',       muscle: 'chest',     sets: 4, reps: '6-8',   note: 'Primary mass builder — go heavy, full range of motion' },
+      { name: 'Bench Press',               muscle: 'chest',     sets: 3, reps: '8-10',  note: 'Full chest activation, slight arch, retract scapula' },
+      { name: 'Cable Fly',                 muscle: 'chest',     sets: 3, reps: '12-15', note: 'Stretch hard at the bottom, squeeze at the top' },
+      { name: 'Overhead Press',            muscle: 'shoulders', sets: 4, reps: '6-8',   note: 'Builds shoulder width and mass — press straight up' },
+      { name: 'Lateral Raise',             muscle: 'shoulders', sets: 4, reps: '15-20', note: 'Strict form, lead with elbows, no swinging' },
+      { name: 'Tricep Pushdown',           muscle: 'arms',      sets: 3, reps: '12-15', note: 'Full extension at bottom, elbows locked at sides' },
+      { name: 'Skull Crusher',             muscle: 'arms',      sets: 3, reps: '10-12', note: 'Keep elbows tucked, lower to forehead slowly' },
+    ]
+  },
+  {
+    day: 'Day 2', label: 'PULL',
+    focus: 'Back · Biceps · Rear Delts',
+    muscles: ['back', 'arms'],
+    davidTip: 'David Laid is known for his V-taper. Heavy deadlifts and wide-grip pull-ups are the foundation. Focus on feeling the lat stretch on every rep.',
+    exercises: [
+      { name: 'Deadlift',              muscle: 'back',  sets: 4, reps: '4-6',   note: 'King of all lifts — brace your core hard, drive through heels' },
+      { name: 'Pull-ups',              muscle: 'back',  sets: 4, reps: '6-10',  note: 'Wide grip for lat width, full hang at bottom' },
+      { name: 'Barbell Row',           muscle: 'back',  sets: 3, reps: '8-10',  note: 'Chest to bar, control the eccentric, retract scapula' },
+      { name: 'Lat Pulldown',          muscle: 'back',  sets: 3, reps: '10-12', note: 'Full stretch at top, pull to upper chest' },
+      { name: 'Seated Cable Row',      muscle: 'back',  sets: 3, reps: '12-15', note: 'Squeeze shoulder blades together at contraction' },
+      { name: 'Barbell Curl',          muscle: 'arms',  sets: 3, reps: '8-10',  note: 'Slow eccentric (3 sec down) for bicep peak' },
+      { name: 'Hammer Curl',           muscle: 'arms',  sets: 3, reps: '10-12', note: 'Builds brachialis for arm thickness' },
+      { name: 'Face Pull',             muscle: 'back',  sets: 3, reps: '15-20', note: 'Rear delt health and width — pull to forehead level' },
+    ]
+  },
+  {
+    day: 'Day 3', label: 'LEGS',
+    focus: 'Quads · Hamstrings · Glutes · Calves',
+    muscles: ['legs'],
+    davidTip: 'David Laid squats deep with full range of motion. He trains legs hard and equally — no skipping. Balanced legs = better overall proportions.',
+    exercises: [
+      { name: 'Squat',                 muscle: 'legs', sets: 4, reps: '6-8',   note: 'Full depth, chest up, knees track over toes' },
+      { name: 'Romanian Deadlift',     muscle: 'legs', sets: 4, reps: '8-10',  note: 'Feel the hamstring stretch at the bottom, hinge at hips' },
+      { name: 'Leg Press',             muscle: 'legs', sets: 3, reps: '10-12', note: 'High foot placement for more glute activation' },
+      { name: 'Bulgarian Split Squat', muscle: 'legs', sets: 3, reps: '10-12', note: 'Each leg separately — brutal but incredible for legs' },
+      { name: 'Leg Extension',         muscle: 'legs', sets: 3, reps: '15-20', note: 'Squeeze and hold at the top for quad isolation' },
+      { name: 'Leg Curl',              muscle: 'legs', sets: 3, reps: '12-15', note: 'Slow and controlled, full range of motion' },
+      { name: 'Calf Raise',            muscle: 'legs', sets: 4, reps: '15-20', note: 'Full range, pause and stretch at bottom' },
+    ]
+  },
+  {
+    day: 'Day 4', label: 'UPPER',
+    focus: 'Full Upper Body · Weak Points · Core',
+    muscles: ['chest', 'back', 'shoulders', 'arms', 'core'],
+    davidTip: 'Use this day to hit weak points and bring up lagging muscles. David Laid stays proportional by identifying and targeting what needs the most work.',
+    exercises: [
+      { name: 'Decline Bench Press',           muscle: 'chest',     sets: 3, reps: '8-10',  note: 'Lower chest detail and fullness' },
+      { name: 'Single Arm Dumbbell Row',       muscle: 'back',      sets: 3, reps: '10-12', note: 'Full stretch, full contraction — feel the lat' },
+      { name: 'Arnold Press',                  muscle: 'shoulders', sets: 3, reps: '10-12', note: 'Great for shoulder roundness and fullness' },
+      { name: 'Cable Lateral Raise',           muscle: 'shoulders', sets: 3, reps: '15-20', note: 'Constant tension — better than dumbbells for medial delt' },
+      { name: 'Incline Dumbbell Curl',         muscle: 'arms',      sets: 3, reps: '10-12', note: 'Long head bicep stretch at bottom for peak' },
+      { name: 'Overhead Tricep Extension',     muscle: 'arms',      sets: 3, reps: '12-15', note: 'Long head stretch — adds mass to back of arm' },
+      { name: 'Ab Wheel',                      muscle: 'core',      sets: 3, reps: '10-15', note: 'Control the rollout, brace core throughout' },
+      { name: 'Hanging Leg Raise',             muscle: 'core',      sets: 3, reps: '12-15', note: 'No swinging, curl hips up at the top' },
+    ]
+  },
+]
+
+const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 function calc1RM(weight, reps) {
   if (reps === 1) return weight
@@ -47,6 +146,19 @@ function getNextRank(score) {
   return null
 }
 
+function convertWeight(kg, unit) {
+  return unit === 'lbs' ? Math.round(kg * 2.205 * 10) / 10 : Math.round(kg * 10) / 10
+}
+
+const STORAGE_KEY = 'forge_settings_v1'
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : { unit: 'kg', trainingDays: ['Mon', 'Tue', 'Thu', 'Fri'] }
+  } catch { return { unit: 'kg', trainingDays: ['Mon', 'Tue', 'Thu', 'Fri'] } }
+}
+
 export default function Home() {
   const [tab, setTab] = useState('dashboard')
   const [workouts, setWorkouts] = useState([])
@@ -55,6 +167,13 @@ export default function Home() {
   const [logMsg, setLogMsg] = useState('')
   const [logLoading, setLogLoading] = useState(false)
   const [historyFilter, setHistoryFilter] = useState('all')
+  const [settings, setSettings] = useState(loadSettings)
+  const [planDay, setPlanDay] = useState(0)
+  const [expandedEx, setExpandedEx] = useState(null)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+  }, [settings])
 
   const fetchWorkouts = useCallback(async () => {
     setLoading(true)
@@ -68,6 +187,15 @@ export default function Home() {
 
   useEffect(() => { fetchWorkouts() }, [fetchWorkouts])
 
+  function toggleTrainingDay(day) {
+    setSettings(s => {
+      const days = s.trainingDays.includes(day)
+        ? s.trainingDays.filter(d => d !== day)
+        : [...s.trainingDays, day]
+      return { ...s, trainingDays: days }
+    })
+  }
+
   async function handleLog() {
     const { muscle, exercise, weight, reps, sets } = logForm
     if (!exercise || !weight || !reps || !sets) {
@@ -75,17 +203,19 @@ export default function Home() {
       return
     }
     setLogLoading(true)
+    const weightKg = settings.unit === 'lbs'
+      ? parseFloat(weight) / 2.205
+      : parseFloat(weight)
     const { error } = await supabase.from('workouts').insert([{
-      muscle,
-      exercise,
-      weight: parseFloat(weight),
+      muscle, exercise,
+      weight: Math.round(weightKg * 10) / 10,
       reps: parseInt(reps),
       sets: parseInt(sets),
     }])
     if (error) {
       setLogMsg('✗ Error saving. Try again.')
     } else {
-      setLogMsg(`✓ Logged ${exercise} — ${weight}kg × ${reps} reps × ${sets} sets`)
+      setLogMsg(`✓ Logged ${exercise} — ${weight}${settings.unit} × ${reps} reps × ${sets} sets`)
       setLogForm(f => ({ ...f, exercise: '', weight: '', reps: '', sets: '' }))
       fetchWorkouts()
     }
@@ -93,7 +223,6 @@ export default function Home() {
     setTimeout(() => setLogMsg(''), 4000)
   }
 
-  // Group workouts by muscle
   const byMuscle = MUSCLE_GROUPS.reduce((acc, mg) => {
     acc[mg.id] = workouts.filter(w => w.muscle === mg.id)
     return acc
@@ -106,10 +235,13 @@ export default function Home() {
 
   const totalScore = MUSCLE_GROUPS.reduce((sum, mg) => sum + scores[mg.id], 0) / MUSCLE_GROUPS.length
   const overallRank = getRank(totalScore)
+  const unit = settings.unit
 
-  const filtered = historyFilter === 'all'
-    ? workouts
-    : workouts.filter(w => w.muscle === historyFilter)
+  const filtered = historyFilter === 'all' ? workouts : workouts.filter(w => w.muscle === historyFilter)
+  const sortedTrainingDays = [...settings.trainingDays].sort((a, b) => {
+    const order = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 }
+    return order[a] - order[b]
+  })
 
   return (
     <div style={{ minHeight: '100vh', background: '#080C10', color: '#E2E8F0', paddingBottom: 80 }}>
@@ -121,6 +253,11 @@ export default function Home() {
         .log-btn { transition: all 0.2s; }
         .log-btn:hover:not(:disabled) { filter: brightness(1.15); transform: scale(1.02); }
         .log-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .day-btn { transition: all 0.2s; }
+        .day-btn:hover { filter: brightness(1.1); }
+        .ex-card { transition: border-color 0.2s; cursor: pointer; }
+        .ex-card:hover { border-color: #EF444455 !important; }
+        .tog { transition: all 0.2s; cursor: pointer; }
         @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
         .slide-in { animation: slideIn 0.3s ease forwards; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -128,27 +265,35 @@ export default function Home() {
       `}</style>
 
       {/* Header */}
-      <div style={{ background: 'linear-gradient(180deg, #0F1520 0%, #080C10 100%)', borderBottom: '1px solid #1A2332', padding: '20px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div style={{ background: 'linear-gradient(180deg, #0F1520 0%, #080C10 100%)', borderBottom: '1px solid #1A2332', padding: '16px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <div>
             <div style={{ fontSize: 11, letterSpacing: 4, color: '#EF4444', fontWeight: 700, textTransform: 'uppercase' }}>PHYSIQUE TRACKER</div>
             <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: 1, lineHeight: 1.1 }}>FORGE</div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, color: '#64748B', letterSpacing: 2, textTransform: 'uppercase' }}>Overall</div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+            <div style={{ display: 'flex', background: '#0F1520', border: '1px solid #1A2332', borderRadius: 20, overflow: 'hidden' }}>
+              {['kg', 'lbs'].map(u => (
+                <button key={u} className="tog" onClick={() => setSettings(s => ({ ...s, unit: u }))} style={{
+                  padding: '4px 14px', border: 'none', fontSize: 11, fontWeight: 700,
+                  fontFamily: 'inherit', letterSpacing: 1, cursor: 'pointer',
+                  background: unit === u ? '#EF4444' : 'transparent',
+                  color: unit === u ? '#fff' : '#475569',
+                }}>{u.toUpperCase()}</button>
+              ))}
+            </div>
             {loading
-              ? <div style={{ fontSize: 14, color: '#475569' }}>Loading...</div>
-              : <div style={{ fontSize: 22, fontWeight: 800, color: overallRank.color }}>{overallRank.icon} {overallRank.name}</div>
+              ? <div style={{ fontSize: 13, color: '#475569' }}>Loading...</div>
+              : <div style={{ fontSize: 18, fontWeight: 800, color: overallRank.color }}>{overallRank.icon} {overallRank.name}</div>
             }
           </div>
         </div>
 
-        {/* Tabs */}
         <div style={{ display: 'flex' }}>
-          {[['dashboard', 'RANKS'], ['log', 'LOG SET'], ['history', 'HISTORY'], ['stats', 'STATS']].map(([id, label]) => (
+          {[['dashboard', 'RANKS'], ['plan', 'PLAN'], ['log', 'LOG'], ['history', 'HISTORY'], ['stats', 'STATS']].map(([id, label]) => (
             <button key={id} className="tab-btn" onClick={() => setTab(id)} style={{
-              flex: 1, padding: '10px 4px', border: 'none', cursor: 'pointer',
-              fontSize: 11, fontWeight: 700, letterSpacing: 2, fontFamily: 'inherit',
+              flex: 1, padding: '10px 2px', border: 'none', cursor: 'pointer',
+              fontSize: 10, fontWeight: 700, letterSpacing: 1.5, fontFamily: 'inherit',
               background: 'transparent',
               color: tab === id ? '#EF4444' : '#475569',
               borderBottom: tab === id ? '2px solid #EF4444' : '2px solid transparent',
@@ -159,10 +304,9 @@ export default function Home() {
 
       <div style={{ padding: '20px 16px' }}>
 
-        {/* DASHBOARD */}
+        {/* ── DASHBOARD ── */}
         {tab === 'dashboard' && (
           <div className="slide-in">
-            {/* Overall score bar */}
             <div style={{ background: '#0F1520', border: '1px solid #1A2332', borderRadius: 12, padding: 16, marginBottom: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <div style={{ fontSize: 12, color: '#64748B', letterSpacing: 2, textTransform: 'uppercase' }}>Overall Score</div>
@@ -179,7 +323,7 @@ export default function Home() {
             {loading ? (
               <div style={{ textAlign: 'center', padding: 40, color: '#475569' }}>
                 <div className="spinner" style={{ fontSize: 24, marginBottom: 8 }}>◈</div>
-                <div>Loading your data...</div>
+                <div>Loading...</div>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -210,7 +354,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Rank legend */}
             <div style={{ marginTop: 20, background: '#0F1520', border: '1px solid #1A2332', borderRadius: 12, padding: 16 }}>
               <div style={{ fontSize: 11, color: '#64748B', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>Rank Tiers</div>
               {RANKS.map(r => (
@@ -224,11 +367,167 @@ export default function Home() {
           </div>
         )}
 
-        {/* LOG */}
+        {/* ── PLAN ── */}
+        {tab === 'plan' && (
+          <div className="slide-in">
+            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 1, marginBottom: 2 }}>YOUR PLAN</div>
+            <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16, fontFamily: 'Barlow, sans-serif' }}>
+              4-day split built for the David Laid aesthetic.
+            </div>
+
+            {/* Training days picker */}
+            <div style={{ background: '#0F1520', border: '1px solid #1A2332', borderRadius: 12, padding: 14, marginBottom: 16 }}>
+              <div style={{ fontSize: 10, color: '#64748B', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 10 }}>Your Training Days</div>
+              <div style={{ display: 'flex', gap: 5, justifyContent: 'space-between' }}>
+                {DAYS_OF_WEEK.map(day => {
+                  const active = settings.trainingDays.includes(day)
+                  return (
+                    <button key={day} className="day-btn" onClick={() => toggleTrainingDay(day)} style={{
+                      flex: 1, padding: '8px 2px', border: `1px solid ${active ? '#EF4444' : '#1A2332'}`,
+                      borderRadius: 8, background: active ? '#EF444422' : 'transparent',
+                      color: active ? '#EF4444' : '#475569', fontSize: 10, fontWeight: 700,
+                      cursor: 'pointer', fontFamily: 'inherit',
+                    }}>{day}</button>
+                  )
+                })}
+              </div>
+              <div style={{ fontSize: 11, color: '#475569', marginTop: 8 }}>
+                {settings.trainingDays.length} days selected · Tap a day to toggle
+              </div>
+            </div>
+
+            {/* Day tabs */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4 }}>
+              {WEEKLY_PLAN.map((plan, i) => (
+                <button key={i} className="day-btn" onClick={() => { setPlanDay(i); setExpandedEx(null) }} style={{
+                  padding: '8px 14px', border: `1px solid ${planDay === i ? '#EF4444' : '#1A2332'}`,
+                  borderRadius: 20, background: planDay === i ? '#EF4444' : '#0F1520',
+                  color: planDay === i ? '#fff' : '#64748B',
+                  fontSize: 11, fontWeight: 700, letterSpacing: 1, cursor: 'pointer',
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                }}>{plan.day}: {plan.label}</button>
+              ))}
+            </div>
+
+            {(() => {
+              const plan = WEEKLY_PLAN[planDay]
+              const assignedDay = sortedTrainingDays[planDay]
+              return (
+                <div>
+                  <div style={{ background: '#0F1520', border: '1px solid #1A2332', borderRadius: 12, padding: 16, marginBottom: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                      <div>
+                        <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>{plan.label}</div>
+                        <div style={{ fontSize: 12, color: '#64748B' }}>{plan.focus}</div>
+                      </div>
+                      {assignedDay && (
+                        <div style={{ background: '#EF444422', border: '1px solid #EF444444', borderRadius: 8, padding: '4px 12px', fontSize: 12, color: '#EF4444', fontWeight: 700 }}>
+                          {assignedDay}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ background: '#080C10', borderRadius: 8, padding: 12, borderLeft: '3px solid #EF4444' }}>
+                      <div style={{ fontSize: 10, color: '#EF4444', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>David Laid Tip</div>
+                      <div style={{ fontSize: 12, color: '#94A3B8', fontFamily: 'Barlow, sans-serif', lineHeight: 1.6 }}>{plan.davidTip}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: 10, color: '#64748B', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 10 }}>
+                    Exercises — tap to expand
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {plan.exercises.map((ex, i) => {
+                      const mg = MUSCLE_GROUPS.find(m => m.id === ex.muscle)
+                      const muscleScore = scores[ex.muscle]
+                      const rank = getRank(muscleScore)
+                      const next = getNextRank(muscleScore)
+                      const sessions = byMuscle[ex.muscle] || []
+                      const best1RM = sessions.length > 0 ? Math.max(...sessions.map(s => calc1RM(s.weight, s.reps))) : 0
+                      const targetKg = next ? (next.min / 100) * 200 * 0.75 : null
+                      const targetW = targetKg ? Math.round(convertWeight(targetKg, unit)) : null
+                      const isExpanded = expandedEx === `${planDay}-${i}`
+
+                      return (
+                        <div key={i} className="ex-card"
+                          onClick={() => setExpandedEx(isExpanded ? null : `${planDay}-${i}`)}
+                          style={{ background: '#0F1520', border: '1px solid #1A2332', borderRadius: 10, overflow: 'hidden' }}>
+                          <div style={{ padding: '12px 14px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 700 }}>{i + 1}</span>
+                                  <span style={{ fontSize: 15, fontWeight: 700 }}>{ex.name}</span>
+                                </div>
+                                <div style={{ fontSize: 11, color: '#64748B' }}>
+                                  {mg?.icon} {mg?.name} · {ex.sets} sets × {ex.reps} reps
+                                </div>
+                              </div>
+                              <div style={{ textAlign: 'right', marginLeft: 8 }}>
+                                <div style={{ fontSize: 11, color: rank.color, fontWeight: 700 }}>{rank.icon} {rank.name}</div>
+                                <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>{isExpanded ? '▲' : '▼'}</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {isExpanded && (
+                            <div style={{ borderTop: '1px solid #1A2332', padding: '14px', background: '#080C10' }}>
+                              <div style={{ fontSize: 12, color: '#94A3B8', fontFamily: 'Barlow, sans-serif', marginBottom: 12, lineHeight: 1.6 }}>
+                                💡 {ex.note}
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
+                                <div style={{ background: '#0F1520', borderRadius: 8, padding: '10px', textAlign: 'center' }}>
+                                  <div style={{ fontSize: 10, color: '#64748B', letterSpacing: 1, marginBottom: 4 }}>YOUR BEST 1RM</div>
+                                  <div style={{ fontSize: 20, fontWeight: 800, color: rank.color }}>
+                                    {best1RM > 0 ? `${Math.round(convertWeight(best1RM, unit))}${unit}` : '—'}
+                                  </div>
+                                </div>
+                                <div style={{ background: '#0F1520', borderRadius: 8, padding: '10px', textAlign: 'center' }}>
+                                  <div style={{ fontSize: 10, color: '#64748B', letterSpacing: 1, marginBottom: 4 }}>TARGET TO RANK UP</div>
+                                  <div style={{ fontSize: 20, fontWeight: 800, color: next ? '#EF4444' : '#F59E0B' }}>
+                                    {next && targetW ? `${targetW}${unit}` : '🏆 MAX'}
+                                  </div>
+                                </div>
+                              </div>
+                              {next && targetW && (
+                                <div style={{ background: '#0F1520', borderRadius: 8, padding: 12, borderLeft: `3px solid ${next.color}`, marginBottom: 10 }}>
+                                  <div style={{ fontSize: 11, color: next.color, fontWeight: 700, marginBottom: 4 }}>
+                                    To reach {next.icon} {next.name}:
+                                  </div>
+                                  <div style={{ fontSize: 12, color: '#94A3B8', fontFamily: 'Barlow, sans-serif', lineHeight: 1.5 }}>
+                                    Work up to ~{targetW}{unit} for a working set. Progressive overload — add small weight each week. Log every session to track your climb.
+                                  </div>
+                                </div>
+                              )}
+                              <button onClick={(e) => {
+                                e.stopPropagation()
+                                setLogForm({ muscle: ex.muscle, exercise: ex.name, weight: '', reps: '', sets: '' })
+                                setTab('log')
+                              }} style={{
+                                width: '100%', background: '#EF4444', border: 'none',
+                                borderRadius: 8, color: '#fff', padding: '11px',
+                                fontSize: 12, fontWeight: 800, letterSpacing: 2,
+                                cursor: 'pointer', fontFamily: 'inherit',
+                              }}>LOG THIS EXERCISE →</button>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+        )}
+
+        {/* ── LOG ── */}
         {tab === 'log' && (
           <div className="slide-in">
             <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 1, marginBottom: 4 }}>LOG A SET</div>
-            <div style={{ fontSize: 13, color: '#64748B', marginBottom: 20, fontFamily: 'Barlow, sans-serif' }}>Record your lifts and rank up.</div>
+            <div style={{ fontSize: 13, color: '#64748B', marginBottom: 20, fontFamily: 'Barlow, sans-serif' }}>
+              Weight in <span style={{ color: '#EF4444', fontWeight: 700 }}>{unit.toUpperCase()}</span> · Toggle top-right to switch
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
@@ -253,9 +552,9 @@ export default function Home() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-                {[['weight', 'WEIGHT (kg)'], ['reps', 'REPS'], ['sets', 'SETS']].map(([field, label]) => (
+                {[['weight', `WEIGHT (${unit})`], ['reps', 'REPS'], ['sets', 'SETS']].map(([field, label]) => (
                   <div key={field}>
-                    <div style={{ fontSize: 10, letterSpacing: 3, color: '#64748B', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
+                    <div style={{ fontSize: 10, letterSpacing: 2, color: '#64748B', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
                     <input type="number" min="0" value={logForm[field]}
                       onChange={e => setLogForm(f => ({ ...f, [field]: e.target.value }))}
                       placeholder="0"
@@ -268,7 +567,7 @@ export default function Home() {
                 <div style={{ background: '#0F1520', border: '1px solid #1A2332', borderRadius: 8, padding: 12, textAlign: 'center' }}>
                   <div style={{ fontSize: 11, color: '#64748B', letterSpacing: 2 }}>ESTIMATED 1RM</div>
                   <div style={{ fontSize: 28, fontWeight: 900, color: '#EF4444' }}>
-                    {Math.round(calc1RM(parseFloat(logForm.weight), parseInt(logForm.reps)))} kg
+                    {Math.round(calc1RM(parseFloat(logForm.weight), parseInt(logForm.reps)))} {unit}
                   </div>
                 </div>
               )}
@@ -294,7 +593,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* HISTORY */}
+        {/* ── HISTORY ── */}
         {tab === 'history' && (
           <div className="slide-in">
             <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 1, marginBottom: 4 }}>HISTORY</div>
@@ -307,7 +606,7 @@ export default function Home() {
                   border: '1px solid ' + (historyFilter === id ? '#EF4444' : '#1A2332'),
                   borderRadius: 20, color: historyFilter === id ? '#fff' : '#64748B',
                   padding: '6px 14px', fontSize: 11, fontWeight: 700, letterSpacing: 1,
-                  cursor: 'pointer', whiteSpace: 'nowrap',
+                  cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
                 }}>{label}</button>
               ))}
             </div>
@@ -323,7 +622,8 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {filtered.map(s => {
                   const mg = MUSCLE_GROUPS.find(m => m.id === s.muscle)
-                  const rm = Math.round(calc1RM(s.weight, s.reps))
+                  const displayW = convertWeight(s.weight, unit)
+                  const rm = Math.round(convertWeight(calc1RM(s.weight, s.reps), unit))
                   const dateStr = new Date(s.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                   return (
                     <div key={s.id} style={{ background: '#0F1520', border: '1px solid #1A2332', borderRadius: 10, padding: '12px 14px' }}>
@@ -333,8 +633,8 @@ export default function Home() {
                           <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{mg?.icon} {mg?.name} · {dateStr}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: 13, fontWeight: 700 }}>{s.weight}kg × {s.reps} × {s.sets}</div>
-                          <div style={{ fontSize: 11, color: '#EF4444' }}>1RM ~{rm}kg</div>
+                          <div style={{ fontSize: 13, fontWeight: 700 }}>{displayW}{unit} × {s.reps} × {s.sets}</div>
+                          <div style={{ fontSize: 11, color: '#EF4444' }}>1RM ~{rm}{unit}</div>
                         </div>
                       </div>
                     </div>
@@ -345,7 +645,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* STATS */}
+        {/* ── STATS ── */}
         {tab === 'stats' && (
           <div className="slide-in">
             <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 1, marginBottom: 4 }}>STATS</div>
@@ -355,6 +655,7 @@ export default function Home() {
               const sessions = byMuscle[mg.id] || []
               const score = scores[mg.id]
               const rank = getRank(score)
+              const next = getNextRank(score)
               if (sessions.length === 0) return (
                 <div key={mg.id} style={{ background: '#0F1520', border: '1px solid #1A2332', borderRadius: 10, padding: 14, marginBottom: 10, opacity: 0.5 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -367,16 +668,17 @@ export default function Home() {
               const totalVol = sessions.reduce((sum, s) => sum + s.weight * s.reps * s.sets, 0)
               const topEx = sessions.reduce((acc, s) => { acc[s.exercise] = (acc[s.exercise] || 0) + 1; return acc }, {})
               const favEx = Object.entries(topEx).sort((a, b) => b[1] - a[1])[0]?.[0]
+              const targetW = next ? Math.round(convertWeight((next.min / 100) * 200, unit)) : null
               return (
                 <div key={mg.id} style={{ background: rank.bg, border: `1px solid ${rank.color}33`, borderRadius: 12, padding: 14, marginBottom: 10 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{mg.icon} {mg.name}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: rank.color }}>{rank.icon} {rank.name}</div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
                     {[
-                      ['Best 1RM', `${Math.round(best1RM)}kg`],
-                      ['Total Vol.', `${Math.round(totalVol / 1000)}k kg`],
+                      ['Best 1RM', `${Math.round(convertWeight(best1RM, unit))}${unit}`],
+                      ['Total Vol.', `${Math.round(convertWeight(totalVol, unit) / 1000)}k`],
                       ['Sessions', sessions.length],
                     ].map(([label, val]) => (
                       <div key={label} style={{ background: '#00000033', borderRadius: 8, padding: '8px 6px', textAlign: 'center' }}>
@@ -385,6 +687,12 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
+                  {next && targetW && (
+                    <div style={{ background: '#00000033', borderRadius: 8, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: 11, color: '#64748B' }}>Target for {next.icon} {next.name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: next.color }}>{targetW}{unit} 1RM</div>
+                    </div>
+                  )}
                   {favEx && <div style={{ marginTop: 8, fontSize: 11, color: '#64748B' }}>Top exercise: <span style={{ color: '#94A3B8' }}>{favEx}</span></div>}
                 </div>
               )
@@ -396,7 +704,7 @@ export default function Home() {
                 {[
                   ['Sessions', workouts.length],
                   ['Total Sets', workouts.reduce((s, w) => s + w.sets, 0)],
-                  ['Volume', `${Math.round(workouts.reduce((s, w) => s + w.weight * w.reps * w.sets, 0) / 1000)}k kg`],
+                  ['Volume', `${Math.round(convertWeight(workouts.reduce((s, w) => s + w.weight * w.reps * w.sets, 0), unit) / 1000)}k ${unit}`],
                   ['Overall Score', Math.round(totalScore)],
                 ].map(([label, val]) => (
                   <div key={label} style={{ background: '#080C10', borderRadius: 8, padding: '12px 10px', textAlign: 'center' }}>
