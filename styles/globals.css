@@ -1,0 +1,19 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: #080C10;
+  color: #E2E8F0;
+  font-family: 'Barlow Condensed', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0F1520; }
+::-webkit-scrollbar-thumb { background: #2D3748; border-radius: 2px; }
+
+input, select, button { font-family: 'Barlow Condensed', sans-serif; }
+input:focus, select:focus { outline: none; border-color: #EF4444 !important; }
