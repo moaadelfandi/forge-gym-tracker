@@ -415,6 +415,7 @@ export default function App() {
   const [authMsg, setAuthMsg]         = useState('')
   const [authLoading, setAuthLoading] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
+  const [pendingUser, setPendingUser]   = useState(null) // user waiting for calibration
 
   const fetchUsers = useCallback(async () => {
     const {data} = await supabase.from('users').select('id,name,goal').order('name')
@@ -437,7 +438,8 @@ export default function App() {
     const id = name.trim().toLowerCase().replace(/\s+/g,'-')+'-'+Date.now()
     const {error} = await supabase.from('users').insert([{id, name:name.trim(), pin, goal}])
     if (error) { setAuthMsg('Error creating account. Try again.'); setAuthLoading(false); return }
-    setCurrentUser({id, name:name.trim(), goal})
+    setPendingUser({id, name:name.trim(), goal})
+    setScreen('calibrate')
     setAuthLoading(false)
   }
 
@@ -457,7 +459,8 @@ export default function App() {
     setAuthMsg(''); setSelectedUser(null)
   }
 
-  if (screen==='app' && currentUser) return <MainApp currentUser={currentUser} onLogout={handleLogout} allUsers={users} />
+  if (screen==='app' && currentUser) return <MainApp currentUser={currentUser} onLogout={handleLogout} allUsers={users} onRecalibrate={()=>{ setPendingUser(currentUser); setScreen('calibrate') }} />
+  if (screen==='calibrate' && pendingUser) return <CalibrationScreen user={pendingUser} onDone={(user)=>{ setCurrentUser(user); setPendingUser(null) }} onSkip={(user)=>{ setCurrentUser(user); setPendingUser(null) }} />
 
   return (
     <div style={{minHeight:'100vh',background:'#080C10',color:'#E2E8F0',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,fontFamily:'Barlow Condensed, sans-serif'}}>
@@ -564,9 +567,154 @@ export default function App() {
   )
 }
 
+
+// ─── Calibration Screen ───────────────────────────────────────────────────────
+
+function CalibrationScreen({ user, onDone, onSkip }) {
+  const [lifts, setLifts]       = useState({})
+  const [saving, setSaving]     = useState(false)
+  const [step, setStep]         = useState(0) // 0 = intro, 1 = inputs, 2 = done
+  const unit = 'kg' // use kg internally, shown as kg for now
+
+  // Representative exercise per muscle for calibration
+  const CALIB_EXERCISES = [
+    { muscle:'chest',     name:'Bench Press',     placeholder:'e.g. 80' },
+    { muscle:'back',      name:'Deadlift',         placeholder:'e.g. 100' },
+    { muscle:'legs',      name:'Squat',            placeholder:'e.g. 90' },
+    { muscle:'shoulders', name:'Overhead Press',   placeholder:'e.g. 60' },
+    { muscle:'arms',      name:'Barbell Curl',     placeholder:'e.g. 40' },
+    { muscle:'core',      name:'Hanging Leg Raise',placeholder:'reps only' },
+  ]
+
+  async function handleSave() {
+    setSaving(true)
+    const entries = Object.entries(lifts).filter(([,v])=>v && parseFloat(v) > 0)
+    if (entries.length > 0) {
+      const rows = entries.map(([muscle, weight]) => {
+        const ex = CALIB_EXERCISES.find(e=>e.muscle===muscle)
+        // Store as a calibration entry with reps=1 (so 1RM = weight entered)
+        return {
+          user_id: user.id,
+          muscle,
+          exercise: ex?.name || muscle,
+          weight: parseFloat(weight),
+          reps: 1,
+          sets: 1,
+        }
+      })
+      await supabase.from('workouts').insert(rows)
+    }
+    setSaving(false)
+    onDone(user)
+  }
+
+  const S2 = {
+    input: { width:'100%', background:'#080C10', border:'1px solid #1A2332', borderRadius:8, color:'#E2E8F0', padding:'12px 14px', fontSize:18, fontWeight:700, fontFamily:'Barlow Condensed, sans-serif', textAlign:'center' },
+  }
+
+  if (step === 0) return (
+    <div style={{minHeight:'100vh',background:'#080C10',color:'#E2E8F0',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,fontFamily:'Barlow Condensed, sans-serif'}}>
+      <style>{`*{box-sizing:border-box;margin:0;padding:0;}.btn{transition:all 0.2s;cursor:pointer;}.btn:hover:not(:disabled){filter:brightness(1.1);}`}</style>
+      <div style={{width:'100%',maxWidth:400,textAlign:'center'}}>
+        <div style={{fontSize:48,marginBottom:16}}>🏋️</div>
+        <div style={{fontSize:11,letterSpacing:4,color:'#EF4444',fontWeight:700,marginBottom:8}}>WELCOME TO FORGE</div>
+        <div style={{fontSize:28,fontWeight:900,marginBottom:16}}>Hey {user.name}!</div>
+        <div style={{fontSize:14,color:'#94A3B8',fontFamily:'Barlow,sans-serif',lineHeight:1.7,marginBottom:28}}>
+          Have you been training before? We can set your starting rank based on where you actually are — not start everyone at Beginner.
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          <button className="btn" onClick={()=>setStep(1)} style={{background:'linear-gradient(135deg,#EF4444,#DC2626)',border:'none',borderRadius:10,color:'#fff',padding:16,fontSize:15,fontWeight:800,letterSpacing:2,fontFamily:'inherit'}}>
+            YES, SET MY STARTING RANK
+          </button>
+          <button className="btn" onClick={()=>onSkip(user)} style={{background:'transparent',border:'1px solid #1A2332',borderRadius:10,color:'#64748B',padding:14,fontSize:13,fontWeight:700,letterSpacing:2,fontFamily:'inherit'}}>
+            I'M NEW — START FROM SCRATCH
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <div style={{minHeight:'100vh',background:'#080C10',color:'#E2E8F0',fontFamily:'Barlow Condensed, sans-serif',paddingBottom:40}}>
+      <style>{`*{box-sizing:border-box;margin:0;padding:0;}input{outline:none;font-family:'Barlow Condensed',sans-serif;}input:focus{border-color:#EF4444!important;}.btn{transition:all 0.2s;cursor:pointer;}.btn:hover:not(:disabled){filter:brightness(1.1);}.btn:disabled{opacity:.6;cursor:not-allowed;}`}</style>
+
+      {/* Header */}
+      <div style={{background:'linear-gradient(180deg,#0F1520 0%,#080C10 100%)',borderBottom:'1px solid #1A2332',padding:'20px 20px 16px'}}>
+        <div style={{fontSize:11,letterSpacing:4,color:'#EF4444',fontWeight:700,marginBottom:4}}>CALIBRATION</div>
+        <div style={{fontSize:24,fontWeight:900,lineHeight:1.1}}>Set Your Starting Rank</div>
+        <div style={{fontSize:13,color:'#64748B',marginTop:4,fontFamily:'Barlow,sans-serif'}}>Enter your current best working weight for each lift. Skip any you don't know.</div>
+      </div>
+
+      <div style={{padding:'20px 16px'}}>
+        {/* Info card */}
+        <div style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:12,padding:14,marginBottom:20}}>
+          <div style={{fontSize:11,color:'#EF4444',letterSpacing:2,textTransform:'uppercase',marginBottom:6}}>How this works</div>
+          <div style={{fontSize:13,color:'#94A3B8',fontFamily:'Barlow,sans-serif',lineHeight:1.6}}>
+            Enter the weight you can currently lift for a solid working set (the weight you normally train with, not your absolute max). We'll use this to calculate your 1RM and assign your rank. Leave blank to start from scratch on that muscle.
+          </div>
+        </div>
+
+        {/* Lift inputs */}
+        <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:20}}>
+          {CALIB_EXERCISES.map(ex => {
+            const mg = MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+            const val = lifts[ex.muscle] || ''
+            // Live rank preview
+            const est1RM = val ? calc1RM(parseFloat(val), 5) : 0 // assume 5 reps for working weight
+            const previewScore = est1RM > 0 ? Math.min((est1RM/200)*100*0.6 + Math.min((parseFloat(val)*5*3/10000)*100,100)*0.4, 100) : 0
+            const previewRank = getRank(previewScore)
+            return (
+              <div key={ex.muscle} style={{background:'#0F1520',border:`1px solid ${val ? previewRank.color+'44' : '#1A2332'}`,borderRadius:12,padding:14,transition:'border-color 0.3s'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                  <div>
+                    <div style={{fontSize:15,fontWeight:700}}>{mg?.icon} {mg?.name}</div>
+                    <div style={{fontSize:11,color:'#64748B'}}>{ex.name}</div>
+                  </div>
+                  {val ? (
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontSize:13,fontWeight:800,color:previewRank.color}}>{previewRank.icon} {previewRank.name}</div>
+                      <div style={{fontSize:10,color:'#64748B'}}>starting rank</div>
+                    </div>
+                  ) : (
+                    <div style={{fontSize:11,color:'#475569'}}>◈ Beginner</div>
+                  )}
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:8,alignItems:'center'}}>
+                  <input
+                    type="number" min="0" inputMode="decimal"
+                    placeholder={ex.placeholder}
+                    value={val}
+                    onChange={e=>setLifts(l=>({...l,[ex.muscle]:e.target.value}))}
+                    style={{...S2.input}}
+                  />
+                  <div style={{fontSize:12,color:'#475569',fontWeight:700,whiteSpace:'nowrap'}}>kg</div>
+                </div>
+                {val && (
+                  <div style={{marginTop:8,fontSize:11,color:'#64748B'}}>
+                    Est. 1RM: <span style={{color:previewRank.color,fontWeight:700}}>{Math.round(est1RM)}kg</span>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          <button className="btn" onClick={handleSave} disabled={saving} style={{background:'linear-gradient(135deg,#EF4444,#DC2626)',border:'none',borderRadius:10,color:'#fff',padding:16,fontSize:15,fontWeight:800,letterSpacing:2,fontFamily:'inherit'}}>
+            {saving ? '...' : 'SAVE & START'}
+          </button>
+          <button className="btn" onClick={()=>onSkip(user)} style={{background:'transparent',border:'none',color:'#475569',padding:10,fontSize:12,fontWeight:700,letterSpacing:1,fontFamily:'inherit'}}>
+            Skip — I'll log naturally
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 
-function MainApp({currentUser, onLogout, allUsers}) {
+function MainApp({currentUser, onLogout, allUsers, onRecalibrate}) {
   const [tab,setTab]               = useState('dashboard')
   const [workouts,setWorkouts]     = useState([])
   const [allWorkouts,setAllWorkouts] = useState([]) // for leaderboard
@@ -1185,6 +1333,17 @@ function MainApp({currentUser, onLogout, allUsers}) {
                 <span style={{fontSize:12,color:'#64748B'}}>Total workouts logged</span>
                 <span style={{fontSize:16,fontWeight:800,color:'#E2E8F0'}}>{workouts.length}</span>
               </div>
+            </div>
+
+            {/* Recalibrate */}
+            <div style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:12,padding:16,marginBottom:12}}>
+              <div style={{fontSize:10,color:'#64748B',letterSpacing:3,textTransform:'uppercase',marginBottom:8}}>Starting Rank</div>
+              <div style={{fontSize:13,color:'#94A3B8',fontFamily:'Barlow,sans-serif',marginBottom:14,lineHeight:1.5}}>
+                Already been training? Set your starting rank based on your current lifts so the leaderboard reflects where you actually are.
+              </div>
+              <button onClick={onRecalibrate} style={{width:'100%',background:'transparent',border:'1px solid #3B82F6',borderRadius:8,color:'#3B82F6',padding:12,fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'inherit'}}>
+                ◉ RECALIBRATE MY RANK
+              </button>
             </div>
 
             {/* Delete account */}
