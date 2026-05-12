@@ -321,6 +321,43 @@ const PLANS = {
   },
 }
 
+
+// ─── Adaptive plan based on training days selected ───────────────────────────
+// Each goal has full day templates. We pick which days to include based on
+// how many training days the user selected (1-7), using smart splits:
+// 1 day  → Full Body
+// 2 days → Upper / Lower
+// 3 days → Push / Pull / Legs
+// 4 days → Push / Pull / Legs / Upper
+// 5 days → Push / Pull / Legs / Upper / Lower
+// 6 days → Push / Pull / Legs / Push / Pull / Legs
+// 7 days → all 4 + extra Upper/Lower/Full
+// We achieve this by mapping day counts to indices into the plan's day array,
+// and for goals that only have 4 days we cycle/repeat intelligently.
+
+function getActiveDays(planDays, numSelected) {
+  const total = planDays.length
+  if (numSelected <= 0) return []
+  if (numSelected >= total) {
+    // repeat the cycle if user picks more days than plan has
+    const result = []
+    for (let i = 0; i < numSelected; i++) result.push({...planDays[i % total], day: `Day ${i+1}`})
+    return result
+  }
+  // Smart selection: spread evenly across the plan
+  const indices = {
+    1: [0],
+    2: [0, 1],
+    3: [0, 1, 2],
+    4: [0, 1, 2, 3],
+    5: [0, 1, 2, 3, 1],
+    6: [0, 1, 2, 0, 1, 2],
+    7: [0, 1, 2, 3, 0, 1, 2],
+  }
+  const picks = (indices[numSelected] || Array.from({length:numSelected},(_,i)=>i%total))
+  return picks.map((idx, i) => ({...planDays[idx], day: `Day ${i+1}`}))
+}
+
 const DAYS_OF_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 const AVATAR_COLORS = ['#EF4444','#F59E0B','#10B981','#3B82F6','#8B5CF6','#EC4899','#06B6D4','#84CC16']
 
@@ -355,8 +392,8 @@ function avatarColor(name) {
 const SETTINGS_KEY = 'forge_settings_v2'
 const SESSION_KEY  = 'forge_session_v1'
 function loadSettings() {
-  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {unit:'kg',trainingDays:['Mon','Tue','Thu','Fri']} }
-  catch { return {unit:'kg',trainingDays:['Mon','Tue','Thu','Fri']} }
+  try { const s = JSON.parse(localStorage.getItem(SETTINGS_KEY)); return s ? {...{unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false},...s} : {unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false} }
+  catch { return {unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false} }
 }
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || null }
@@ -603,6 +640,12 @@ function MainApp({currentUser, onLogout, allUsers}) {
 
   const unit = settings.unit
   const plan = PLANS[currentUser.goal||'general']
+  const numTrainingDays = settings.trainingDays.length || 4
+  const activePlanDays  = getActiveDays(plan.days, numTrainingDays)
+  const splitLabel = {1:'1-day Full Body',2:'2-day Upper/Lower',3:'3-day Push/Pull/Legs',4:'4-day split',5:'5-day split',6:'6-day split',7:'7-day split'}[numTrainingDays] || `${numTrainingDays}-day split`
+  // Keep planDay in bounds when number of training days changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(()=>{ if(planDay >= activePlanDays.length) setPlanDay(0) },[numTrainingDays])
 
   const byMuscle = MUSCLE_GROUPS.reduce((acc,mg)=>({...acc,[mg.id]:workouts.filter(w=>w.muscle===mg.id)}),{})
   const scores   = MUSCLE_GROUPS.reduce((acc,mg)=>({...acc,[mg.id]:calcScore(byMuscle[mg.id])}),{})
@@ -733,101 +776,168 @@ function MainApp({currentUser, onLogout, allUsers}) {
         {tab==='plan'&&(
           <div className="si">
             <div style={{fontSize:22,fontWeight:900,letterSpacing:1,marginBottom:2}}>{plan.title}</div>
-            <div style={{fontSize:13,color:'#64748B',marginBottom:16,fontFamily:'Barlow,sans-serif'}}>{plan.subtitle}</div>
+            <div style={{fontSize:13,color:'#64748B',marginBottom:16,fontFamily:'Barlow,sans-serif'}}>
+              {settings.ownSplit ? 'Your own split · rank targets below' : `${splitLabel} · ${settings.trainingDays.length} days selected`}
+            </div>
 
+            {/* Own split toggle */}
             <div style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:12,padding:14,marginBottom:16}}>
-              <div style={{fontSize:10,color:'#64748B',letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Your Training Days</div>
-              <div style={{display:'flex',gap:5}}>
-                {DAYS_OF_WEEK.map(day=>{
-                  const active=settings.trainingDays.includes(day)
-                  return <button key={day} className="db" onClick={()=>setSettings(s=>{const days=s.trainingDays.includes(day)?s.trainingDays.filter(d=>d!==day):[...s.trainingDays,day];return{...s,trainingDays:days}})} style={{flex:1,padding:'8px 2px',border:`1px solid ${active?'#EF4444':'#1A2332'}`,borderRadius:8,background:active?'#EF444422':'transparent',color:active?'#EF4444':'#475569',fontSize:10,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>{day}</button>
-                })}
-              </div>
-              <div style={{fontSize:11,color:'#475569',marginTop:8}}>{settings.trainingDays.length} days · tap to toggle</div>
-            </div>
-
-            <div style={{display:'flex',gap:8,marginBottom:16,overflowX:'auto',paddingBottom:4}}>
-              {plan.days.map((d,i)=>(
-                <button key={i} className="db" onClick={()=>{setPlanDay(i);setExpandedEx(null)}} style={{padding:'8px 14px',border:`1px solid ${planDay===i?'#EF4444':'#1A2332'}`,borderRadius:20,background:planDay===i?'#EF4444':'#0F1520',color:planDay===i?'#fff':'#64748B',fontSize:11,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>{d.day}: {d.label}</button>
-              ))}
-            </div>
-
-            {(()=>{
-              const d=plan.days[planDay], assignedDay=sortedTrainingDays[planDay]
-              return (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <div>
-                  <div style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:12,padding:16,marginBottom:12}}>
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
-                      <div>
-                        <div style={{fontSize:24,fontWeight:900}}>{d.label}</div>
-                        <div style={{fontSize:12,color:'#64748B'}}>{d.focus}</div>
-                      </div>
-                      {assignedDay&&<div style={{background:'#EF444422',border:'1px solid #EF444444',borderRadius:8,padding:'4px 12px',fontSize:12,color:'#EF4444',fontWeight:700}}>{assignedDay}</div>}
-                    </div>
-                    <div style={{background:'#080C10',borderRadius:8,padding:12,borderLeft:'3px solid #EF4444'}}>
-                      <div style={{fontSize:10,color:'#EF4444',letterSpacing:2,textTransform:'uppercase',marginBottom:4}}>Tip</div>
-                      <div style={{fontSize:12,color:'#94A3B8',fontFamily:'Barlow,sans-serif',lineHeight:1.6}}>{d.tip}</div>
-                    </div>
-                  </div>
+                  <div style={{fontSize:13,fontWeight:700}}>I have my own split</div>
+                  <div style={{fontSize:11,color:'#475569',fontFamily:'Barlow,sans-serif',marginTop:2}}>Just show me rank targets, not a program</div>
+                </div>
+                <button className="tog" onClick={()=>setSettings(s=>({...s,ownSplit:!s.ownSplit}))} style={{
+                  width:48,height:26,borderRadius:13,border:'none',cursor:'pointer',position:'relative',
+                  background:settings.ownSplit?'#EF4444':'#1A2332',transition:'background 0.2s',flexShrink:0,
+                }}>
+                  <div style={{position:'absolute',top:3,left:settings.ownSplit?24:4,width:20,height:20,borderRadius:10,background:'#fff',transition:'left 0.2s'}} />
+                </button>
+              </div>
+            </div>
 
-                  <div style={{fontSize:10,color:'#64748B',letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Exercises — tap to expand</div>
-                  <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                    {d.exercises.map((ex,i)=>{
-                      const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
-                      const muscleScore=scores[ex.muscle],rank=getRank(muscleScore),next=getNextRank(muscleScore)
-                      const sessions=byMuscle[ex.muscle]||[]
-                      const best1RM=sessions.length>0?Math.max(...sessions.map(s=>calc1RM(s.weight,s.reps))):0
-                      const targetW=next?Math.round(convertWeight((next.min/100)*200*0.75,unit)):null
-                      const isExp=expandedEx===`${planDay}-${i}`
-                      return (
-                        <div key={i} className="ec" onClick={()=>setExpandedEx(isExp?null:`${planDay}-${i}`)} style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:10,overflow:'hidden'}}>
-                          <div style={{padding:'12px 14px'}}>
-                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                              <div style={{flex:1}}>
-                                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:3}}>
-                                  <span style={{fontSize:12,color:'#475569',fontWeight:700}}>{i+1}</span>
-                                  <span style={{fontSize:15,fontWeight:700}}>{ex.name}</span>
-                                </div>
-                                <div style={{fontSize:11,color:'#64748B'}}>{mg?.icon} {mg?.name} · {ex.sets}×{ex.reps}</div>
-                              </div>
-                              <div style={{textAlign:'right',marginLeft:8}}>
-                                <div style={{fontSize:11,color:rank.color,fontWeight:700}}>{rank.icon} {rank.name}</div>
-                                <div style={{fontSize:11,color:'#475569',marginTop:2}}>{isExp?'▲':'▼'}</div>
-                              </div>
-                            </div>
-                          </div>
-                          {isExp&&(
-                            <div style={{borderTop:'1px solid #1A2332',padding:14,background:'#080C10'}}>
-                              <div style={{fontSize:12,color:'#94A3B8',fontFamily:'Barlow,sans-serif',marginBottom:12,lineHeight:1.6}}>💡 {ex.note}</div>
-                              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
-                                <div style={{background:'#0F1520',borderRadius:8,padding:10,textAlign:'center'}}>
-                                  <div style={{fontSize:10,color:'#64748B',marginBottom:4}}>YOUR BEST 1RM</div>
-                                  <div style={{fontSize:20,fontWeight:800,color:rank.color}}>{best1RM>0?`${Math.round(convertWeight(best1RM,unit))}${unit}`:'—'}</div>
-                                </div>
-                                <div style={{background:'#0F1520',borderRadius:8,padding:10,textAlign:'center'}}>
-                                  <div style={{fontSize:10,color:'#64748B',marginBottom:4}}>TARGET TO RANK UP</div>
-                                  <div style={{fontSize:20,fontWeight:800,color:next?'#EF4444':'#F59E0B'}}>{next&&targetW?`${targetW}${unit}`:'🏆 MAX'}</div>
-                                </div>
-                              </div>
-                              {next&&targetW&&(
-                                <div style={{background:'#0F1520',borderRadius:8,padding:12,borderLeft:`3px solid ${next.color}`,marginBottom:10}}>
-                                  <div style={{fontSize:11,color:next.color,fontWeight:700,marginBottom:4}}>To reach {next.icon} {next.name}:</div>
-                                  <div style={{fontSize:12,color:'#94A3B8',fontFamily:'Barlow,sans-serif',lineHeight:1.5}}>Work up to ~{targetW}{unit} for a working set. Log every session to track progress.</div>
-                                </div>
-                              )}
-                              <button onClick={e=>{e.stopPropagation();setLogForm({muscle:ex.muscle,exercise:ex.name,weight:'',reps:'',sets:''});setTab('log')}} style={{width:'100%',background:'#EF4444',border:'none',borderRadius:8,color:'#fff',padding:11,fontSize:12,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:'inherit'}}>LOG THIS EXERCISE →</button>
-                            </div>
-                          )}
+            {settings.ownSplit ? (
+              /* ── OWN SPLIT MODE: just show rank targets per muscle ── */
+              <div>
+                <div style={{fontSize:10,color:'#64748B',letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Rank Targets — What to hit next</div>
+                <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                  {MUSCLE_GROUPS.map(mg=>{
+                    const muscleScore = scores[mg.id]
+                    const rank  = getRank(muscleScore)
+                    const next  = getNextRank(muscleScore)
+                    const sessions = byMuscle[mg.id]||[]
+                    const best1RM  = sessions.length>0 ? Math.max(...sessions.map(s=>calc1RM(s.weight,s.reps))) : 0
+                    const targetW  = next ? Math.round(convertWeight((next.min/100)*200*0.75, unit)) : null
+                    const pct = next ? ((muscleScore-rank.min)/(next.min-rank.min))*100 : 100
+                    return (
+                      <div key={mg.id} style={{background:rank.bg,border:`1px solid ${rank.color}33`,borderRadius:12,padding:14}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                          <div style={{fontSize:16,fontWeight:800}}>{mg.icon} {mg.name}</div>
+                          <div style={{fontSize:14,fontWeight:700,color:rank.color}}>{rank.icon} {rank.name}</div>
                         </div>
-                      )
+                        <div style={{background:'#00000033',borderRadius:3,height:4,overflow:'hidden',marginBottom:10}}>
+                          <div style={{height:'100%',width:`${pct}%`,background:rank.color,borderRadius:3,transition:'width 1s ease'}} />
+                        </div>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom: next ? 10 : 0}}>
+                          <div style={{background:'#00000033',borderRadius:8,padding:'8px 6px',textAlign:'center'}}>
+                            <div style={{fontSize:10,color:'#64748B',letterSpacing:1,marginBottom:2}}>YOUR BEST 1RM</div>
+                            <div style={{fontSize:18,fontWeight:800,color:rank.color}}>{best1RM>0?`${Math.round(convertWeight(best1RM,unit))}${unit}`:'—'}</div>
+                          </div>
+                          <div style={{background:'#00000033',borderRadius:8,padding:'8px 6px',textAlign:'center'}}>
+                            <div style={{fontSize:10,color:'#64748B',letterSpacing:1,marginBottom:2}}>TARGET TO RANK UP</div>
+                            <div style={{fontSize:18,fontWeight:800,color:next?'#EF4444':'#F59E0B'}}>{next&&targetW?`${targetW}${unit}`:'🏆 MAX'}</div>
+                          </div>
+                        </div>
+                        {next&&targetW&&(
+                          <div style={{background:'#00000033',borderRadius:8,padding:'8px 10px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            <div style={{fontSize:11,color:'#64748B'}}>Next: {next.icon} {next.name}</div>
+                            <button onClick={()=>{setLogForm(f=>({...f,muscle:mg.id,exercise:''}));setTab('log')}} style={{background:'#EF4444',border:'none',borderRadius:6,color:'#fff',padding:'4px 10px',fontSize:10,fontWeight:800,letterSpacing:1,cursor:'pointer',fontFamily:'inherit'}}>LOG →</button>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : (
+              /* ── GUIDED PLAN MODE ── */
+              <div>
+                <div style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:12,padding:14,marginBottom:16}}>
+                  <div style={{fontSize:10,color:'#64748B',letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Your Training Days</div>
+                  <div style={{display:'flex',gap:5}}>
+                    {DAYS_OF_WEEK.map(day=>{
+                      const active=settings.trainingDays.includes(day)
+                      return <button key={day} className="db" onClick={()=>setSettings(s=>{const days=s.trainingDays.includes(day)?s.trainingDays.filter(d=>d!==day):[...s.trainingDays,day];return{...s,trainingDays:days}})} style={{flex:1,padding:'8px 2px',border:`1px solid ${active?'#EF4444':'#1A2332'}`,borderRadius:8,background:active?'#EF444422':'transparent',color:active?'#EF4444':'#475569',fontSize:10,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>{day}</button>
                     })}
                   </div>
+                  <div style={{fontSize:11,color:'#475569',marginTop:8}}>{settings.trainingDays.length} days · tap to toggle</div>
                 </div>
-              )
-            })()}
+
+                <div style={{display:'flex',gap:8,marginBottom:16,overflowX:'auto',paddingBottom:4}}>
+                  {activePlanDays.map((d,i)=>(
+                    <button key={i} className="db" onClick={()=>{setPlanDay(i);setExpandedEx(null)}} style={{padding:'8px 14px',border:`1px solid ${planDay===i?'#EF4444':'#1A2332'}`,borderRadius:20,background:planDay===i?'#EF4444':'#0F1520',color:planDay===i?'#fff':'#64748B',fontSize:11,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>{d.day}: {d.label}</button>
+                  ))}
+                </div>
+
+                {(()=>{
+                  const d=activePlanDays[planDay]||activePlanDays[0], assignedDay=sortedTrainingDays[planDay]
+                  return (
+                    <div>
+                      <div style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:12,padding:16,marginBottom:12}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
+                          <div>
+                            <div style={{fontSize:24,fontWeight:900}}>{d.label}</div>
+                            <div style={{fontSize:12,color:'#64748B'}}>{d.focus}</div>
+                          </div>
+                          {assignedDay&&<div style={{background:'#EF444422',border:'1px solid #EF444444',borderRadius:8,padding:'4px 12px',fontSize:12,color:'#EF4444',fontWeight:700}}>{assignedDay}</div>}
+                        </div>
+                        <div style={{background:'#080C10',borderRadius:8,padding:12,borderLeft:'3px solid #EF4444'}}>
+                          <div style={{fontSize:10,color:'#EF4444',letterSpacing:2,textTransform:'uppercase',marginBottom:4}}>Tip</div>
+                          <div style={{fontSize:12,color:'#94A3B8',fontFamily:'Barlow,sans-serif',lineHeight:1.6}}>{d.tip}</div>
+                        </div>
+                      </div>
+
+                      <div style={{fontSize:10,color:'#64748B',letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Exercises — tap to expand</div>
+                      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                        {d.exercises.map((ex,i)=>{
+                          const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+                          const muscleScore=scores[ex.muscle],rank=getRank(muscleScore),next=getNextRank(muscleScore)
+                          const sessions=byMuscle[ex.muscle]||[]
+                          const best1RM=sessions.length>0?Math.max(...sessions.map(s=>calc1RM(s.weight,s.reps))):0
+                          const targetW=next?Math.round(convertWeight((next.min/100)*200*0.75,unit)):null
+                          const isExp=expandedEx===`${planDay}-${i}`
+                          return (
+                            <div key={i} className="ec" onClick={()=>setExpandedEx(isExp?null:`${planDay}-${i}`)} style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:10,overflow:'hidden'}}>
+                              <div style={{padding:'12px 14px'}}>
+                                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                                  <div style={{flex:1}}>
+                                    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:3}}>
+                                      <span style={{fontSize:12,color:'#475569',fontWeight:700}}>{i+1}</span>
+                                      <span style={{fontSize:15,fontWeight:700}}>{ex.name}</span>
+                                    </div>
+                                    <div style={{fontSize:11,color:'#64748B'}}>{mg?.icon} {mg?.name} · {ex.sets}×{ex.reps}</div>
+                                  </div>
+                                  <div style={{textAlign:'right',marginLeft:8}}>
+                                    <div style={{fontSize:11,color:rank.color,fontWeight:700}}>{rank.icon} {rank.name}</div>
+                                    <div style={{fontSize:11,color:'#475569',marginTop:2}}>{isExp?'▲':'▼'}</div>
+                                  </div>
+                                </div>
+                              </div>
+                              {isExp&&(
+                                <div style={{borderTop:'1px solid #1A2332',padding:14,background:'#080C10'}}>
+                                  <div style={{fontSize:12,color:'#94A3B8',fontFamily:'Barlow,sans-serif',marginBottom:12,lineHeight:1.6}}>💡 {ex.note}</div>
+                                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
+                                    <div style={{background:'#0F1520',borderRadius:8,padding:10,textAlign:'center'}}>
+                                      <div style={{fontSize:10,color:'#64748B',marginBottom:4}}>YOUR BEST 1RM</div>
+                                      <div style={{fontSize:20,fontWeight:800,color:rank.color}}>{best1RM>0?`${Math.round(convertWeight(best1RM,unit))}${unit}`:'—'}</div>
+                                    </div>
+                                    <div style={{background:'#0F1520',borderRadius:8,padding:10,textAlign:'center'}}>
+                                      <div style={{fontSize:10,color:'#64748B',marginBottom:4}}>TARGET TO RANK UP</div>
+                                      <div style={{fontSize:20,fontWeight:800,color:next?'#EF4444':'#F59E0B'}}>{next&&targetW?`${targetW}${unit}`:'🏆 MAX'}</div>
+                                    </div>
+                                  </div>
+                                  {next&&targetW&&(
+                                    <div style={{background:'#0F1520',borderRadius:8,padding:12,borderLeft:`3px solid ${next.color}`,marginBottom:10}}>
+                                      <div style={{fontSize:11,color:next.color,fontWeight:700,marginBottom:4}}>To reach {next.icon} {next.name}:</div>
+                                      <div style={{fontSize:12,color:'#94A3B8',fontFamily:'Barlow,sans-serif',lineHeight:1.5}}>Work up to ~{targetW}{unit} for a working set. Log every session to track progress.</div>
+                                    </div>
+                                  )}
+                                  <button onClick={e=>{e.stopPropagation();setLogForm({muscle:ex.muscle,exercise:ex.name,weight:'',reps:'',sets:''});setTab('log')}} style={{width:'100%',background:'#EF4444',border:'none',borderRadius:8,color:'#fff',padding:11,fontSize:12,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:'inherit'}}>LOG THIS EXERCISE →</button>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+            )}
           </div>
         )}
 
+        {/* LOG */}
         {/* LOG */}
         {tab==='log'&&(
           <div className="si">
