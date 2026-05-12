@@ -542,6 +542,10 @@ function MainApp({currentUser, onLogout, allUsers}) {
   const [settings,setSettings]     = useState(loadSettings)
   const [planDay,setPlanDay]       = useState(0)
   const [expandedEx,setExpandedEx] = useState(null)
+  const [deletePin,setDeletePin]   = useState('')
+  const [deleteMsg,setDeleteMsg]   = useState('')
+  const [deleteLoading,setDeleteLoading] = useState(false)
+  const [showDeleteConfirm,setShowDeleteConfirm] = useState(false)
 
   useEffect(()=>{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings))},[settings])
 
@@ -580,6 +584,21 @@ function MainApp({currentUser, onLogout, allUsers}) {
     }
     setLogLoading(false)
     setTimeout(()=>setLogMsg(''),4000)
+  }
+
+
+  async function handleDeleteAccount() {
+    if (!deletePin) { setDeleteMsg('Enter your PIN to confirm.'); return }
+    setDeleteLoading(true)
+    // Verify PIN first
+    const {data, error} = await supabase.from('users').select('id').eq('id', currentUser.id).eq('pin', deletePin).single()
+    if (error || !data) { setDeleteMsg('Wrong PIN. Try again.'); setDeleteLoading(false); return }
+    // Delete all workouts for this user
+    await supabase.from('workouts').delete().eq('user_id', currentUser.id)
+    // Delete user account
+    await supabase.from('users').delete().eq('id', currentUser.id)
+    setDeleteLoading(false)
+    onLogout()
   }
 
   const unit = settings.unit
@@ -657,7 +676,7 @@ function MainApp({currentUser, onLogout, allUsers}) {
           </div>
         )}
         <div style={{display:'flex',overflowX:'auto'}}>
-          {[['dashboard','RANKS'],['plan','PLAN'],['log','LOG'],['history','HIST'],['stats','STATS'],['leaderboard','🏆']].map(([id,label])=>(
+          {[['dashboard','RANKS'],['plan','PLAN'],['log','LOG'],['history','HIST'],['stats','STATS'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
             <button key={id} className="tb" onClick={()=>setTab(id)} style={{
               flex:'0 0 auto',padding:'10px 12px',border:'none',cursor:'pointer',
               fontSize:10,fontWeight:700,letterSpacing:1.5,fontFamily:'inherit',
@@ -1033,6 +1052,63 @@ function MainApp({currentUser, onLogout, allUsers}) {
                 })}
               </>
             )}
+          </div>
+        )}
+
+        {/* SETTINGS */}
+        {tab==='settings'&&(
+          <div className="si">
+            <div style={{fontSize:22,fontWeight:900,letterSpacing:1,marginBottom:2}}>SETTINGS</div>
+            <div style={{fontSize:13,color:'#64748B',marginBottom:20,fontFamily:'Barlow,sans-serif'}}>Manage your account.</div>
+
+            {/* Account info */}
+            <div style={{background:'#0F1520',border:'1px solid #1A2332',borderRadius:12,padding:16,marginBottom:12}}>
+              <div style={{fontSize:10,color:'#64748B',letterSpacing:3,textTransform:'uppercase',marginBottom:12}}>Account</div>
+              <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
+                <div style={{width:48,height:48,borderRadius:24,background:avatarColor(currentUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:900,color:'#fff'}}>{currentUser.name[0].toUpperCase()}</div>
+                <div>
+                  <div style={{fontSize:18,fontWeight:800}}>{currentUser.name}</div>
+                  <div style={{fontSize:12,color:'#64748B'}}>{GOALS.find(g=>g.id===(currentUser.goal||'general'))?.icon} {GOALS.find(g=>g.id===(currentUser.goal||'general'))?.label}</div>
+                </div>
+              </div>
+              <div style={{background:'#080C10',borderRadius:8,padding:'10px 12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <span style={{fontSize:12,color:'#64748B'}}>Total workouts logged</span>
+                <span style={{fontSize:16,fontWeight:800,color:'#E2E8F0'}}>{workouts.length}</span>
+              </div>
+            </div>
+
+            {/* Delete account */}
+            <div style={{background:'#0F1520',border:'1px solid #450A0A',borderRadius:12,padding:16}}>
+              <div style={{fontSize:10,color:'#EF4444',letterSpacing:3,textTransform:'uppercase',marginBottom:8}}>Danger Zone</div>
+              <div style={{fontSize:13,color:'#94A3B8',fontFamily:'Barlow,sans-serif',marginBottom:16,lineHeight:1.5}}>
+                Deleting your account will permanently remove your profile and <strong style={{color:'#E2E8F0'}}>all {workouts.length} workout sessions</strong>. This cannot be undone.
+              </div>
+
+              {!showDeleteConfirm ? (
+                <button onClick={()=>setShowDeleteConfirm(true)} style={{width:'100%',background:'transparent',border:'1px solid #EF4444',borderRadius:8,color:'#EF4444',padding:12,fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'inherit'}}>
+                  DELETE MY ACCOUNT
+                </button>
+              ) : (
+                <div>
+                  <div style={{background:'#450A0A',borderRadius:8,padding:12,marginBottom:12,fontSize:12,color:'#FCA5A5',fontFamily:'Barlow,sans-serif',lineHeight:1.5}}>
+                    ⚠️ This will delete your account and all your workout data permanently.
+                  </div>
+                  <label style={{fontSize:10,letterSpacing:3,color:'#64748B',textTransform:'uppercase',marginBottom:6,display:'block'}}>Confirm with your PIN</label>
+                  <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
+                    value={deletePin} onChange={e=>setDeletePin(e.target.value)}
+                    style={{width:'100%',background:'#080C10',border:'1px solid #EF444466',borderRadius:8,color:'#E2E8F0',padding:'12px 14px',fontSize:22,letterSpacing:8,textAlign:'center',fontFamily:'Barlow Condensed,sans-serif',marginBottom:10}} />
+                  {deleteMsg&&<div style={{color:'#EF4444',fontSize:12,textAlign:'center',marginBottom:10}}>{deleteMsg}</div>}
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                    <button onClick={()=>{setShowDeleteConfirm(false);setDeletePin('');setDeleteMsg('')}} style={{background:'transparent',border:'1px solid #1A2332',borderRadius:8,color:'#64748B',padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>
+                      CANCEL
+                    </button>
+                    <button onClick={handleDeleteAccount} disabled={deleteLoading} style={{background:'#EF4444',border:'none',borderRadius:8,color:'#fff',padding:12,fontSize:13,fontWeight:800,letterSpacing:1,cursor:'pointer',fontFamily:'inherit',opacity:deleteLoading?0.6:1}}>
+                      {deleteLoading ? '...' : 'CONFIRM'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
