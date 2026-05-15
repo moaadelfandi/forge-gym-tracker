@@ -753,6 +753,12 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   const [currentSession,setCurrentSession] = useState([]) // exercises logged this session
   const [chartExercise,setChartExercise] = useState('')
   const [chartMuscle,setChartMuscle]    = useState('chest')
+  const [challenges,setChallenges]       = useState([])
+  const [myParticipations,setMyParticipations] = useState([])
+  const [challengeForm,setChallengeForm] = useState({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30})
+  const [showCreateChallenge,setShowCreateChallenge] = useState(false)
+  const [challengeLoading,setChallengeLoading] = useState(false)
+  const [allUsersWorkouts,setAllUsersWorkouts] = useState([])
   const [bodyWeights,setBodyWeights] = useState([])
   const [bwInput,setBwInput]         = useState('')
   const [bwUnit,setBwUnit]           = useState('kg')
@@ -789,6 +795,37 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
 
   useEffect(()=>{fetchWorkouts()},[fetchWorkouts])
   useEffect(()=>{if(tab==='leaderboard')fetchAllWorkouts()},[tab,fetchAllWorkouts])
+
+  const fetchChallenges = useCallback(async()=>{
+    const{data:ch}=await supabase.from('challenges').select('*').order('created_at',{ascending:false})
+    const{data:pa}=await supabase.from('challenge_participants').select('*').eq('user_id',currentUser.id)
+    const{data:aw}=await supabase.from('workouts').select('user_id,muscle,exercise,weight,reps,sets,created_at')
+    if(ch) setChallenges(ch)
+    if(pa) setMyParticipations(pa)
+    if(aw) setAllUsersWorkouts(aw)
+  },[currentUser.id])
+
+  useEffect(()=>{if(tab==='challenges'||tab==='achievements') fetchChallenges()},[tab,fetchChallenges])
+
+  async function handleJoinChallenge(challengeId){
+    await supabase.from('challenge_participants').insert([{challenge_id:challengeId,user_id:currentUser.id}])
+    fetchChallenges()
+  }
+
+  async function handleCreateChallenge(){
+    const{title,description,muscle,metric,target,days}=challengeForm
+    if(!title.trim()||!target) return
+    setChallengeLoading(true)
+    const endsAt=new Date();endsAt.setDate(endsAt.getDate()+parseInt(days))
+    await supabase.from('challenges').insert([{
+      created_by:currentUser.id,title:title.trim(),description:description.trim(),
+      muscle,metric,target:parseFloat(target),unit,ends_at:endsAt.toISOString()
+    }])
+    setChallengeLoading(false)
+    setShowCreateChallenge(false)
+    setChallengeForm({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30})
+    fetchChallenges()
+  }
 
   const fetchBodyWeights=useCallback(async()=>{
     const{data}=await supabase.from('bodyweight').select('*').eq('user_id',currentUser.id).order('logged_at',{ascending:true})
@@ -905,6 +942,41 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
     return{sessions:lastWeek.length,volume:vol,prs:prs.length,muscles,days:[...new Set(lastWeek.map(w=>new Date(w.created_at).toLocaleDateString('en-US',{weekday:'short'})))]}
   })()
 
+  // ── Achievements ──────────────────────────────────────────────────────────
+  const ACHIEVEMENTS = [
+    // Logging milestones
+    {id:'first_log',    icon:'🌱', name:'First Rep',        desc:'Log your very first set',                  check:()=>workouts.length>=1},
+    {id:'log_10',       icon:'📝', name:'Getting Started',  desc:'Log 10 total sets',                        check:()=>workouts.length>=10},
+    {id:'log_50',       icon:'💪', name:'Consistent',       desc:'Log 50 total sets',                        check:()=>workouts.length>=50},
+    {id:'log_100',      icon:'🔥', name:'Dedicated',        desc:'Log 100 total sets',                       check:()=>workouts.length>=100},
+    {id:'log_250',      icon:'⚡', name:'Obsessed',         desc:'Log 250 total sets',                       check:()=>workouts.length>=250},
+    {id:'log_500',      icon:'👑', name:'Legend Grinder',   desc:'Log 500 total sets',                       check:()=>workouts.length>=500},
+    // Streak
+    {id:'streak_2',     icon:'🔥', name:'On a Roll',        desc:'Train 2 weeks in a row',                   check:()=>trainingStreak>=2},
+    {id:'streak_4',     icon:'💯', name:'Monthly Warrior',  desc:'Train 4 weeks in a row',                   check:()=>trainingStreak>=4},
+    {id:'streak_8',     icon:'🏆', name:'Iron Discipline',  desc:'Train 8 weeks in a row',                   check:()=>trainingStreak>=8},
+    {id:'streak_12',    icon:'🌟', name:'Unstoppable',      desc:'Train 12 weeks in a row',                  check:()=>trainingStreak>=12},
+    // PRs
+    {id:'first_pr',     icon:'⭐', name:'New Heights',      desc:'Set your first personal record',            check:()=>Object.keys(personalRecords).length>=1},
+    {id:'pr_5',         icon:'🌠', name:'PR Machine',       desc:'Set 5 personal records',                   check:()=>Object.keys(personalRecords).length>=5},
+    {id:'pr_10',        icon:'💎', name:'Record Breaker',   desc:'Set 10 personal records',                  check:()=>Object.keys(personalRecords).length>=10},
+    // Rank milestones
+    {id:'rank_novice',  icon:'◆', name:'Novice',            desc:'Reach Novice rank on any muscle',          check:()=>Object.values(scores||{}).some(s=>s>=20)},
+    {id:'rank_inter',   icon:'◉', name:'Intermediate',      desc:'Reach Intermediate on any muscle',         check:()=>Object.values(scores||{}).some(s=>s>=40)},
+    {id:'rank_adv',     icon:'✦', name:'Advanced',          desc:'Reach Advanced on any muscle',             check:()=>Object.values(scores||{}).some(s=>s>=60)},
+    {id:'rank_elite',   icon:'★', name:'Elite',             desc:'Reach Elite on any muscle',                check:()=>Object.values(scores||{}).some(s=>s>=80)},
+    {id:'rank_legend',  icon:'⬡', name:'Legend',            desc:'Reach Legend on any muscle',               check:()=>Object.values(scores||{}).some(s=>s>=95)},
+    {id:'all_novice',   icon:'🎯', name:'Well Rounded',     desc:'Reach Novice on ALL muscle groups',        check:()=>Object.values(scores||{}).every(s=>s>=20)},
+    {id:'all_inter',    icon:'🏅', name:'Complete Athlete', desc:'Reach Intermediate on ALL muscle groups',  check:()=>Object.values(scores||{}).every(s=>s>=40)},
+    // Volume
+    {id:'vol_100k',     icon:'📦', name:'100k Club',        desc:'Lift 100,000kg total volume',              check:()=>workouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)>=100000},
+    {id:'vol_500k',     icon:'🚀', name:'Half Million',     desc:'Lift 500,000kg total volume',              check:()=>workouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)>=500000},
+    // All muscles logged
+    {id:'all_muscles',  icon:'🧬', name:'Full Body',        desc:'Log at least one set for every muscle group', check:()=>MUSCLE_GROUPS.every(mg=>workouts.some(w=>w.muscle===mg.id))},
+  ]
+  const unlockedAchievements = ACHIEVEMENTS.filter(a=>{try{return a.check()}catch{return false}})
+  const lockedAchievements   = ACHIEVEMENTS.filter(a=>{try{return !a.check()}catch{return true}})
+
   const byMuscle=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:workouts.filter(w=>w.muscle===mg.id)}),{})
   const scores=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:calcScore(byMuscle[mg.id])}),{})
   const totalScore=MUSCLE_GROUPS.reduce((s,mg)=>s+scores[mg.id],0)/MUSCLE_GROUPS.length
@@ -993,7 +1065,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
 
         {/* Tabs */}
         <div style={{display:'flex',overflowX:'auto',padding:'0 4px'}}>
-          {[['dashboard','RANKS'],['body','BODY'],['plan','PLAN'],['log','LOG'],['templates','TMPL'],['history','HIST'],['stats','STATS'],['charts','📈'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
+          {[['dashboard','RANKS'],['body','BODY'],['plan','PLAN'],['log','LOG'],['templates','TMPL'],['history','HIST'],['stats','STATS'],['charts','📈'],['achievements','🎖️'],['challenges','⚔️'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
             <button key={id} className="tab-item" onClick={()=>setTab(id)} style={{
               flex:'0 0 auto',padding:'10px 14px',border:'none',cursor:'pointer',
               fontSize:11,fontWeight:700,letterSpacing:1.5,fontFamily:'Rajdhani',
@@ -1828,6 +1900,267 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                 </div>
               )
             })()}
+          </div>
+        )}
+
+
+        {/* ACHIEVEMENTS */}
+        {tab==='achievements'&&(
+          <div className="slide-up">
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>ACHIEVEMENTS</div>
+            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>{unlockedAchievements.length} / {ACHIEVEMENTS.length} unlocked</div>
+
+            {/* Progress bar */}
+            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,marginBottom:20}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                <div style={{fontSize:13,fontWeight:700,color:T.text}}>Overall Progress</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.accent}}>{Math.round(unlockedAchievements.length/ACHIEVEMENTS.length*100)}%</div>
+              </div>
+              <div style={{background:T.bg3,borderRadius:4,height:8,overflow:'hidden',position:'relative'}}>
+                <div className="bar-fill" style={{'--pct':`${unlockedAchievements.length/ACHIEVEMENTS.length*100}%`,height:'100%',background:`linear-gradient(90deg,${T.accent},#F59E0B)`,borderRadius:4}} />
+                <div className="bar-streak" style={{position:'absolute',top:0,width:'40%',height:'100%',background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)'}} />
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginTop:12}}>
+                {[
+                  ['Unlocked',unlockedAchievements.length],
+                  ['Locked',lockedAchievements.length],
+                  ['Streak',`${trainingStreak}w`],
+                  ['PRs',Object.keys(personalRecords).length],
+                ].map(([l,v])=>(
+                  <div key={l} style={{background:T.bg3,borderRadius:8,padding:'6px',textAlign:'center'}}>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text}}>{v}</div>
+                    <div style={{fontSize:9,color:T.text3,letterSpacing:1}}>{l.toUpperCase()}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Unlocked */}
+            {unlockedAchievements.length>0&&(
+              <div style={{marginBottom:20}}>
+                <div style={{fontSize:11,color:'#F59E0B',letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>⭐ Unlocked ({unlockedAchievements.length})</div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                  {unlockedAchievements.map(a=>(
+                    <div key={a.id} className="hover-lift" style={{background:`linear-gradient(135deg,${T.bg2},${T.bg3})`,border:'1px solid #F59E0B44',borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
+                      <div style={{position:'absolute',top:0,left:0,right:0,height:2,background:'linear-gradient(90deg,#F59E0B,transparent)'}} />
+                      <div style={{fontSize:28,marginBottom:6}}>{a.icon}</div>
+                      <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:2}}>{a.name}</div>
+                      <div style={{fontSize:11,color:T.text3,fontFamily:'Inter',lineHeight:1.4}}>{a.desc}</div>
+                      <div style={{position:'absolute',bottom:8,right:10,fontSize:10,color:'#F59E0B',fontWeight:700}}>✓ DONE</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Locked */}
+            {lockedAchievements.length>0&&(
+              <div>
+                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>🔒 Locked ({lockedAchievements.length})</div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                  {lockedAchievements.map(a=>(
+                    <div key={a.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,opacity:0.55}}>
+                      <div style={{fontSize:28,marginBottom:6,filter:'grayscale(1)'}}>{a.icon}</div>
+                      <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:2}}>{a.name}</div>
+                      <div style={{fontSize:11,color:T.text3,fontFamily:'Inter',lineHeight:1.4}}>{a.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+
+        {/* CHALLENGES */}
+        {tab==='challenges'&&(
+          <div className="slide-up">
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>CHALLENGES</div>
+            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>Compete with your gym crew.</div>
+
+            {/* Create button */}
+            {!showCreateChallenge?(
+              <button className="btn-press" onClick={()=>setShowCreateChallenge(true)}
+                style={{width:'100%',background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:14,fontSize:15,fontWeight:700,letterSpacing:3,cursor:'pointer',fontFamily:'Bebas Neue',marginBottom:16}}>
+                + CREATE CHALLENGE
+              </button>
+            ):(
+              <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
+                <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text,marginBottom:14}}>New Challenge</div>
+                <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                  <div>
+                    <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Title</div>
+                    <input placeholder="e.g. Bench Press Battle" value={challengeForm.title}
+                      onChange={e=>setChallengeForm(f=>({...f,title:e.target.value}))}
+                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:15,fontFamily:'Rajdhani'}} />
+                  </div>
+                  <div>
+                    <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Description</div>
+                    <input placeholder="e.g. Who hits the highest 1RM?" value={challengeForm.description}
+                      onChange={e=>setChallengeForm(f=>({...f,description:e.target.value}))}
+                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:15,fontFamily:'Rajdhani'}} />
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                    <div>
+                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Muscle</div>
+                      <select value={challengeForm.muscle} onChange={e=>setChallengeForm(f=>({...f,muscle:e.target.value}))}
+                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
+                        {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Metric</div>
+                      <select value={challengeForm.metric} onChange={e=>setChallengeForm(f=>({...f,metric:e.target.value}))}
+                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
+                        <option value="1rm">Best 1RM</option>
+                        <option value="volume">Total Volume</option>
+                        <option value="sessions">Most Sessions</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                    <div>
+                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Target ({unit})</div>
+                      <input type="number" min="0" placeholder="e.g. 100" value={challengeForm.target}
+                        onChange={e=>setChallengeForm(f=>({...f,target:e.target.value}))}
+                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:18,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
+                    </div>
+                    <div>
+                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Duration</div>
+                      <select value={challengeForm.days} onChange={e=>setChallengeForm(f=>({...f,days:e.target.value}))}
+                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
+                        {[7,14,30,60,90].map(d=><option key={d} value={d}>{d} days</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                    <button className="btn-press" onClick={()=>{setShowCreateChallenge(false);setChallengeForm({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30})}}
+                      style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
+                      CANCEL
+                    </button>
+                    <button className="btn-press" onClick={handleCreateChallenge} disabled={challengeLoading}
+                      style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:2}}>
+                      {challengeLoading?'...':'CREATE'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Challenge list */}
+            {challenges.length===0?(
+              <div style={{textAlign:'center',padding:50,color:T.text3}}>
+                <div style={{fontSize:48,marginBottom:12}}>⚔️</div>
+                <div style={{fontSize:16,fontWeight:700,color:T.text2,marginBottom:8}}>No challenges yet</div>
+                <div style={{fontSize:13,fontFamily:'Inter',lineHeight:1.6}}>Create the first one and challenge your crew.</div>
+              </div>
+            ):(
+              <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                {challenges.map(ch=>{
+                  const mg=MUSCLE_GROUPS.find(m=>m.id===ch.muscle)
+                  const isJoined=myParticipations.some(p=>p.challenge_id===ch.id)
+                  const isExpired=new Date(ch.ends_at)<new Date()
+                  const daysLeft=Math.max(0,Math.ceil((new Date(ch.ends_at)-new Date())/(1000*60*60*24)))
+                  const creator=allUsers.find(u=>u.id===ch.created_by)
+
+                  // Compute leaderboard for this challenge
+                  const challStart=new Date(ch.created_at)
+                  const challEnd=new Date(ch.ends_at)
+                  const participants=[...new Set([
+                    ...myParticipations.filter(p=>p.challenge_id===ch.id).map(p=>p.user_id),
+                    ch.created_by
+                  ])]
+
+                  const challBoard=allUsers.filter(u=>participants.includes(u.id)).map(u=>{
+                    const uw=allUsersWorkouts.filter(w=>w.user_id===u.id&&w.muscle===ch.muscle&&new Date(w.created_at)>=challStart&&new Date(w.created_at)<=challEnd)
+                    let score=0
+                    if(ch.metric==='1rm') score=uw.length>0?Math.max(...uw.map(w=>cvt(calc1RM(w.weight,w.reps),unit))):0
+                    else if(ch.metric==='volume') score=Math.round(cvt(uw.reduce((s,w)=>s+w.weight*w.reps*w.sets,0),unit))
+                    else if(ch.metric==='sessions') score=uw.length
+                    return{...u,score}
+                  }).sort((a,b)=>b.score-a.score)
+
+                  const myScore=challBoard.find(u=>u.id===currentUser.id)?.score||0
+                  const myPos=challBoard.findIndex(u=>u.id===currentUser.id)+1
+                  const metricLabel=ch.metric==='1rm'?`${unit} 1RM`:ch.metric==='volume'?`${unit} volume`:'sessions'
+
+                  return(
+                    <div key={ch.id} style={{background:T.bg2,border:`1px solid ${isExpired?T.border:T.accent+'44'}`,borderRadius:14,padding:16,position:'relative',overflow:'hidden'}}>
+                      <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:isExpired?T.bg3:`linear-gradient(90deg,${T.accent},#F59E0B)`}} />
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+                        <div style={{flex:1}}>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text}}>{ch.title}</div>
+                          <div style={{fontSize:12,color:T.text3,marginTop:2}}>{ch.description}</div>
+                        </div>
+                        <div style={{textAlign:'right',marginLeft:8}}>
+                          {isExpired
+                            ?<span style={{background:T.bg3,borderRadius:6,padding:'2px 8px',fontSize:10,color:T.text3,fontWeight:700}}>ENDED</span>
+                            :<span style={{background:T.accentDim,border:`1px solid ${T.accent}44`,borderRadius:6,padding:'2px 8px',fontSize:10,color:T.accent,fontWeight:700}}>{daysLeft}d left</span>
+                          }
+                        </div>
+                      </div>
+
+                      {/* Info chips */}
+                      <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
+                        <span style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</span>
+                        <span style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>
+                          {ch.metric==='1rm'?'Best 1RM':ch.metric==='volume'?'Total Volume':'Most Sessions'}
+                        </span>
+                        <span style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>by {creator?.name||'Unknown'}</span>
+                      </div>
+
+                      {/* Target bar */}
+                      <div style={{marginBottom:12}}>
+                        <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:T.text3,marginBottom:4}}>
+                          <span>Target: {ch.metric!=='sessions'?`${cvt(ch.target,unit)}${unit}`:ch.target}</span>
+                          <span>Your score: {myScore}{ch.metric!=='sessions'?unit:''}</span>
+                        </div>
+                        <div style={{background:T.bg3,borderRadius:4,height:6,overflow:'hidden'}}>
+                          <div style={{height:'100%',width:`${Math.min((myScore/(ch.metric!=='sessions'?cvt(ch.target,unit):ch.target))*100,100)}%`,background:myScore>=(ch.metric!=='sessions'?cvt(ch.target,unit):ch.target)?'#10B981':T.accent,borderRadius:4,transition:'width 1s ease'}} />
+                        </div>
+                      </div>
+
+                      {/* Mini leaderboard */}
+                      {challBoard.length>0&&(
+                        <div style={{background:T.bg3,borderRadius:10,padding:10,marginBottom:12}}>
+                          <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:8}}>Leaderboard</div>
+                          {challBoard.slice(0,3).map((u,i)=>{
+                            const medals=['🥇','🥈','🥉']
+                            const isMe=u.id===currentUser.id
+                            return(
+                              <div key={u.id} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 0',borderBottom:i<Math.min(challBoard.length,3)-1?`1px solid ${T.border}`:'none'}}>
+                                <span style={{fontSize:14}}>{medals[i]}</span>
+                                <div style={{width:24,height:24,borderRadius:12,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:'#fff',fontFamily:'Bebas Neue'}}>{u.name[0].toUpperCase()}</div>
+                                <span style={{flex:1,fontSize:13,color:isMe?T.accent:T.text,fontWeight:isMe?700:400}}>{u.name}{isMe?' (you)':''}</span>
+                                <span style={{fontFamily:'Bebas Neue',fontSize:14,letterSpacing:1,color:T.text}}>{u.score}{ch.metric!=='sessions'?unit:''}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+
+                      {/* My position */}
+                      {isJoined&&myPos>0&&(
+                        <div style={{fontSize:12,color:T.text3,marginBottom:10,textAlign:'center'}}>
+                          You are <span style={{color:T.accent,fontWeight:700}}>#{myPos}</span> out of {challBoard.length} participants
+                        </div>
+                      )}
+
+                      {/* Join button */}
+                      {!isJoined&&!isExpired&&ch.created_by!==currentUser.id&&(
+                        <button className="btn-press" onClick={()=>handleJoinChallenge(ch.id)}
+                          style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:11,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                          JOIN CHALLENGE
+                        </button>
+                      )}
+                      {(isJoined||ch.created_by===currentUser.id)&&(
+                        <div style={{textAlign:'center',fontSize:12,color:'#10B981',fontWeight:700,letterSpacing:1}}>✓ {ch.created_by===currentUser.id?'You created this':'Joined'}</div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 
