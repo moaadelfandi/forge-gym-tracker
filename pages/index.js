@@ -746,6 +746,11 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   const [logMsg,setLogMsg]           = useState('')
   const [logLoading,setLogLoading]   = useState(false)
   const [logSuccess,setLogSuccess]   = useState(false)
+  const [bodyWeights,setBodyWeights] = useState([])
+  const [bwInput,setBwInput]         = useState('')
+  const [bwUnit,setBwUnit]           = useState('kg')
+  const [bwMsg,setBwMsg]             = useState('')
+  const [bwLoading,setBwLoading]     = useState(false)
   const [histFilter,setHistFilter]   = useState('all')
   const [planDay,setPlanDay]         = useState(0)
   const [expandedEx,setExpandedEx]   = useState(null)
@@ -778,6 +783,24 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   useEffect(()=>{fetchWorkouts()},[fetchWorkouts])
   useEffect(()=>{if(tab==='leaderboard')fetchAllWorkouts()},[tab,fetchAllWorkouts])
 
+  const fetchBodyWeights=useCallback(async()=>{
+    const{data}=await supabase.from('bodyweight').select('*').eq('user_id',currentUser.id).order('logged_at',{ascending:true})
+    if(data) setBodyWeights(data)
+  },[currentUser.id])
+
+  useEffect(()=>{fetchBodyWeights()},[fetchBodyWeights])
+
+  async function handleLogBodyWeight(){
+    if(!bwInput||parseFloat(bwInput)<=0){setBwMsg('Enter a valid weight.');return}
+    setBwLoading(true)
+    const wKg = bwUnit==='lbs' ? parseFloat(bwInput)/2.205 : parseFloat(bwInput)
+    const{error}=await supabase.from('bodyweight').insert([{user_id:currentUser.id,weight:Math.round(wKg*10)/10,unit:'kg'}])
+    if(error){setBwMsg('Error saving. Try again.')}
+    else{setBwMsg('✓ Weight logged!');setBwInput('');fetchBodyWeights()}
+    setBwLoading(false)
+    setTimeout(()=>setBwMsg(''),3000)
+  }
+
   async function handleLog(){
     const{muscle,exercise,weight,reps,sets}=logForm
     if(!exercise||!weight||!reps||!sets){setLogMsg('⚠ Fill in all fields.');return}
@@ -806,6 +829,43 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
     setDeleteLoading(false)
     onLogout()
   }
+
+  // ── Personal Records: best 1RM per exercise ──
+  const personalRecords = workouts.reduce((acc,w)=>{
+    const rm=calc1RM(w.weight,w.reps)
+    if(!acc[w.exercise]||rm>acc[w.exercise].rm)
+      acc[w.exercise]={rm,weight:w.weight,reps:w.reps,date:w.created_at,id:w.id}
+    return acc
+  },{})
+
+  // ── Streak: consecutive weeks with at least 1 workout ──
+  const trainingStreak=(()=>{
+    if(workouts.length===0) return 0
+    const getWeek=d=>{const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toDateString()}
+    const weeks=[...new Set(workouts.map(w=>getWeek(w.created_at)))].sort((a,b)=>new Date(b)-new Date(a))
+    let streak=0,cur=new Date()
+    cur.setDate(cur.getDate()-cur.getDay()+(cur.getDay()===0?-6:1))
+    for(let i=0;i<weeks.length;i++){
+      const wk=new Date(weeks[i])
+      const diff=Math.round((cur-wk)/(7*24*60*60*1000))
+      if(diff===i) streak++
+      else break
+    }
+    return streak
+  })()
+
+  // ── Weekly Summary: last week's stats ──
+  const weeklySummary=(()=>{
+    const now=new Date()
+    const dayOfWeek=now.getDay()
+    const startOfThisWeek=new Date(now);startOfThisWeek.setDate(now.getDate()-dayOfWeek+(dayOfWeek===0?-6:1));startOfThisWeek.setHours(0,0,0,0)
+    const startOfLastWeek=new Date(startOfThisWeek);startOfLastWeek.setDate(startOfThisWeek.getDate()-7)
+    const lastWeek=workouts.filter(w=>{const d=new Date(w.created_at);return d>=startOfLastWeek&&d<startOfThisWeek})
+    const vol=lastWeek.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
+    const prs=lastWeek.filter(w=>{const rm=calc1RM(w.weight,w.reps);const prev=workouts.filter(x=>x.exercise===w.exercise&&new Date(x.created_at)<startOfLastWeek);return prev.length>0&&rm>Math.max(...prev.map(x=>calc1RM(x.weight,x.reps)))})
+    const muscles=[...new Set(lastWeek.map(w=>w.muscle))]
+    return{sessions:lastWeek.length,volume:vol,prs:prs.length,muscles,days:[...new Set(lastWeek.map(w=>new Date(w.created_at).toLocaleDateString('en-US',{weekday:'short'})))]}
+  })()
 
   const byMuscle=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:workouts.filter(w=>w.muscle===mg.id)}),{})
   const scores=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:calcScore(byMuscle[mg.id])}),{})
@@ -895,7 +955,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
 
         {/* Tabs */}
         <div style={{display:'flex',overflowX:'auto',padding:'0 4px'}}>
-          {[['dashboard','RANKS'],['plan','PLAN'],['log','LOG'],['history','HIST'],['stats','STATS'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
+          {[['dashboard','RANKS'],['body','BODY'],['plan','PLAN'],['log','LOG'],['history','HIST'],['stats','STATS'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
             <button key={id} className="tab-item" onClick={()=>setTab(id)} style={{
               flex:'0 0 auto',padding:'10px 14px',border:'none',cursor:'pointer',
               fontSize:11,fontWeight:700,letterSpacing:1.5,fontFamily:'Rajdhani',
@@ -934,6 +994,37 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                 </div>
                 <div style={{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:10,color:'rgba(255,255,255,0.5)'}}>
                   <span>0</span><span>100</span>
+                </div>
+              </div>
+            )}
+
+            {/* Streak + Weekly Summary row */}
+            {!loading&&(
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
+                {/* Streak */}
+                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
+                  <div style={{position:'absolute',top:-10,right:-6,fontSize:52,opacity:0.07}}>🔥</div>
+                  <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:4}}>Training Streak</div>
+                  <div style={{fontFamily:'Bebas Neue',fontSize:40,letterSpacing:2,color:trainingStreak>0?'#F59E0B':T.text3,lineHeight:1}}>{trainingStreak}</div>
+                  <div style={{fontSize:11,color:T.text3,marginTop:2}}>{trainingStreak===1?'week in a row':trainingStreak>1?'weeks in a row':'Start your streak!'}</div>
+                  {trainingStreak>=3&&<div style={{marginTop:6,fontSize:10,color:'#F59E0B',fontWeight:700}}>🔥 ON FIRE</div>}
+                </div>
+                {/* This week snapshot */}
+                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
+                  <div style={{position:'absolute',top:-10,right:-6,fontSize:52,opacity:0.07}}>📅</div>
+                  <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:4}}>Last Week</div>
+                  {weeklySummary.sessions===0?(
+                    <div style={{fontSize:13,color:T.text3,marginTop:8,fontFamily:'Inter',lineHeight:1.5}}>No sessions last week.</div>
+                  ):(
+                    <>
+                      <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:T.accent,lineHeight:1}}>{weeklySummary.sessions}</div>
+                      <div style={{fontSize:11,color:T.text3}}>{weeklySummary.sessions===1?'session':'sessions'}</div>
+                      <div style={{display:'flex',gap:6,marginTop:8,flexWrap:'wrap'}}>
+                        {weeklySummary.prs>0&&<span style={{background:'#F59E0B22',border:'1px solid #F59E0B44',borderRadius:6,padding:'2px 6px',fontSize:10,color:'#F59E0B',fontWeight:700}}>⭐ {weeklySummary.prs} PR{weeklySummary.prs>1?'s':''}</span>}
+                        <span style={{background:T.bg3,borderRadius:6,padding:'2px 6px',fontSize:10,color:T.text3}}>{Math.round(cvt(weeklySummary.volume,unit)/1000*10)/10}k {unit}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -981,6 +1072,115 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   ))}
                 </div>
               </>
+            )}
+          </div>
+        )}
+
+
+        {/* BODY WEIGHT */}
+        {tab==='body'&&(
+          <div className="slide-up">
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>BODY WEIGHT</div>
+            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Track your weight over time.</div>
+
+            {/* Log input */}
+            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
+              <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Log Today's Weight</div>
+              <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:10}}>
+                <input type="number" min="0" inputMode="decimal" placeholder="0.0"
+                  value={bwInput} onChange={e=>setBwInput(e.target.value)}
+                  style={{flex:1,background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:28,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:2}} />
+                <div style={{display:'flex',flexDirection:'column',gap:4}}>
+                  {['kg','lbs'].map(u=>(
+                    <button key={u} onClick={()=>setBwUnit(u)}
+                      style={{background:bwUnit===u?T.accent:'transparent',border:`1px solid ${bwUnit===u?T.accent:T.border}`,borderRadius:8,color:bwUnit===u?'#fff':T.text3,padding:'6px 10px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
+                      {u.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {bwMsg&&<div style={{color:bwMsg.startsWith('✓')?'#10B981':T.accent,fontSize:13,textAlign:'center',marginBottom:10}}>{bwMsg}</div>}
+              <button className="btn-press" onClick={handleLogBodyWeight} disabled={bwLoading}
+                style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:12,fontSize:15,fontWeight:700,letterSpacing:3,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                {bwLoading?'...':'LOG WEIGHT'}
+              </button>
+            </div>
+
+            {/* Chart */}
+            {bodyWeights.length>1&&(()=>{
+              const dispWeights=bodyWeights.map(w=>({...w,display:Math.round(cvt(w.weight,unit)*10)/10}))
+              const vals=dispWeights.map(w=>w.display)
+              const minV=Math.min(...vals),maxV=Math.max(...vals)
+              const range=maxV-minV||1
+              const W=340,H=120,PAD=12
+              const pts=dispWeights.slice(-30).map((w,i,arr)=>{
+                const x=PAD+(i/(arr.length-1||1))*(W-PAD*2)
+                const y=H-PAD-(((w.display-minV)/range)*(H-PAD*2))
+                return{x,y,w}
+              })
+              const pathD=pts.map((p,i)=>i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`).join(' ')
+              const areaD=`${pathD} L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`
+              const latest=dispWeights[dispWeights.length-1]
+              const first=dispWeights[0]
+              const diff=Math.round((latest.display-first.display)*10)/10
+              return(
+                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+                    <div>
+                      <div style={{fontSize:11,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:2}}>Current Weight</div>
+                      <div style={{fontFamily:'Bebas Neue',fontSize:36,letterSpacing:2,color:T.text,lineHeight:1}}>{latest.display} <span style={{fontSize:18,color:T.text3}}>{unit}</span></div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontSize:11,color:T.text3,marginBottom:2}}>Total change</div>
+                      <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:diff<0?'#10B981':diff>0?T.accent:T.text3}}>{diff>0?'+':''}{diff} {unit}</div>
+                    </div>
+                  </div>
+                  <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',display:'block'}}>
+                    <defs>
+                      <linearGradient id="bwGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={T.accent} stopOpacity="0.3"/>
+                        <stop offset="100%" stopColor={T.accent} stopOpacity="0.02"/>
+                      </linearGradient>
+                    </defs>
+                    <path d={areaD} fill="url(#bwGrad)" />
+                    <path d={pathD} fill="none" stroke={T.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    {pts.map((p,i)=>i===pts.length-1&&(
+                      <circle key={i} cx={p.x} cy={p.y} r="5" fill={T.accent} stroke={T.bg2} strokeWidth="2"/>
+                    ))}
+                  </svg>
+                  <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:T.text3,marginTop:4}}>
+                    <span>{new Date(bodyWeights[Math.max(0,bodyWeights.length-30)].logged_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+                    <span>Today</span>
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* History list */}
+            {bodyWeights.length===0?(
+              <div style={{textAlign:'center',padding:40,color:T.text3}}>
+                <div style={{fontSize:32,marginBottom:8}}>⚖️</div>
+                <div>Log your first weight above.</div>
+              </div>
+            ):(
+              <div>
+                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>History</div>
+                <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                  {[...bodyWeights].reverse().slice(0,20).map((w,i)=>{
+                    const prev=[...bodyWeights].reverse()[i+1]
+                    const diff=prev?Math.round((cvt(w.weight,unit)-cvt(prev.weight,unit))*10)/10:null
+                    return(
+                      <div key={w.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,padding:'10px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <div style={{fontSize:13,color:T.text2}}>{new Date(w.logged_at).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>
+                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                          {diff!==null&&<div style={{fontSize:11,color:diff<0?'#10B981':diff>0?T.accent:T.text3,fontWeight:700}}>{diff>0?'+':''}{diff}</div>}
+                          <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text}}>{Math.round(cvt(w.weight,unit)*10)/10} {unit}</div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -1242,19 +1442,26 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   const dt=new Date(s.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
                   const rank=getRank(calcScore([s]))
                   return(
-                    <div key={s.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:12,padding:'12px 14px',position:'relative',overflow:'hidden'}}>
-                      <div style={{position:'absolute',left:0,top:0,bottom:0,width:3,background:rank.gradient}} />
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginLeft:8}}>
-                        <div>
-                          <div style={{fontSize:15,fontWeight:700,color:T.text}}>{s.exercise}</div>
-                          <div style={{fontSize:11,color:T.text3,marginTop:2}}>{mg?.icon} {mg?.name} · {dt}</div>
+                    {(()=>{
+                      const thisRM=calc1RM(s.weight,s.reps)
+                      const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
+                      return(
+                        <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:12,padding:'12px 14px',position:'relative',overflow:'hidden'}}>
+                          <div style={{position:'absolute',left:0,top:0,bottom:0,width:3,background:isPR?'linear-gradient(180deg,#F59E0B,#D97706)':rank.gradient}} />
+                          {isPR&&<div style={{position:'absolute',top:8,right:10,background:'#F59E0B22',border:'1px solid #F59E0B55',borderRadius:6,padding:'2px 8px',fontSize:10,color:'#F59E0B',fontWeight:700,letterSpacing:1}}>⭐ PR</div>}
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginLeft:8}}>
+                            <div style={{flex:1,paddingRight:isPR?50:0}}>
+                              <div style={{fontSize:15,fontWeight:700,color:T.text}}>{s.exercise}</div>
+                              <div style={{fontSize:11,color:T.text3,marginTop:2}}>{mg?.icon} {mg?.name} · {dt}</div>
+                            </div>
+                            <div style={{textAlign:'right'}}>
+                              <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:T.text}}>{dW}{unit} × {s.reps} × {s.sets}</div>
+                              <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
+                            </div>
+                          </div>
                         </div>
-                        <div style={{textAlign:'right'}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:T.text}}>{dW}{unit} × {s.reps} × {s.sets}</div>
-                          <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
-                        </div>
-                      </div>
-                    </div>
+                      )
+                    })()}
                   )
                 })}
               </div>
@@ -1310,6 +1517,30 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                 )
               })}
             </div>
+            {/* Personal Records Summary */}
+            {Object.keys(personalRecords).length>0&&(
+              <div style={{background:T.bg2,border:'1px solid #F59E0B33',borderRadius:14,padding:16,marginTop:12,marginBottom:12}}>
+                <div style={{fontSize:11,letterSpacing:3,color:'#F59E0B',textTransform:'uppercase',marginBottom:12}}>⭐ Personal Records</div>
+                <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                  {Object.entries(personalRecords).sort((a,b)=>b[1].rm-a[1].rm).slice(0,8).map(([ex,pr])=>{
+                    const mg=MUSCLE_GROUPS.find(m=>m.exercises&&m.exercises.includes(ex))
+                    return(
+                      <div key={ex} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:`1px solid ${T.border}`}}>
+                        <div>
+                          <div style={{fontSize:14,fontWeight:700,color:T.text}}>{ex}</div>
+                          <div style={{fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name} · {new Date(pr.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+                        </div>
+                        <div style={{textAlign:'right'}}>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:'#F59E0B'}}>{Math.round(cvt(pr.rm,unit))}{unit}</div>
+                          <div style={{fontSize:10,color:T.text3}}>1RM</div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginTop:12}}>
               <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:12}}>Overall Totals</div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
