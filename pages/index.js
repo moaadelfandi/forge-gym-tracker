@@ -745,7 +745,14 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   const [logForm,setLogForm]         = useState({muscle:'chest',exercise:'',weight:'',reps:'',sets:''})
   const [logMsg,setLogMsg]           = useState('')
   const [logLoading,setLogLoading]   = useState(false)
-  const [logSuccess,setLogSuccess]   = useState(false)
+  const [logSuccess,setLogSuccess]       = useState(false)
+  const [templates,setTemplates]         = useState([])
+  const [savingTemplate,setSavingTemplate] = useState(false)
+  const [templateName,setTemplateName]   = useState('')
+  const [showSaveTemplate,setShowSaveTemplate] = useState(false)
+  const [currentSession,setCurrentSession] = useState([]) // exercises logged this session
+  const [chartExercise,setChartExercise] = useState('')
+  const [chartMuscle,setChartMuscle]    = useState('chest')
   const [bodyWeights,setBodyWeights] = useState([])
   const [bwInput,setBwInput]         = useState('')
   const [bwUnit,setBwUnit]           = useState('kg')
@@ -790,6 +797,36 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
 
   useEffect(()=>{fetchBodyWeights()},[fetchBodyWeights])
 
+  // Templates stored in localStorage per user
+  useEffect(()=>{
+    try{
+      const saved=JSON.parse(localStorage.getItem(`arise_templates_${currentUser.id}`)||'[]')
+      setTemplates(saved)
+    }catch{}
+  },[currentUser.id])
+
+  function saveTemplates(tmpl){
+    setTemplates(tmpl)
+    localStorage.setItem(`arise_templates_${currentUser.id}`,JSON.stringify(tmpl))
+  }
+
+  function handleSaveTemplate(){
+    if(!templateName.trim()||currentSession.length===0) return
+    const newTmpl={id:Date.now(),name:templateName.trim(),exercises:currentSession,created:new Date().toISOString()}
+    saveTemplates([newTmpl,...templates])
+    setTemplateName('');setShowSaveTemplate(false)
+  }
+
+  function handleDeleteTemplate(id){
+    saveTemplates(templates.filter(t=>t.id!==id))
+  }
+
+  function handleLoadTemplate(tmpl){
+    setLogForm({muscle:tmpl.exercises[0]?.muscle||'chest',exercise:tmpl.exercises[0]?.exercise||'',weight:'',reps:'',sets:''})
+    setCurrentSession(tmpl.exercises)
+    setTab('log')
+  }
+
   async function handleLogBodyWeight(){
     if(!bwInput||parseFloat(bwInput)<=0){setBwMsg('Enter a valid weight.');return}
     setBwLoading(true)
@@ -812,6 +849,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
       setLogSuccess(true)
       setTimeout(()=>setLogSuccess(false),2200)
       setLogMsg(`✓ ${exercise} — ${weight}${unit} × ${reps} × ${sets}`)
+      setCurrentSession(s=>[...s,{muscle,exercise,weight:parseFloat(weight),reps:parseInt(reps),sets:parseInt(sets)}])
       setLogForm(f=>({...f,exercise:'',weight:'',reps:'',sets:''}))
       fetchWorkouts()
     }
@@ -955,7 +993,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
 
         {/* Tabs */}
         <div style={{display:'flex',overflowX:'auto',padding:'0 4px'}}>
-          {[['dashboard','RANKS'],['body','BODY'],['plan','PLAN'],['log','LOG'],['history','HIST'],['stats','STATS'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
+          {[['dashboard','RANKS'],['body','BODY'],['plan','PLAN'],['log','LOG'],['templates','TMPL'],['history','HIST'],['stats','STATS'],['charts','📈'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
             <button key={id} className="tab-item" onClick={()=>setTab(id)} style={{
               flex:'0 0 auto',padding:'10px 14px',border:'none',cursor:'pointer',
               fontSize:11,fontWeight:700,letterSpacing:1.5,fontFamily:'Rajdhani',
@@ -1410,7 +1448,110 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   {logMsg}
                 </div>
               )}
+
+              {/* Current session summary */}
+              {currentSession.length>0&&(
+                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                    <div style={{fontSize:11,color:T.text3,letterSpacing:2,textTransform:'uppercase'}}>This Session ({currentSession.length} sets)</div>
+                    <button onClick={()=>setCurrentSession([])} style={{background:'none',border:'none',color:T.text3,fontSize:11,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>CLEAR</button>
+                  </div>
+                  <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:12}}>
+                    {currentSession.map((s,i)=>{
+                      const mg=MUSCLE_GROUPS.find(m=>m.id===s.muscle)
+                      return(
+                        <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:`1px solid ${T.border}`}}>
+                          <div>
+                            <div style={{fontSize:13,fontWeight:700,color:T.text}}>{s.exercise}</div>
+                            <div style={{fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</div>
+                          </div>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:15,letterSpacing:1,color:T.text2}}>{cvt(s.weight,unit)}{unit} × {s.reps} × {s.sets}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {!showSaveTemplate?(
+                    <button className="btn-press" onClick={()=>setShowSaveTemplate(true)}
+                      style={{width:'100%',background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text2,padding:10,fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Rajdhani'}}>
+                      💾 SAVE AS TEMPLATE
+                    </button>
+                  ):(
+                    <div style={{display:'flex',gap:8}}>
+                      <input placeholder="Template name..." value={templateName} onChange={e=>setTemplateName(e.target.value)}
+                        onKeyDown={e=>e.key==='Enter'&&handleSaveTemplate()}
+                        style={{flex:1,background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}} />
+                      <button className="btn-press" onClick={handleSaveTemplate}
+                        style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:'10px 16px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',whiteSpace:'nowrap'}}>
+                        SAVE
+                      </button>
+                      <button onClick={()=>{setShowSaveTemplate(false);setTemplateName('')}}
+                        style={{background:'none',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:'10px 12px',fontSize:13,cursor:'pointer',fontFamily:'Rajdhani'}}>
+                        ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+          </div>
+        )}
+
+
+        {/* TEMPLATES */}
+        {tab==='templates'&&(
+          <div className="slide-up">
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>TEMPLATES</div>
+            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Save and load your favourite sessions.</div>
+
+            {templates.length===0?(
+              <div style={{textAlign:'center',padding:50,color:T.text3}}>
+                <div style={{fontSize:48,marginBottom:12}}>💾</div>
+                <div style={{fontSize:16,fontWeight:700,color:T.text2,marginBottom:8}}>No templates yet</div>
+                <div style={{fontSize:13,fontFamily:'Inter',lineHeight:1.6}}>Log a workout, then tap<br/>"Save as Template" at the bottom of the LOG tab.</div>
+              </div>
+            ):(
+              <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                {templates.map(tmpl=>(
+                  <div key={tmpl.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,position:'relative',overflow:'hidden'}}>
+                    <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},transparent)`}} />
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
+                      <div>
+                        <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text}}>{tmpl.name}</div>
+                        <div style={{fontSize:11,color:T.text3}}>{tmpl.exercises.length} exercises · {new Date(tmpl.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+                      </div>
+                      <button onClick={()=>handleDeleteTemplate(tmpl.id)}
+                        style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'0 4px'}}>✕</button>
+                    </div>
+                    {/* Exercise list preview */}
+                    <div style={{display:'flex',flexDirection:'column',gap:4,marginBottom:12}}>
+                      {tmpl.exercises.map((ex,i)=>{
+                        const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+                        return(
+                          <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:`1px solid ${T.border}`}}>
+                            <div style={{display:'flex',alignItems:'center',gap:8}}>
+                              <span style={{fontSize:13}}>{mg?.icon}</span>
+                              <span style={{fontSize:13,color:T.text}}>{ex.exercise}</span>
+                            </div>
+                            <span style={{fontSize:12,color:T.text3,fontFamily:'Bebas Neue',letterSpacing:1}}>{cvt(ex.weight,unit)}{unit} × {ex.reps} × {ex.sets}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {/* Muscle group chips */}
+                    <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
+                      {[...new Set(tmpl.exercises.map(e=>e.muscle))].map(mid=>{
+                        const mg=MUSCLE_GROUPS.find(m=>m.id===mid)
+                        return <span key={mid} style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</span>
+                      })}
+                    </div>
+                    <button className="btn-press" onClick={()=>handleLoadTemplate(tmpl)}
+                      style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:11,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                      LOAD TEMPLATE →
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -1441,27 +1582,22 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   const rm=Math.round(cvt(calc1RM(s.weight,s.reps),unit))
                   const dt=new Date(s.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
                   const rank=getRank(calcScore([s]))
+                  const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
                   return(
-                    {(()=>{
-                      const thisRM=calc1RM(s.weight,s.reps)
-                      const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
-                      return(
-                        <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:12,padding:'12px 14px',position:'relative',overflow:'hidden'}}>
-                          <div style={{position:'absolute',left:0,top:0,bottom:0,width:3,background:isPR?'linear-gradient(180deg,#F59E0B,#D97706)':rank.gradient}} />
-                          {isPR&&<div style={{position:'absolute',top:8,right:10,background:'#F59E0B22',border:'1px solid #F59E0B55',borderRadius:6,padding:'2px 8px',fontSize:10,color:'#F59E0B',fontWeight:700,letterSpacing:1}}>⭐ PR</div>}
-                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginLeft:8}}>
-                            <div style={{flex:1,paddingRight:isPR?50:0}}>
-                              <div style={{fontSize:15,fontWeight:700,color:T.text}}>{s.exercise}</div>
-                              <div style={{fontSize:11,color:T.text3,marginTop:2}}>{mg?.icon} {mg?.name} · {dt}</div>
-                            </div>
-                            <div style={{textAlign:'right'}}>
-                              <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:T.text}}>{dW}{unit} × {s.reps} × {s.sets}</div>
-                              <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
-                            </div>
-                          </div>
+                    <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:12,padding:'12px 14px',position:'relative',overflow:'hidden'}}>
+                      <div style={{position:'absolute',left:0,top:0,bottom:0,width:3,background:isPR?'linear-gradient(180deg,#F59E0B,#D97706)':rank.gradient}} />
+                      {isPR&&<div style={{position:'absolute',top:8,right:10,background:'#F59E0B22',border:'1px solid #F59E0B55',borderRadius:6,padding:'2px 8px',fontSize:10,color:'#F59E0B',fontWeight:700,letterSpacing:1}}>⭐ PR</div>}
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginLeft:8}}>
+                        <div style={{flex:1,paddingRight:isPR?50:0}}>
+                          <div style={{fontSize:15,fontWeight:700,color:T.text}}>{s.exercise}</div>
+                          <div style={{fontSize:11,color:T.text3,marginTop:2}}>{mg?.icon} {mg?.name} · {dt}</div>
                         </div>
-                      )
-                    })()}
+                        <div style={{textAlign:'right'}}>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:T.text}}>{dW}{unit} × {s.reps} × {s.sets}</div>
+                          <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
+                        </div>
+                      </div>
+                    </div>
                   )
                 })}
               </div>
@@ -1552,6 +1688,146 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                 ))}
               </div>
             </div>
+          </div>
+        )}
+
+
+        {/* CHARTS */}
+        {tab==='charts'&&(
+          <div className="slide-up">
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>PROGRESS CHARTS</div>
+            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>Your 1RM over time per exercise.</div>
+
+            {/* Muscle filter */}
+            <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4,marginBottom:12}}>
+              {MUSCLE_GROUPS.map(mg=>(
+                <button key={mg.id} onClick={()=>{setChartMuscle(mg.id);setChartExercise('')}}
+                  style={{background:chartMuscle===mg.id?T.accent:T.bg2,border:`1px solid ${chartMuscle===mg.id?T.accent:T.border}`,borderRadius:20,color:chartMuscle===mg.id?'#fff':T.text3,padding:'6px 14px',fontSize:11,fontWeight:700,letterSpacing:1,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.15s',fontFamily:'Rajdhani'}}>
+                  {mg.icon} {mg.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Exercise picker */}
+            {(()=>{
+              const mg=MUSCLE_GROUPS.find(m=>m.id===chartMuscle)
+              const exercisesLogged=[...new Set(workouts.filter(w=>w.muscle===chartMuscle).map(w=>w.exercise))]
+              const activeEx=chartExercise||exercisesLogged[0]||''
+              const exData=workouts.filter(w=>w.exercise===activeEx).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))
+              const rmData=exData.map(w=>({date:w.created_at,rm:calc1RM(w.weight,w.reps),weight:w.weight,reps:w.reps}))
+
+              return(
+                <div>
+                  {exercisesLogged.length===0?(
+                    <div style={{textAlign:'center',padding:50,color:T.text3}}>
+                      <div style={{fontSize:36,marginBottom:8}}>📈</div>
+                      <div>No {mg?.name} data yet. Log some sets first.</div>
+                    </div>
+                  ):(
+                    <>
+                      {/* Exercise selector */}
+                      <div style={{marginBottom:16}}>
+                        <select value={activeEx} onChange={e=>setChartExercise(e.target.value)}
+                          style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani'}}>
+                          {exercisesLogged.map(ex=><option key={ex} value={ex}>{ex}</option>)}
+                        </select>
+                      </div>
+
+                      {rmData.length>1&&(()=>{
+                        const vals=rmData.map(d=>cvt(d.rm,unit))
+                        const minV=Math.min(...vals),maxV=Math.max(...vals)
+                        const range=maxV-minV||1
+                        const W=340,H=140,PAD=14
+                        const pts=rmData.map((d,i,arr)=>{
+                          const x=PAD+(i/(arr.length-1||1))*(W-PAD*2)
+                          const y=H-PAD-(((cvt(d.rm,unit)-minV)/range)*(H-PAD*2))
+                          return{x,y,d}
+                        })
+                        const pathD=pts.map((p,i)=>i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`).join(' ')
+                        const areaD=`${pathD} L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`
+                        const best=Math.max(...vals)
+                        const latest=vals[vals.length-1]
+                        const first=vals[0]
+                        const gain=Math.round((latest-first)*10)/10
+                        const rank=getRank(calcScore(exData))
+                        return(
+                          <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
+                            {/* Stats row */}
+                            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:16}}>
+                              {[
+                                ['Best 1RM',`${Math.round(best)}${unit}`],
+                                ['Latest',`${Math.round(latest)}${unit}`],
+                                ['Total Gain',`${gain>0?'+':''}${gain}${unit}`],
+                              ].map(([label,val])=>(
+                                <div key={label} style={{background:T.bg3,borderRadius:10,padding:'8px 6px',textAlign:'center'}}>
+                                  <div style={{fontSize:10,color:T.text3,letterSpacing:1,marginBottom:2}}>{label}</div>
+                                  <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:label==='Best 1RM'?rank.color:label==='Total Gain'?gain>=0?'#10B981':T.accent:T.text}}>{val}</div>
+                                </div>
+                              ))}
+                            </div>
+                            {/* SVG Chart */}
+                            <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',display:'block'}}>
+                              <defs>
+                                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor={rank.color} stopOpacity="0.35"/>
+                                  <stop offset="100%" stopColor={rank.color} stopOpacity="0.02"/>
+                                </linearGradient>
+                              </defs>
+                              {/* Grid lines */}
+                              {[0.25,0.5,0.75].map((f,i)=>(
+                                <line key={i} x1={PAD} y1={PAD+(f*(H-PAD*2))} x2={W-PAD} y2={PAD+(f*(H-PAD*2))}
+                                  stroke={T.border} strokeWidth="1" strokeDasharray="4,4"/>
+                              ))}
+                              {/* Y labels */}
+                              {[[0,maxV],[0.5,Math.round((minV+maxV)/2)],[1,minV]].map(([f,v])=>(
+                                <text key={f} x={PAD-2} y={PAD+(f*(H-PAD*2))+4} fill={T.text3} fontSize="9" textAnchor="end">{Math.round(cvt(v,unit))}</text>
+                              ))}
+                              <path d={areaD} fill="url(#chartGrad)" />
+                              <path d={pathD} fill="none" stroke={rank.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              {/* Dots */}
+                              {pts.map((p,i)=>(
+                                <circle key={i} cx={p.x} cy={p.y} r={i===pts.length-1?5:3}
+                                  fill={i===pts.length-1?rank.color:T.bg2} stroke={rank.color} strokeWidth="2"/>
+                              ))}
+                            </svg>
+                            {/* X axis labels */}
+                            <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:T.text3,marginTop:4}}>
+                              <span>{new Date(rmData[0].date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+                              <span>{rmData.length} sessions</span>
+                              <span>{new Date(rmData[rmData.length-1].date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+                            </div>
+                          </div>
+                        )
+                      })()}
+
+                      {/* Session log for this exercise */}
+                      <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>All Sessions</div>
+                      <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                        {[...exData].reverse().map((s,i)=>{
+                          const rm=Math.round(cvt(calc1RM(s.weight,s.reps),unit))
+                          const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
+                          return(
+                            <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:10,padding:'10px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                              <div>
+                                <div style={{fontSize:13,color:T.text}}>{new Date(s.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+                                <div style={{fontSize:11,color:T.text3}}>{s.sets} sets × {s.reps} reps</div>
+                              </div>
+                              <div style={{textAlign:'right',display:'flex',alignItems:'center',gap:8}}>
+                                {isPR&&<span style={{background:'#F59E0B22',border:'1px solid #F59E0B44',borderRadius:6,padding:'2px 6px',fontSize:10,color:'#F59E0B',fontWeight:700}}>⭐ PR</span>}
+                                <div>
+                                  <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:T.text}}>{cvt(s.weight,unit)}{unit}</div>
+                                  <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })()}
           </div>
         )}
 
