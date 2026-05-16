@@ -746,11 +746,24 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   const [logMsg,setLogMsg]           = useState('')
   const [logLoading,setLogLoading]   = useState(false)
   const [logSuccess,setLogSuccess]       = useState(false)
-  const [templates,setTemplates]         = useState([])
-  const [savingTemplate,setSavingTemplate] = useState(false)
-  const [templateName,setTemplateName]   = useState('')
+  const [templates,setTemplates]           = useState([])
+  const [currentSession,setCurrentSession]   = useState([])
   const [showSaveTemplate,setShowSaveTemplate] = useState(false)
-  const [currentSession,setCurrentSession] = useState([]) // exercises logged this session
+  const [templateName,setTemplateName]       = useState('')
+  // New template builder
+  const [showCreateTemplate,setShowCreateTemplate] = useState(false)
+  const [editingTemplate,setEditingTemplate]   = useState(null) // template being built/edited
+  const [newTmplName,setNewTmplName]           = useState('')
+  const [newTmplExercises,setNewTmplExercises] = useState([])
+  const [addingExercise,setAddingExercise]     = useState(false)
+  const [exForm,setExForm]                     = useState({muscle:'chest',exercise:'',sets:'3',reps:'8',weight:''})
+  // Active template session (checklist mode)
+  const [activeTemplate,setActiveTemplate]     = useState(null) // template currently being worked out
+  const [checkedExercises,setCheckedExercises] = useState({}) // {exIdx: true/false}
+  const [confirmEx,setConfirmEx]               = useState(null) // {tmplId, exIdx, ex} waiting confirm
+  const [confirmWeight,setConfirmWeight]       = useState('')
+  const [confirmReps,setConfirmReps]           = useState('')
+  const [confirmSets,setConfirmSets]           = useState('')
   const [chartExercise,setChartExercise] = useState('')
   const [chartMuscle,setChartMuscle]    = useState('chest')
   const [challenges,setChallenges]       = useState([])
@@ -847,21 +860,84 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
     localStorage.setItem(`arise_templates_${currentUser.id}`,JSON.stringify(tmpl))
   }
 
+  // ── New template builder functions ──
+  function handleAddExerciseToTemplate(){
+    if(!exForm.exercise||!exForm.weight) return
+    const ex={muscle:exForm.muscle,exercise:exForm.exercise,sets:parseInt(exForm.sets)||3,reps:parseInt(exForm.reps)||8,weight:parseFloat(exForm.weight)}
+    setNewTmplExercises(prev=>[...prev,ex])
+    setExForm(f=>({...f,exercise:'',weight:''}))
+    setAddingExercise(false)
+  }
+
+  function handleSaveNewTemplate(){
+    if(!newTmplName.trim()||newTmplExercises.length===0) return
+    const tmpl={id:Date.now(),name:newTmplName.trim(),exercises:newTmplExercises,created:new Date().toISOString()}
+    saveTemplates([tmpl,...templates])
+    setNewTmplName('');setNewTmplExercises([]);setShowCreateTemplate(false)
+  }
+
+  function handleDeleteTemplate(id){
+    if(activeTemplate?.id===id) setActiveTemplate(null)
+    saveTemplates(templates.filter(t=>t.id!==id))
+  }
+
+  function handleUpdateExWeight(tmplId,exIdx,newWeight){
+    const updated=templates.map(t=>{
+      if(t.id!==tmplId) return t
+      const exs=[...t.exercises]
+      exs[exIdx]={...exs[exIdx],weight:parseFloat(newWeight)||exs[exIdx].weight}
+      return{...t,exercises:exs}
+    })
+    saveTemplates(updated)
+    if(activeTemplate?.id===tmplId){
+      const tmpl=updated.find(t=>t.id===tmplId)
+      setActiveTemplate(tmpl)
+    }
+  }
+
+  function handleRemoveExFromNew(idx){
+    setNewTmplExercises(prev=>prev.filter((_,i)=>i!==idx))
+  }
+
+  function handleOpenTemplate(tmpl){
+    setActiveTemplate(tmpl)
+    setCheckedExercises({})
+    setConfirmEx(null)
+  }
+
+  function handleCheckExercise(exIdx,ex){
+    setConfirmEx({exIdx,ex})
+    setConfirmWeight(String(cvt(ex.weight,unit)))
+    setConfirmReps(String(ex.reps))
+    setConfirmSets(String(ex.sets))
+  }
+
+  async function handleConfirmLog(){
+    if(!confirmEx||!activeTemplate) return
+    const wKg=unit==='lbs'?parseFloat(confirmWeight)/2.205:parseFloat(confirmWeight)
+    const{error}=await supabase.from('workouts').insert([{
+      user_id:currentUser.id,
+      muscle:confirmEx.ex.muscle,
+      exercise:confirmEx.ex.exercise,
+      weight:Math.round(wKg*10)/10,
+      reps:parseInt(confirmReps),
+      sets:parseInt(confirmSets),
+    }])
+    if(!error){
+      setCheckedExercises(prev=>({...prev,[confirmEx.exIdx]:true}))
+      // Update template weight to what was actually logged
+      handleUpdateExWeight(activeTemplate.id,confirmEx.exIdx,wKg)
+      fetchWorkouts()
+    }
+    setConfirmEx(null)
+  }
+
+  // Old save from session (kept for backward compat)
   function handleSaveTemplate(){
     if(!templateName.trim()||currentSession.length===0) return
     const newTmpl={id:Date.now(),name:templateName.trim(),exercises:currentSession,created:new Date().toISOString()}
     saveTemplates([newTmpl,...templates])
     setTemplateName('');setShowSaveTemplate(false)
-  }
-
-  function handleDeleteTemplate(id){
-    saveTemplates(templates.filter(t=>t.id!==id))
-  }
-
-  function handleLoadTemplate(tmpl){
-    setLogForm({muscle:tmpl.exercises[0]?.muscle||'chest',exercise:tmpl.exercises[0]?.exercise||'',weight:'',reps:'',sets:''})
-    setCurrentSession(tmpl.exercises)
-    setTab('log')
   }
 
   async function handleLogBodyWeight(){
@@ -1572,56 +1648,288 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
         {/* TEMPLATES */}
         {tab==='templates'&&(
           <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>TEMPLATES</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Save and load your favourite sessions.</div>
 
-            {templates.length===0?(
-              <div style={{textAlign:'center',padding:50,color:T.text3}}>
-                <div style={{fontSize:48,marginBottom:12}}>💾</div>
-                <div style={{fontSize:16,fontWeight:700,color:T.text2,marginBottom:8}}>No templates yet</div>
-                <div style={{fontSize:13,fontFamily:'Inter',lineHeight:1.6}}>Log a workout, then tap<br/>"Save as Template" at the bottom of the LOG tab.</div>
-              </div>
-            ):(
-              <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                {templates.map(tmpl=>(
-                  <div key={tmpl.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,position:'relative',overflow:'hidden'}}>
-                    <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},transparent)`}} />
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
-                      <div>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text}}>{tmpl.name}</div>
-                        <div style={{fontSize:11,color:T.text3}}>{tmpl.exercises.length} exercises · {new Date(tmpl.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+            {/* ── CONFIRM LOG MODAL ── */}
+            {confirmEx&&activeTemplate&&(
+              <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:500,display:'flex',alignItems:'flex-end',justifyContent:'center',padding:'0 16px 24px'}}>
+                <div className="slide-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:20,width:'100%',maxWidth:420}}>
+                  <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},#F59E0B)`,borderRadius:'20px 20px 0 0'}} />
+                  <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:2,color:T.text,marginBottom:4,marginTop:4}}>LOG SET</div>
+                  <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',marginBottom:16}}>{confirmEx.ex.exercise}</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:16}}>
+                    {[
+                      [`WT (${unit})`,confirmWeight,setConfirmWeight],
+                      ['REPS',confirmReps,setConfirmReps],
+                      ['SETS',confirmSets,setConfirmSets],
+                    ].map(([label,val,setter])=>(
+                      <div key={label}>
+                        <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:6,textAlign:'center'}}>{label}</div>
+                        <input type="number" min="0" value={val} onChange={e=>setter(e.target.value)}
+                          style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 6px',fontSize:24,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
                       </div>
-                      <button onClick={()=>handleDeleteTemplate(tmpl.id)}
-                        style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'0 4px'}}>✕</button>
-                    </div>
-                    {/* Exercise list preview */}
-                    <div style={{display:'flex',flexDirection:'column',gap:4,marginBottom:12}}>
-                      {tmpl.exercises.map((ex,i)=>{
-                        const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
-                        return(
-                          <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:`1px solid ${T.border}`}}>
-                            <div style={{display:'flex',alignItems:'center',gap:8}}>
-                              <span style={{fontSize:13}}>{mg?.icon}</span>
-                              <span style={{fontSize:13,color:T.text}}>{ex.exercise}</span>
-                            </div>
-                            <span style={{fontSize:12,color:T.text3,fontFamily:'Bebas Neue',letterSpacing:1}}>{cvt(ex.weight,unit)}{unit} × {ex.reps} × {ex.sets}</span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                    {/* Muscle group chips */}
-                    <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
-                      {[...new Set(tmpl.exercises.map(e=>e.muscle))].map(mid=>{
-                        const mg=MUSCLE_GROUPS.find(m=>m.id===mid)
-                        return <span key={mid} style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</span>
-                      })}
-                    </div>
-                    <button className="btn-press" onClick={()=>handleLoadTemplate(tmpl)}
-                      style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:11,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                      LOAD TEMPLATE →
+                    ))}
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                    <button className="btn-press" onClick={()=>setConfirmEx(null)}
+                      style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:12,color:T.text3,padding:13,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
+                      CANCEL
+                    </button>
+                    <button className="btn-press" onClick={handleConfirmLog}
+                      style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:13,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                      LOG ✓
                     </button>
                   </div>
-                ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── ACTIVE TEMPLATE SESSION ── */}
+            {activeTemplate?(
+              <div>
+                <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
+                  <button onClick={()=>{setActiveTemplate(null);setCheckedExercises({})}}
+                    style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,color:T.text2,padding:'8px 12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
+                    ← BACK
+                  </button>
+                  <div>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:2,color:T.text,lineHeight:1}}>{activeTemplate.name}</div>
+                    <div style={{fontSize:12,color:T.text3}}>{Object.values(checkedExercises).filter(Boolean).length} / {activeTemplate.exercises.length} done</div>
+                  </div>
+                </div>
+
+                {/* Session progress bar */}
+                <div style={{background:T.bg3,borderRadius:4,height:6,overflow:'hidden',marginBottom:16,position:'relative'}}>
+                  <div className="bar-fill" style={{'--pct':`${(Object.values(checkedExercises).filter(Boolean).length/activeTemplate.exercises.length)*100}%`,height:'100%',background:`linear-gradient(90deg,${T.accent},#10B981)`,borderRadius:4}} />
+                  <div className="bar-streak" style={{position:'absolute',top:0,width:'40%',height:'100%',background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)'}} />
+                </div>
+
+                {/* Exercise checklist */}
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {activeTemplate.exercises.map((ex,i)=>{
+                    const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+                    const done=checkedExercises[i]===true
+                    const rank=getRank(scores[ex.muscle]||0)
+                    return(
+                      <div key={i} style={{background:done?T.bg3:T.bg2,border:`1px solid ${done?T.border:rank.color+'33'}`,borderRadius:14,padding:14,opacity:done?0.6:1,transition:'all 0.2s',position:'relative',overflow:'hidden'}}>
+                        {!done&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:rank.gradient}} />}
+                        <div style={{display:'flex',alignItems:'center',gap:12}}>
+                          {/* Checkbox */}
+                          <button onClick={()=>!done&&handleCheckExercise(i,ex)}
+                            style={{width:32,height:32,borderRadius:16,border:`2px solid ${done?'#10B981':rank.color}`,background:done?'#10B981':T.input,display:'flex',alignItems:'center',justifyContent:'center',cursor:done?'default':'pointer',flexShrink:0,transition:'all 0.2s'}}>
+                            {done&&<span style={{color:'#fff',fontSize:16,fontWeight:700}}>✓</span>}
+                          </button>
+                          <div style={{flex:1}}>
+                            <div style={{fontSize:15,fontWeight:700,color:done?T.text3:T.text,textDecoration:done?'line-through':'none'}}>{ex.exercise}</div>
+                            <div style={{fontSize:11,color:T.text3,marginTop:2}}>{mg?.icon} {mg?.name}</div>
+                          </div>
+                          {/* Weight — editable inline */}
+                          <div style={{textAlign:'right'}}>
+                            <div style={{display:'flex',alignItems:'center',gap:4,justifyContent:'flex-end',marginBottom:2}}>
+                              <input type="number" value={cvt(ex.weight,unit)}
+                                onChange={e=>handleUpdateExWeight(activeTemplate.id,i,unit==='lbs'?parseFloat(e.target.value)/2.205:parseFloat(e.target.value))}
+                                style={{width:60,background:'transparent',border:`1px solid ${T.border}`,borderRadius:6,color:T.text,padding:'3px 6px',fontSize:14,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
+                              <span style={{fontSize:11,color:T.text3}}>{unit}</span>
+                            </div>
+                            <div style={{fontSize:11,color:T.text3}}>{ex.sets} sets × {ex.reps} reps</div>
+                          </div>
+                        </div>
+                        {!done&&(
+                          <button className="btn-press" onClick={()=>handleCheckExercise(i,ex)}
+                            style={{width:'100%',marginTop:10,background:rank.gradient,border:'none',borderRadius:8,color:'#fff',padding:'9px',fontSize:12,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                            MARK DONE + LOG
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Done state */}
+                {Object.values(checkedExercises).filter(Boolean).length===activeTemplate.exercises.length&&activeTemplate.exercises.length>0&&(
+                  <div style={{background:'#052218',border:'1px solid #10B981',borderRadius:14,padding:20,marginTop:16,textAlign:'center'}}>
+                    <div style={{fontSize:36,marginBottom:8}}>🎉</div>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:2,color:'#10B981',marginBottom:4}}>SESSION COMPLETE!</div>
+                    <div style={{fontSize:13,color:'#10B981',fontFamily:'Inter'}}>All exercises logged. Great work.</div>
+                    <button className="btn-press" onClick={()=>{setActiveTemplate(null);setCheckedExercises({})}}
+                      style={{marginTop:14,background:'#10B981',border:'none',borderRadius:10,color:'#fff',padding:'12px 24px',fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                      FINISH
+                    </button>
+                  </div>
+                )}
+              </div>
+
+            /* ── TEMPLATE LIST ── */
+            ):(
+              <div>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+                  <div>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,lineHeight:1}}>TEMPLATES</div>
+                    <div style={{fontSize:13,color:T.text2,fontFamily:'Inter'}}>{templates.length} saved</div>
+                  </div>
+                  <button className="btn-press" onClick={()=>setShowCreateTemplate(true)}
+                    style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',width:44,height:44,fontSize:24,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:`0 4px 14px ${T.accent}44`}}>
+                    +
+                  </button>
+                </div>
+
+                {/* ── CREATE TEMPLATE PANEL ── */}
+                {showCreateTemplate&&(
+                  <div className="slide-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:16,marginBottom:16,position:'relative',overflow:'hidden'}}>
+                    <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},transparent)`}} />
+                    <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text,marginBottom:12,marginTop:4}}>New Template</div>
+
+                    {/* Name */}
+                    <div style={{marginBottom:12}}>
+                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Template Name</div>
+                      <input placeholder="e.g. Push Day, Monday Workout..." value={newTmplName}
+                        onChange={e=>setNewTmplName(e.target.value)}
+                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'11px 14px',fontSize:15,fontFamily:'Rajdhani'}} />
+                    </div>
+
+                    {/* Added exercises */}
+                    {newTmplExercises.length>0&&(
+                      <div style={{marginBottom:12}}>
+                        <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:8}}>Exercises ({newTmplExercises.length})</div>
+                        <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                          {newTmplExercises.map((ex,i)=>{
+                            const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+                            return(
+                              <div key={i} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'10px 12px'}}>
+                                <span style={{fontSize:16}}>{mg?.icon}</span>
+                                <div style={{flex:1}}>
+                                  <div style={{fontSize:14,fontWeight:700,color:T.text}}>{ex.exercise}</div>
+                                  <div style={{fontSize:11,color:T.text3}}>{ex.sets}×{ex.reps} · {ex.weight}{unit}</div>
+                                </div>
+                                <button onClick={()=>handleRemoveExFromNew(i)}
+                                  style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'0 4px'}}>✕</button>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Add exercise form */}
+                    {addingExercise?(
+                      <div style={{background:T.bg3,borderRadius:12,padding:12,marginBottom:12}}>
+                        <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Add Exercise</div>
+                        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                          <select value={exForm.muscle} onChange={e=>setExForm(f=>({...f,muscle:e.target.value,exercise:''}))}
+                            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
+                            {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
+                          </select>
+                          <select value={exForm.exercise} onChange={e=>setExForm(f=>({...f,exercise:e.target.value}))}
+                            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
+                            <option value="">Select exercise...</option>
+                            {MUSCLE_GROUPS.find(m=>m.id===exForm.muscle)?.exercises.map(ex=><option key={ex} value={ex}>{ex}</option>)}
+                          </select>
+                          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
+                            {[
+                              [`WT (${unit})`,exForm.weight,'weight'],
+                              ['REPS',exForm.reps,'reps'],
+                              ['SETS',exForm.sets,'sets'],
+                            ].map(([label,val,field])=>(
+                              <div key={field}>
+                                <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:4,textAlign:'center'}}>{label}</div>
+                                <input type="number" min="0" value={val} onChange={e=>setExForm(f=>({...f,[field]:e.target.value}))} placeholder="0"
+                                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,padding:'10px 6px',fontSize:20,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
+                              </div>
+                            ))}
+                          </div>
+                          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                            <button className="btn-press" onClick={()=>{setAddingExercise(false);setExForm(f=>({...f,exercise:'',weight:''}))}}
+                              style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:10,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani'}}>
+                              CANCEL
+                            </button>
+                            <button className="btn-press" onClick={handleAddExerciseToTemplate}
+                              style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'Rajdhani'}}>
+                              ADD
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ):(
+                      <button className="btn-press" onClick={()=>setAddingExercise(true)}
+                        style={{width:'100%',background:'transparent',border:`1px dashed ${T.border}`,borderRadius:10,color:T.text3,padding:11,fontSize:13,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'Rajdhani',marginBottom:12}}>
+                        + ADD EXERCISE
+                      </button>
+                    )}
+
+                    {/* Save / Cancel */}
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                      <button className="btn-press" onClick={()=>{setShowCreateTemplate(false);setNewTmplName('');setNewTmplExercises([]);setAddingExercise(false)}}
+                        style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani'}}>
+                        CANCEL
+                      </button>
+                      <button className="btn-press" onClick={handleSaveNewTemplate}
+                        disabled={!newTmplName.trim()||newTmplExercises.length===0}
+                        style={{background:(!newTmplName.trim()||newTmplExercises.length===0)?T.bg3:T.accent,border:'none',borderRadius:10,color:(!newTmplName.trim()||newTmplExercises.length===0)?T.text3:'#fff',padding:12,fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                        SAVE TEMPLATE
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Template cards */}
+                {templates.length===0&&!showCreateTemplate?(
+                  <div style={{textAlign:'center',padding:50,color:T.text3}}>
+                    <div style={{fontSize:48,marginBottom:12}}>📋</div>
+                    <div style={{fontSize:16,fontWeight:700,color:T.text2,marginBottom:8}}>No templates yet</div>
+                    <div style={{fontSize:13,fontFamily:'Inter',lineHeight:1.6,marginBottom:20}}>Tap the + button to create your first workout template.</div>
+                    <button className="btn-press" onClick={()=>setShowCreateTemplate(true)}
+                      style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:'12px 28px',fontSize:15,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
+                      CREATE TEMPLATE
+                    </button>
+                  </div>
+                ):(
+                  <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                    {templates.map(tmpl=>{
+                      const muscles=[...new Set(tmpl.exercises.map(e=>e.muscle))]
+                      return(
+                        <div key={tmpl.id} className="hover-lift" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,position:'relative',overflow:'hidden',cursor:'pointer'}}
+                          onClick={()=>handleOpenTemplate(tmpl)}>
+                          <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},transparent)`}} />
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
+                            <div style={{flex:1}}>
+                              <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:T.text}}>{tmpl.name}</div>
+                              <div style={{fontSize:12,color:T.text3}}>{tmpl.exercises.length} exercises</div>
+                            </div>
+                            <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                              <button onClick={e=>{e.stopPropagation();handleDeleteTemplate(tmpl.id)}}
+                                style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'4px 6px'}}>✕</button>
+                            </div>
+                          </div>
+                          {/* Exercise preview */}
+                          <div style={{display:'flex',flexDirection:'column',gap:4,marginBottom:12}}>
+                            {tmpl.exercises.slice(0,4).map((ex,i)=>{
+                              const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+                              return(
+                                <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:`1px solid ${T.border}`}}>
+                                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                                    <span style={{fontSize:13}}>{mg?.icon}</span>
+                                    <span style={{fontSize:13,color:T.text}}>{ex.exercise}</span>
+                                  </div>
+                                  <span style={{fontSize:12,color:T.text3,fontFamily:'Bebas Neue',letterSpacing:1}}>{cvt(ex.weight,unit)}{unit} · {ex.sets}×{ex.reps}</span>
+                                </div>
+                              )
+                            })}
+                            {tmpl.exercises.length>4&&<div style={{fontSize:11,color:T.text3,textAlign:'center',paddingTop:4}}>+{tmpl.exercises.length-4} more</div>}
+                          </div>
+                          {/* Muscle chips */}
+                          <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
+                            {muscles.map(mid=>{
+                              const mg=MUSCLE_GROUPS.find(m=>m.id===mid)
+                              return <span key={mid} style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</span>
+                            })}
+                          </div>
+                          <div style={{background:T.accent,borderRadius:10,padding:'10px',textAlign:'center',boxShadow:`0 4px 12px ${T.accent}33`}}>
+                            <span style={{fontFamily:'Bebas Neue',fontSize:15,letterSpacing:3,color:'#fff'}}>START WORKOUT →</span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
