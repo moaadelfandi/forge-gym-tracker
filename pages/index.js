@@ -53,12 +53,12 @@ const GOALS = [
 ]
 
 const MUSCLE_GROUPS = [
-  { id:'chest',     name:'Chest',     icon:'🫁', exercises:['Bench Press','Incline Bench Press','Decline Bench Press','Dumbbell Fly','Incline Dumbbell Fly','Cable Fly','Cable Crossover','Chest Dip','Push-up','Pec Deck Machine','Smith Machine Bench','Landmine Press'] },
-  { id:'back',      name:'Back',      icon:'🔱', exercises:['Deadlift','Barbell Row','Pull-ups','Chin-ups','Lat Pulldown','Seated Cable Row','Single Arm Dumbbell Row','T-Bar Row','Face Pull','Straight Arm Pulldown','Rack Pull','Meadows Row','Cable Pull-over'] },
-  { id:'legs',      name:'Legs',      icon:'⚡', exercises:['Squat','Front Squat','Leg Press','Romanian Deadlift','Hack Squat','Lunges','Bulgarian Split Squat','Leg Extension','Leg Curl','Calf Raise','Goblet Squat','Hip Thrust','Sumo Deadlift','Step-ups'] },
-  { id:'shoulders', name:'Shoulders', icon:'△',  exercises:['Overhead Press','Arnold Press','Lateral Raise','Face Pull','Front Raise','Rear Delt Fly','Cable Lateral Raise','Dumbbell Shoulder Press','Machine Shoulder Press','Upright Row','Shrugs','Cable Face Pull','Reverse Pec Deck'] },
-  { id:'arms',      name:'Arms',      icon:'◎',  exercises:['Barbell Curl','Dumbbell Curl','Hammer Curl','Incline Dumbbell Curl','Cable Curl','Preacher Curl','Tricep Dip','Skull Crusher','Tricep Pushdown','Overhead Tricep Extension','Close Grip Bench Press','Cable Overhead Tricep Extension','Diamond Push-up','Concentration Curl'] },
-  { id:'core',      name:'Core',      icon:'◇',  exercises:['Plank','Ab Wheel','Hanging Leg Raise','Cable Crunch','Dragon Flag','Decline Sit-up','Russian Twist','Hollow Body Hold','L-sit','Weighted Crunch','Landmine Twist','Pallof Press','Dead Bug','Bicycle Crunch'] },
+  { id:'chest',     name:'Chest',     icon:'🫁', color:'#FF6B6B', colorDim:'#FF6B6B20', exercises:['Bench Press','Incline Bench Press','Decline Bench Press','Dumbbell Fly','Incline Dumbbell Fly','Cable Fly','Cable Crossover','Chest Dip','Push-up','Pec Deck Machine','Smith Machine Bench','Landmine Press'] },
+  { id:'back',      name:'Back',      icon:'🔱', color:'#4ECDC4', colorDim:'#4ECDC420', exercises:['Deadlift','Barbell Row','Pull-ups','Chin-ups','Lat Pulldown','Seated Cable Row','Single Arm Dumbbell Row','T-Bar Row','Face Pull','Straight Arm Pulldown','Rack Pull','Meadows Row','Cable Pull-over'] },
+  { id:'legs',      name:'Legs',      icon:'⚡', color:'#FFE66D', colorDim:'#FFE66D20', exercises:['Squat','Front Squat','Leg Press','Romanian Deadlift','Hack Squat','Lunges','Bulgarian Split Squat','Leg Extension','Leg Curl','Calf Raise','Goblet Squat','Hip Thrust','Sumo Deadlift','Step-ups'] },
+  { id:'shoulders', name:'Shoulders', icon:'🔥', color:'#A78BFA', colorDim:'#A78BFA20', exercises:['Overhead Press','Arnold Press','Lateral Raise','Face Pull','Front Raise','Rear Delt Fly','Cable Lateral Raise','Dumbbell Shoulder Press','Machine Shoulder Press','Upright Row','Shrugs','Cable Face Pull','Reverse Pec Deck'] },
+  { id:'arms',      name:'Arms',      icon:'💪', color:'#F97316', colorDim:'#F9731620', exercises:['Barbell Curl','Dumbbell Curl','Hammer Curl','Incline Dumbbell Curl','Cable Curl','Preacher Curl','Tricep Dip','Skull Crusher','Tricep Pushdown','Overhead Tricep Extension','Close Grip Bench Press','Cable Overhead Tricep Extension','Diamond Push-up','Concentration Curl'] },
+  { id:'core',      name:'Core',      icon:'🎯', color:'#34D399', colorDim:'#34D39920', exercises:['Plank','Ab Wheel','Hanging Leg Raise','Cable Crunch','Dragon Flag','Decline Sit-up','Russian Twist','Hollow Body Hold','L-sit','Weighted Crunch','Landmine Twist','Pallof Press','Dead Bug','Bicycle Crunch'] },
 ]
 
 const PLANS = {
@@ -315,101 +315,108 @@ function loadSession(){
 
 // ─── Global CSS ───────────────────────────────────────────────────────────────
 const GLOBAL_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
   *{box-sizing:border-box;margin:0;padding:0;}
-  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar{width:3px;height:3px}
   ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
-  input,select,button{font-family:'Rajdhani',sans-serif;outline:none;}
-  input:focus,select:focus{border-color:var(--accent)!important;box-shadow:0 0 0 2px var(--accent-dim);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  input,select,button{font-family:'Nunito',sans-serif;outline:none;}
+  input:focus,select:focus{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-dim);}
 
   .arise-bg {
     background: var(--bg);
-    background-image: var(--noise);
     min-height: 100vh;
     color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Nunito', sans-serif;
     transition: background 0.3s, color 0.3s;
   }
 
   /* Rank badge glow */
   @keyframes rankGlow {
     0%,100% { box-shadow: 0 0 8px var(--rc), 0 0 20px var(--rc-dim); }
-    50%      { box-shadow: 0 0 14px var(--rc), 0 0 35px var(--rc-dim); }
+    50%      { box-shadow: 0 0 16px var(--rc), 0 0 40px var(--rc-dim); }
   }
   .rank-glow { animation: rankGlow 2.5s ease-in-out infinite; }
 
   /* Bar fill */
   @keyframes barFill { from{width:0} to{width:var(--pct)} }
-  .bar-fill { animation: barFill 1.2s cubic-bezier(0.4,0,0.2,1) forwards; }
+  .bar-fill { animation: barFill 1s cubic-bezier(0.4,0,0.2,1) forwards; }
 
   /* Streak on bar */
   @keyframes streak {
     0%   { left: -40%; opacity: 0; }
-    20%  { opacity: 0.6; }
+    20%  { opacity: 0.7; }
     80%  { opacity: 0.3; }
     100% { left: 120%; opacity: 0; }
   }
   .bar-streak { animation: streak 1.8s ease-in-out forwards; animation-delay: 0.8s; }
 
-  /* Slide in */
-  @keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-  .slide-up { animation: slideUp 0.35s ease forwards; }
+  /* Slide up */
+  @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .slide-up { animation: slideUp 0.3s ease forwards; }
 
-  /* Stagger children */
+  /* Stagger */
   .stagger > * { opacity: 0; animation: slideUp 0.3s ease forwards; }
-  .stagger > *:nth-child(1){animation-delay:0.05s}
-  .stagger > *:nth-child(2){animation-delay:0.10s}
-  .stagger > *:nth-child(3){animation-delay:0.15s}
-  .stagger > *:nth-child(4){animation-delay:0.20s}
-  .stagger > *:nth-child(5){animation-delay:0.25s}
-  .stagger > *:nth-child(6){animation-delay:0.30s}
+  .stagger > *:nth-child(1){animation-delay:0.04s}
+  .stagger > *:nth-child(2){animation-delay:0.08s}
+  .stagger > *:nth-child(3){animation-delay:0.12s}
+  .stagger > *:nth-child(4){animation-delay:0.16s}
+  .stagger > *:nth-child(5){animation-delay:0.20s}
+  .stagger > *:nth-child(6){animation-delay:0.24s}
 
-  /* Logged flash */
+  /* Log flash */
   @keyframes logFlash {
     0%   { opacity:0; transform:scale(0.85); }
-    20%  { opacity:1; transform:scale(1.04); }
-    80%  { opacity:1; transform:scale(1); }
+    15%  { opacity:1; transform:scale(1.05); }
+    85%  { opacity:1; transform:scale(1); }
     100% { opacity:0; transform:scale(0.97); }
   }
-  .log-flash { animation: logFlash 2s ease forwards; }
+  .log-flash { animation: logFlash 2.2s ease forwards; }
 
   /* Spin */
   @keyframes spin { to{transform:rotate(360deg)} }
   .spin { animation: spin 1s linear infinite; display:inline-block; }
 
   /* Card hover */
-  .hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
-  .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+  .hover-lift { transition: transform 0.18s ease, box-shadow 0.18s ease; cursor: pointer; }
+  .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
 
   /* Button */
-  .btn-press { transition: all 0.15s; cursor:pointer; }
-  .btn-press:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
-  .btn-press:active:not(:disabled) { transform: scale(0.97); }
-  .btn-press:disabled { opacity:.5; cursor:not-allowed; }
+  .btn-press { transition: all 0.15s ease; cursor:pointer; border:none; }
+  .btn-press:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+  .btn-press:active:not(:disabled) { transform: scale(0.97); filter: brightness(0.95); }
+  .btn-press:disabled { opacity:.45; cursor:not-allowed; }
 
   /* Tab */
   .tab-item { transition: all 0.2s; cursor:pointer; }
-  .tab-item:hover { opacity: 0.8; }
 
-  /* Noise overlay */
-  .noise-overlay {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: var(--noise);
-    opacity: 1;
-  }
-
-  /* Pulse dot */
-  @keyframes pulseDot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:0.6} }
+  /* Pulse */
+  @keyframes pulseDot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.5} }
   .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
 
-  /* Hero grid lines */
+  /* Hero grid */
   .hero-grid {
     position: absolute; inset: 0; pointer-events: none;
     background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.3;
-    mask-image: radial-gradient(ellipse at center top, black 0%, transparent 70%);
+    background-size: 32px 32px;
+    opacity: 0.25;
+    mask-image: radial-gradient(ellipse at center top, black 0%, transparent 75%);
+  }
+
+  /* Muscle chip */
+  .muscle-chip { transition: all 0.15s; cursor:pointer; }
+  .muscle-chip:active { transform: scale(0.93); }
+
+  /* Input clean */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  /* Card base */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    transition: border-color 0.2s;
   }
 `
 
@@ -1086,7 +1093,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
       )}
 
       {/* ── HEADER ── */}
-      <div style={{background:T.bg2,borderBottom:`1px solid ${T.border}`,position:'sticky',top:0,zIndex:100}}>
+      <div style={{background:T.navBg||T.bg2,borderBottom:`1.5px solid ${T.border}`,position:'sticky',top:0,zIndex:100,backdropFilter:'blur(12px)'}}>
         {/* Hero strip */}
         <div style={{position:'relative',overflow:'hidden',padding:'12px 16px 0'}}>
           <div className="hero-grid" style={{opacity:0.15}} />
@@ -1213,31 +1220,37 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
             ):(
               <>
                 <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:12}}>Muscle Rankings</div>
-                <div className="stagger" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
+                <div className="stagger" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:20}}>
                   {MUSCLE_GROUPS.map(mg=>{
                     const score=scores[mg.id],rank=getRank(score),next=getNextRank(score)
                     const pct=next?((score-rank.min)/(next.min-rank.min))*100:100
-                    const rankBg=settings.darkMode?rank.darkBg:rank.lightBg
                     return(
-                      <div key={mg.id} className="hover-lift" style={{background:rankBg,border:`1px solid ${rank.color}33`,borderRadius:14,padding:14,position:'relative',overflow:'hidden',cursor:'default'}}>
-                        <div style={{position:'absolute',top:-8,right:-8,fontSize:44,opacity:0.07,lineHeight:1}}>{mg.icon}</div>
-                        {/* Rank color strip */}
-                        <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:rank.gradient,borderRadius:'14px 14px 0 0'}} />
-                        <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:4,marginTop:4}}>{mg.name}</div>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:rank.color,marginBottom:2}}>{rank.icon} {rank.name}</div>
-                        <div style={{fontSize:11,color:T.text3,marginBottom:8}}>Score: {Math.round(score)}</div>
-                        <div style={{background:T.darkMode?'rgba(0,0,0,0.3)':'rgba(0,0,0,0.08)',borderRadius:3,height:4,overflow:'hidden',position:'relative'}}>
-                          <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:rank.gradient,borderRadius:3}} />
+                      <div key={mg.id} className="hover-lift" style={{background:T.bg2,border:`1.5px solid ${mg.color}33`,borderRadius:20,padding:16,position:'relative',overflow:'hidden',cursor:'default'}}>
+                        {/* Colored top strip */}
+                        <div style={{position:'absolute',top:0,left:0,right:0,height:4,background:`linear-gradient(90deg,${mg.color},${mg.color}66)`,borderRadius:'20px 20px 0 0'}} />
+                        {/* Big icon watermark */}
+                        <div style={{position:'absolute',bottom:-8,right:-4,fontSize:52,opacity:0.12,lineHeight:1}}>{mg.icon}</div>
+                        <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10,marginTop:4}}>
+                          <div style={{width:32,height:32,borderRadius:10,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>{mg.icon}</div>
+                          <div style={{fontSize:14,fontWeight:800,color:T.text}}>{mg.name}</div>
                         </div>
-                        {next?<div style={{fontSize:9,color:T.text3,marginTop:4}}>→ {next.name}</div>
-                             :<div style={{fontSize:9,color:rank.color,marginTop:4,fontWeight:700}}>MAX RANK ✦</div>}
+                        <div style={{display:'flex',alignItems:'baseline',gap:4,marginBottom:6}}>
+                          <div style={{fontSize:22,fontWeight:900,color:mg.color,lineHeight:1}}>{rank.icon}</div>
+                          <div style={{fontSize:15,fontWeight:800,color:mg.color}}>{rank.name}</div>
+                        </div>
+                        <div style={{background:T.bg3,borderRadius:6,height:6,overflow:'hidden',marginBottom:6,position:'relative'}}>
+                          <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}99)`,borderRadius:6}} />
+                        </div>
+                        {next
+                          ?<div style={{fontSize:11,color:T.text3,fontWeight:600}}>→ {next.name} · {Math.round(score)}/100</div>
+                          :<div style={{fontSize:11,color:mg.color,fontWeight:700}}>MAX RANK ✦</div>}
                       </div>
                     )
                   })}
                 </div>
 
                 {/* Rank tier legend */}
-                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16}}>
+                <div style={{background:T.bg2,border:`1.5px solid ${T.border}`,borderRadius:18,padding:16}}>
                   <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:12}}>Rank Tiers</div>
                   {RANKS.map((r,i)=>(
                     <div key={r.name} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<RANKS.length-1?`1px solid ${T.border}`:'none'}}>
@@ -1538,15 +1551,21 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
         {/* LOG */}
         {tab==='log'&&(
           <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>LOG A SET</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Weight in <span style={{color:T.accent,fontWeight:700}}>{unit.toUpperCase()}</span> · toggle top-right to switch</div>
-            <div style={{display:'flex',flexDirection:'column',gap:14}}>
+            <div style={{fontFamily:'Bebas Neue',fontSize:30,letterSpacing:2,color:T.text,marginBottom:2}}>LOG A SET</div>
+            <div style={{fontSize:14,color:T.text2,marginBottom:20}}>Weight in <span style={{color:T.accent,fontWeight:800}}>{unit.toUpperCase()}</span></div>
+            <div style={{display:'flex',flexDirection:'column',gap:16}}>
+              {/* Muscle group — big tap targets */}
               <div>
-                <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Muscle Group</div>
-                <select value={logForm.muscle} onChange={e=>{setLogForm(f=>({...f,muscle:e.target.value,exercise:''}));setCustomExercise('')}}
-                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani'}}>
-                  {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
-                </select>
+                <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Muscle Group</div>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+                  {MUSCLE_GROUPS.map(mg=>(
+                    <button key={mg.id} className="muscle-chip btn-press" onClick={()=>{setLogForm(f=>({...f,muscle:mg.id,exercise:''}));setCustomExercise('')}}
+                      style={{background:logForm.muscle===mg.id?mg.colorDim:T.bg2,border:`2px solid ${logForm.muscle===mg.id?mg.color:T.border}`,borderRadius:14,padding:'10px 6px',display:'flex',flexDirection:'column',alignItems:'center',gap:4,transition:'all 0.15s'}}>
+                      <span style={{fontSize:22}}>{mg.icon}</span>
+                      <span style={{fontSize:12,fontWeight:700,color:logForm.muscle===mg.id?mg.color:T.text2}}>{mg.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
               <div>
                 <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Exercise</div>
@@ -1571,7 +1590,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   <div key={field}>
                     <div style={{fontSize:10,letterSpacing:2,color:T.text3,textTransform:'uppercase',marginBottom:6}}>{label}</div>
                     <input type="number" min="0" value={logForm[field]} onChange={e=>setLogForm(f=>({...f,[field]:e.target.value}))} placeholder="0"
-                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 6px',fontSize:24,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
+                      style={{width:'100%',background:T.bg3,border:`2px solid ${T.border}`,borderRadius:14,color:T.text,padding:'14px 6px',fontSize:28,fontWeight:900,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
                   </div>
                 ))}
               </div>
@@ -1588,8 +1607,8 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                 </div>
               )}
               <button className="btn-press" onClick={handleLog} disabled={logLoading}
-                style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:16,fontSize:18,fontWeight:700,letterSpacing:4,cursor:'pointer',textTransform:'uppercase',fontFamily:'Bebas Neue',boxShadow:T.darkMode?`0 4px 20px ${T.accent}44`:'none'}}>
-                {logLoading?<span className="spin">◈</span>:'LOG SET'}
+                style={{background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,border:'none',borderRadius:16,color:'#fff',padding:18,fontSize:20,fontWeight:900,letterSpacing:4,cursor:'pointer',textTransform:'uppercase',fontFamily:'Bebas Neue',boxShadow:`0 6px 24px ${T.accent}44`,width:'100%'}}>
+                {logLoading?<span className="spin">◈</span>:'💪 LOG SET'}
               </button>
               {logMsg&&(
                 <div style={{background:logMsg.startsWith('✓')?T.darkMode?'#052218':'#ECFDF5':T.darkMode?'#2A0505':'#FFF5F5',border:`1px solid ${logMsg.startsWith('✓')?'#10B981':T.accent}`,borderRadius:10,padding:12,color:logMsg.startsWith('✓')?'#10B981':T.accent,fontSize:14,textAlign:'center'}}>
@@ -1951,10 +1970,10 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
             <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>HISTORY</div>
             <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>{workouts.length} sessions logged.</div>
             <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4,marginBottom:16}}>
-              {[['all','All'],...MUSCLE_GROUPS.map(mg=>[mg.id,mg.name])].map(([id,label])=>(
+              {[['all','All',T.accent,null],...MUSCLE_GROUPS.map(mg=>[mg.id,mg.name,mg.color,mg])].map(([id,label,color,mg])=>(
                 <button key={id} onClick={()=>setHistFilter(id)}
-                  style={{background:histFilter===id?T.accent:T.bg2,border:`1px solid ${histFilter===id?T.accent:T.border}`,borderRadius:20,color:histFilter===id?'#fff':T.text3,padding:'6px 14px',fontSize:11,fontWeight:700,letterSpacing:1,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.15s'}}>
-                  {label}
+                  style={{background:histFilter===id?color:T.bg2,border:`1.5px solid ${histFilter===id?color:T.border}`,borderRadius:20,color:histFilter===id?'#fff':T.text3,padding:'7px 14px',fontSize:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.15s',display:'flex',alignItems:'center',gap:4}}>
+                  {mg&&<span>{mg.icon}</span>}{label}
                 </button>
               ))}
             </div>
@@ -1975,7 +1994,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
                   return(
                     <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:12,padding:'12px 14px',position:'relative',overflow:'hidden'}}>
-                      <div style={{position:'absolute',left:0,top:0,bottom:0,width:3,background:isPR?'linear-gradient(180deg,#F59E0B,#D97706)':rank.gradient}} />
+                      <div style={{position:'absolute',left:0,top:0,bottom:0,width:4,background:isPR?'linear-gradient(180deg,#F59E0B,#D97706)':`linear-gradient(180deg,${mg?.color||T.accent},${mg?.color||T.accent}66)`}} />
                       {isPR&&<div style={{position:'absolute',top:8,right:10,background:'#F59E0B22',border:'1px solid #F59E0B55',borderRadius:6,padding:'2px 8px',fontSize:10,color:'#F59E0B',fontWeight:700,letterSpacing:1}}>⭐ PR</div>}
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginLeft:8}}>
                         <div style={{flex:1,paddingRight:isPR?50:0}}>
@@ -2671,35 +2690,32 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
 
       {/* Bottom accent line */}
       {/* ── BOTTOM NAV BAR ── */}
-      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:200,background:T.bg2,borderTop:`1px solid ${T.border}`,paddingBottom:'env(safe-area-inset-bottom)'}}>
-        {/* Top accent line */}
-        <div style={{height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`}} />
-
-        {/* Primary nav row — 5 main tabs */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',padding:'6px 0 4px'}}>
+      {/* ── BOTTOM NAV BAR ── */}
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:200,background:T.navBg||T.bg2,borderTop:`1.5px solid ${T.border}`,paddingBottom:'env(safe-area-inset-bottom)',backdropFilter:'blur(12px)'}}>
+        {/* Primary row */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',padding:'8px 0 6px'}}>
           {[
-            {id:'dashboard', icon:'◈', label:'Ranks'},
+            {id:'dashboard', icon:'🏅', label:'Ranks'},
+            {id:'templates', icon:'📋', label:'Workouts'},
             {id:'log',       icon:'＋', label:'Log'},
-            {id:'templates', icon:'📋', label:'Templates'},
             {id:'plan',      icon:'📅', label:'Plan'},
-            {id:'more',      icon:'···', label:'More'},
+            {id:'more',      icon:'☰',  label:'More'},
           ].map(({id,icon,label})=>(
             <button key={id} onClick={()=>setTab(id)}
-              style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'6px 4px',border:'none',background:'transparent',cursor:'pointer',position:'relative'}}>
+              style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'4px 2px',border:'none',background:'transparent',cursor:'pointer',position:'relative'}}>
               {id==='log'?(
-                <div style={{width:44,height:44,borderRadius:22,background:T.accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:700,color:'#fff',marginTop:-14,boxShadow:`0 4px 16px ${T.accent}55`,fontFamily:'Rajdhani'}}>＋</div>
+                <div style={{width:50,height:50,borderRadius:25,background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,fontWeight:900,color:'#fff',marginTop:-18,boxShadow:`0 6px 20px ${T.accent}55`}}>＋</div>
               ):(
-                <div style={{fontSize:tab===id?18:16,color:tab===id?T.accent:T.text3,transition:'all 0.2s',lineHeight:1}}>{icon}</div>
+                <div style={{width:36,height:36,borderRadius:12,background:tab===id?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,transition:'all 0.2s'}}>{icon}</div>
               )}
-              <div style={{fontSize:9,fontWeight:700,letterSpacing:0.5,color:id==='log'?T.accent:tab===id?T.accent:T.text3,fontFamily:'Rajdhani',marginTop:id==='log'?2:0}}>{label}</div>
-              {tab===id&&id!=='log'&&<div style={{position:'absolute',top:0,left:'50%',transform:'translateX(-50%)',width:20,height:2,background:T.accent,borderRadius:1}} />}
+              <div style={{fontSize:10,fontWeight:700,color:tab===id||id==='log'?T.accent:T.text3,marginTop:id==='log'?4:0,transition:'color 0.2s'}}>{label}</div>
             </button>
           ))}
         </div>
 
-        {/* More drawer — shows when "More" tab is active or any secondary tab is active */}
+        {/* More drawer */}
         {(tab==='more'||['body','history','stats','charts','achievements','challenges','leaderboard','settings'].includes(tab))&&(
-          <div style={{borderTop:`1px solid ${T.border}`,display:'grid',gridTemplateColumns:'repeat(4,1fr)',padding:'8px 0 6px',background:T.bg3}}>
+          <div style={{borderTop:`1px solid ${T.border}`,display:'grid',gridTemplateColumns:'repeat(4,1fr)',padding:'10px 4px 8px',background:T.bg3}}>
             {[
               {id:'body',         icon:'⚖️',  label:'Body'},
               {id:'history',      icon:'📝',  label:'History'},
@@ -2711,10 +2727,9 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
               {id:'settings',     icon:'⚙️',  label:'Settings'},
             ].map(({id,icon,label})=>(
               <button key={id} onClick={()=>setTab(id)}
-                style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'6px 4px',border:'none',background:'transparent',cursor:'pointer'}}>
-                <div style={{fontSize:16,lineHeight:1}}>{icon}</div>
-                <div style={{fontSize:9,fontWeight:700,letterSpacing:0.5,color:tab===id?T.accent:T.text3,fontFamily:'Rajdhani'}}>{label}</div>
-                {tab===id&&<div style={{width:16,height:2,background:T.accent,borderRadius:1}} />}
+                style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'6px 4px',border:'none',background:'transparent',cursor:'pointer'}}>
+                <div style={{width:34,height:34,borderRadius:10,background:tab===id?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,transition:'all 0.2s'}}>{icon}</div>
+                <div style={{fontSize:10,fontWeight:700,color:tab===id?T.accent:T.text3,transition:'color 0.2s'}}>{label}</div>
               </button>
             ))}
           </div>
