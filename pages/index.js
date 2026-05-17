@@ -764,6 +764,8 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   const [confirmWeight,setConfirmWeight]       = useState('')
   const [confirmReps,setConfirmReps]           = useState('')
   const [confirmSets,setConfirmSets]           = useState('')
+  const [customExercise,setCustomExercise]     = useState('') // free-text override in log tab
+  const [customExInTemplate,setCustomExInTemplate] = useState('') // free-text in template builder
   const [chartExercise,setChartExercise] = useState('')
   const [chartMuscle,setChartMuscle]    = useState('chest')
   const [challenges,setChallenges]       = useState([])
@@ -1139,23 +1141,11 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
           )}
         </div>
 
-        {/* Tabs */}
-        <div style={{display:'flex',overflowX:'auto',padding:'0 4px'}}>
-          {[['dashboard','RANKS'],['body','BODY'],['plan','PLAN'],['log','LOG'],['templates','TMPL'],['history','HIST'],['stats','STATS'],['charts','📈'],['achievements','🎖️'],['challenges','⚔️'],['leaderboard','🏆'],['settings','⚙️']].map(([id,label])=>(
-            <button key={id} className="tab-item" onClick={()=>setTab(id)} style={{
-              flex:'0 0 auto',padding:'10px 14px',border:'none',cursor:'pointer',
-              fontSize:11,fontWeight:700,letterSpacing:1.5,fontFamily:'Rajdhani',
-              background:'transparent',
-              color:tab===id?T.accent:T.text3,
-              borderBottom:tab===id?`2px solid ${T.accent}`:'2px solid transparent',
-              transition:'all 0.2s',whiteSpace:'nowrap',
-            }}>{label}</button>
-          ))}
-        </div>
+
       </div>
 
       {/* ── CONTENT ── */}
-      <div style={{padding:'20px 16px',position:'relative',zIndex:1}}>
+      <div style={{padding:'20px 16px 100px 16px',position:'relative',zIndex:1}}>
 
         {/* DASHBOARD */}
         {tab==='dashboard'&&(
@@ -1553,18 +1543,28 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
             <div style={{display:'flex',flexDirection:'column',gap:14}}>
               <div>
                 <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Muscle Group</div>
-                <select value={logForm.muscle} onChange={e=>setLogForm(f=>({...f,muscle:e.target.value,exercise:''}))}
+                <select value={logForm.muscle} onChange={e=>{setLogForm(f=>({...f,muscle:e.target.value,exercise:''}));setCustomExercise('')}}
                   style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani'}}>
                   {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
                 </select>
               </div>
               <div>
                 <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Exercise</div>
-                <select value={logForm.exercise} onChange={e=>setLogForm(f=>({...f,exercise:e.target.value}))}
-                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani'}}>
+                <select value={customExercise?'__custom__':logForm.exercise}
+                  onChange={e=>{
+                    if(e.target.value==='__custom__'){setCustomExercise(' ');setLogForm(f=>({...f,exercise:''}))}
+                    else{setCustomExercise('');setLogForm(f=>({...f,exercise:e.target.value}))}
+                  }}
+                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani',marginBottom:customExercise?8:0}}>
                   <option value="">Select exercise...</option>
                   {MUSCLE_GROUPS.find(m=>m.id===logForm.muscle)?.exercises.map(ex=><option key={ex} value={ex}>{ex}</option>)}
+                  <option value="__custom__">✏️ Type my own...</option>
                 </select>
+                {customExercise!==''&&(
+                  <input autoFocus placeholder="Exercise name..." value={customExercise.trim()?customExercise:''}
+                    onChange={e=>{setCustomExercise(e.target.value);setLogForm(f=>({...f,exercise:e.target.value}))}}
+                    style={{width:'100%',background:T.input,border:`1px solid ${T.accent}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani'}} />
+                )}
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
                 {[['weight',`WT (${unit})`],['reps','REPS'],['sets','SETS']].map(([field,label])=>(
@@ -1814,15 +1814,25 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                       <div style={{background:T.bg3,borderRadius:12,padding:12,marginBottom:12}}>
                         <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Add Exercise</div>
                         <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                          <select value={exForm.muscle} onChange={e=>setExForm(f=>({...f,muscle:e.target.value,exercise:''}))}
+                          <select value={exForm.muscle} onChange={e=>{setExForm(f=>({...f,muscle:e.target.value,exercise:''}));setCustomExInTemplate('')}}
                             style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
                             {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
                           </select>
-                          <select value={exForm.exercise} onChange={e=>setExForm(f=>({...f,exercise:e.target.value}))}
+                          <select value={customExInTemplate?'__custom__':exForm.exercise}
+                            onChange={e=>{
+                              if(e.target.value==='__custom__'){setCustomExInTemplate(' ');setExForm(f=>({...f,exercise:''}))}
+                              else{setCustomExInTemplate('');setExForm(f=>({...f,exercise:e.target.value}))}
+                            }}
                             style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
                             <option value="">Select exercise...</option>
                             {MUSCLE_GROUPS.find(m=>m.id===exForm.muscle)?.exercises.map(ex=><option key={ex} value={ex}>{ex}</option>)}
+                            <option value="__custom__">✏️ Type my own...</option>
                           </select>
+                          {customExInTemplate!==''&&(
+                            <input autoFocus placeholder="Exercise name..." value={customExInTemplate.trim()?customExInTemplate:''}
+                              onChange={e=>{setCustomExInTemplate(e.target.value);setExForm(f=>({...f,exercise:e.target.value}))}}
+                              style={{width:'100%',background:T.input,border:`1px solid ${T.accent}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani',marginTop:6}} />
+                          )}
                           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
                             {[
                               [`WT (${unit})`,exForm.weight,'weight'],
@@ -2660,7 +2670,56 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
       </div>
 
       {/* Bottom accent line */}
-      <div style={{position:'fixed',bottom:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`,zIndex:100}} />
+      {/* ── BOTTOM NAV BAR ── */}
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:200,background:T.bg2,borderTop:`1px solid ${T.border}`,paddingBottom:'env(safe-area-inset-bottom)'}}>
+        {/* Top accent line */}
+        <div style={{height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`}} />
+
+        {/* Primary nav row — 5 main tabs */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',padding:'6px 0 4px'}}>
+          {[
+            {id:'dashboard', icon:'◈', label:'Ranks'},
+            {id:'log',       icon:'＋', label:'Log'},
+            {id:'templates', icon:'📋', label:'Templates'},
+            {id:'plan',      icon:'📅', label:'Plan'},
+            {id:'more',      icon:'···', label:'More'},
+          ].map(({id,icon,label})=>(
+            <button key={id} onClick={()=>setTab(id)}
+              style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'6px 4px',border:'none',background:'transparent',cursor:'pointer',position:'relative'}}>
+              {id==='log'?(
+                <div style={{width:44,height:44,borderRadius:22,background:T.accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:700,color:'#fff',marginTop:-14,boxShadow:`0 4px 16px ${T.accent}55`,fontFamily:'Rajdhani'}}>＋</div>
+              ):(
+                <div style={{fontSize:tab===id?18:16,color:tab===id?T.accent:T.text3,transition:'all 0.2s',lineHeight:1}}>{icon}</div>
+              )}
+              <div style={{fontSize:9,fontWeight:700,letterSpacing:0.5,color:id==='log'?T.accent:tab===id?T.accent:T.text3,fontFamily:'Rajdhani',marginTop:id==='log'?2:0}}>{label}</div>
+              {tab===id&&id!=='log'&&<div style={{position:'absolute',top:0,left:'50%',transform:'translateX(-50%)',width:20,height:2,background:T.accent,borderRadius:1}} />}
+            </button>
+          ))}
+        </div>
+
+        {/* More drawer — shows when "More" tab is active or any secondary tab is active */}
+        {(tab==='more'||['body','history','stats','charts','achievements','challenges','leaderboard','settings'].includes(tab))&&(
+          <div style={{borderTop:`1px solid ${T.border}`,display:'grid',gridTemplateColumns:'repeat(4,1fr)',padding:'8px 0 6px',background:T.bg3}}>
+            {[
+              {id:'body',         icon:'⚖️',  label:'Body'},
+              {id:'history',      icon:'📝',  label:'History'},
+              {id:'stats',        icon:'📊',  label:'Stats'},
+              {id:'charts',       icon:'📈',  label:'Charts'},
+              {id:'achievements', icon:'🎖️', label:'Awards'},
+              {id:'challenges',   icon:'⚔️',  label:'Challenges'},
+              {id:'leaderboard',  icon:'🏆',  label:'Leaders'},
+              {id:'settings',     icon:'⚙️',  label:'Settings'},
+            ].map(({id,icon,label})=>(
+              <button key={id} onClick={()=>setTab(id)}
+                style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'6px 4px',border:'none',background:'transparent',cursor:'pointer'}}>
+                <div style={{fontSize:16,lineHeight:1}}>{icon}</div>
+                <div style={{fontSize:9,fontWeight:700,letterSpacing:0.5,color:tab===id?T.accent:T.text3,fontFamily:'Rajdhani'}}>{label}</div>
+                {tab===id&&<div style={{width:16,height:2,background:T.accent,borderRadius:1}} />}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
