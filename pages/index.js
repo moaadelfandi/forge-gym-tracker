@@ -314,110 +314,42 @@ function loadSession(){
 }
 
 // ─── Global CSS ───────────────────────────────────────────────────────────────
+
 const GLOBAL_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap');
   *{box-sizing:border-box;margin:0;padding:0;}
   ::-webkit-scrollbar{width:3px;height:3px}
   ::-webkit-scrollbar-track{background:transparent}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  html,body{font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased;}
   input,select,button{font-family:'Nunito',sans-serif;outline:none;}
   input:focus,select:focus{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-dim);}
-
-  .arise-bg {
-    background: var(--bg);
-    min-height: 100vh;
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  /* Rank badge glow */
-  @keyframes rankGlow {
-    0%,100% { box-shadow: 0 0 8px var(--rc), 0 0 20px var(--rc-dim); }
-    50%      { box-shadow: 0 0 16px var(--rc), 0 0 40px var(--rc-dim); }
-  }
-  .rank-glow { animation: rankGlow 2.5s ease-in-out infinite; }
-
-  /* Bar fill */
-  @keyframes barFill { from{width:0} to{width:var(--pct)} }
-  .bar-fill { animation: barFill 1s cubic-bezier(0.4,0,0.2,1) forwards; }
-
-  /* Streak on bar */
-  @keyframes streak {
-    0%   { left: -40%; opacity: 0; }
-    20%  { opacity: 0.7; }
-    80%  { opacity: 0.3; }
-    100% { left: 120%; opacity: 0; }
-  }
-  .bar-streak { animation: streak 1.8s ease-in-out forwards; animation-delay: 0.8s; }
-
-  /* Slide up */
-  @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-  .slide-up { animation: slideUp 0.3s ease forwards; }
-
-  /* Stagger */
-  .stagger > * { opacity: 0; animation: slideUp 0.3s ease forwards; }
-  .stagger > *:nth-child(1){animation-delay:0.04s}
-  .stagger > *:nth-child(2){animation-delay:0.08s}
-  .stagger > *:nth-child(3){animation-delay:0.12s}
-  .stagger > *:nth-child(4){animation-delay:0.16s}
-  .stagger > *:nth-child(5){animation-delay:0.20s}
-  .stagger > *:nth-child(6){animation-delay:0.24s}
-
-  /* Log flash */
-  @keyframes logFlash {
-    0%   { opacity:0; transform:scale(0.85); }
-    15%  { opacity:1; transform:scale(1.05); }
-    85%  { opacity:1; transform:scale(1); }
-    100% { opacity:0; transform:scale(0.97); }
-  }
-  .log-flash { animation: logFlash 2.2s ease forwards; }
-
-  /* Spin */
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .spin { animation: spin 1s linear infinite; display:inline-block; }
-
-  /* Card hover */
-  .hover-lift { transition: transform 0.18s ease, box-shadow 0.18s ease; cursor: pointer; }
-  .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
-
-  /* Button */
-  .btn-press { transition: all 0.15s ease; cursor:pointer; border:none; }
-  .btn-press:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
-  .btn-press:active:not(:disabled) { transform: scale(0.97); filter: brightness(0.95); }
-  .btn-press:disabled { opacity:.45; cursor:not-allowed; }
-
-  /* Tab */
-  .tab-item { transition: all 0.2s; cursor:pointer; }
-
-  /* Pulse */
-  @keyframes pulseDot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.5} }
-  .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
-
-  /* Hero grid */
-  .hero-grid {
-    position: absolute; inset: 0; pointer-events: none;
-    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 32px 32px;
-    opacity: 0.25;
-    mask-image: radial-gradient(ellipse at center top, black 0%, transparent 75%);
-  }
-
-  /* Muscle chip */
-  .muscle-chip { transition: all 0.15s; cursor:pointer; }
-  .muscle-chip:active { transform: scale(0.93); }
-
-  /* Input clean */
-  input[type=number]::-webkit-inner-spin-button,
-  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-
-  /* Card base */
-  .card {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 18px;
-    transition: border-color 0.2s;
-  }
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+  .arise-bg{background:var(--bg);min-height:100vh;color:var(--text);transition:background 0.25s,color 0.25s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .fade-up{animation:fadeUp 0.3s ease forwards;}
+  .stagger>*{opacity:0;animation:fadeUp 0.3s ease forwards;}
+  .stagger>*:nth-child(1){animation-delay:.04s}.stagger>*:nth-child(2){animation-delay:.08s}
+  .stagger>*:nth-child(3){animation-delay:.12s}.stagger>*:nth-child(4){animation-delay:.16s}
+  .stagger>*:nth-child(5){animation-delay:.20s}.stagger>*:nth-child(6){animation-delay:.24s}
+  @keyframes barFill{from{width:0}to{width:var(--w)}}
+  .bar{animation:barFill 0.9s cubic-bezier(.4,0,.2,1) forwards;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spin{animation:spin 1s linear infinite;display:inline-block;}
+  @keyframes logFlash{0%{opacity:0;transform:scale(.85)}15%{opacity:1;transform:scale(1.04)}85%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.97)}}
+  .log-flash{animation:logFlash 2s ease forwards;}
+  @keyframes rankGlow{0%,100%{box-shadow:0 0 10px var(--rc),0 0 24px var(--rc-dim)}50%{box-shadow:0 0 18px var(--rc),0 0 44px var(--rc-dim)}}
+  .rank-glow{animation:rankGlow 2.5s ease-in-out infinite;}
+  @keyframes streak{0%{left:-40%;opacity:0}20%{opacity:.7}80%{opacity:.3}100%{left:120%;opacity:0}}
+  .streak{animation:streak 1.8s ease-in-out forwards;animation-delay:.7s;}
+  .btn{transition:all .15s ease;cursor:pointer;border:none;}
+  .btn:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px);}
+  .btn:active:not(:disabled){transform:scale(.97);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .lift{transition:transform .18s,box-shadow .18s;}
+  .lift:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.18);}
+  .press{transition:transform .12s;cursor:pointer;}
+  .press:active{transform:scale(.96);}
 `
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -430,10 +362,11 @@ export default function App() {
   const [authLoading,setAuthLoading] = useState(false)
   const [selectedUser,setSelectedUser] = useState(null)
   const [pendingUser,setPendingUser]   = useState(null)
-  const [showOnboarding,setShowOnboarding] = useState(false)
   const [settings,setSettings]        = useState(loadSettings)
+  const [showOnboarding,setShowOnboarding] = useState(false)
 
   const T = settings.darkMode ? DARK : LIGHT
+  const cssVars = {'--bg':T.bg,'--bg2':T.bg2,'--bg3':T.bg3,'--border':T.border,'--text':T.text,'--text2':T.text2,'--text3':T.text3,'--accent':T.accent,'--accent-dim':T.accentDim,'--card':T.card,'--input':T.input}
 
   const fetchUsers = useCallback(async()=>{
     const{data}=await supabase.from('users').select('id,name,goal').order('name')
@@ -455,7 +388,7 @@ export default function App() {
     setAuthLoading(true)
     const id=name.trim().toLowerCase().replace(/\s+/g,'-')+'-'+Date.now()
     const{error}=await supabase.from('users').insert([{id,name:name.trim(),pin,goal}])
-    if(error){setAuthMsg('Error creating account. Try again.');setAuthLoading(false);return}
+    if(error){setAuthMsg('Error. Try again.');setAuthLoading(false);return}
     setPendingUser({id,name:name.trim(),goal})
     setScreen('calibrate')
     setAuthLoading(false)
@@ -466,7 +399,7 @@ export default function App() {
     if(!pin){setAuthMsg('Enter your PIN.');return}
     setAuthLoading(true)
     const{data,error}=await supabase.from('users').select('*').eq('id',userId).eq('pin',pin).single()
-    if(error||!data){setAuthMsg('Wrong PIN. Try again.');setAuthLoading(false);return}
+    if(error||!data){setAuthMsg('Wrong PIN.');setAuthLoading(false);return}
     setCurrentUser({id:data.id,name:data.name,goal:data.goal||'general'})
     setAuthMsg('');setAuthLoading(false)
   }
@@ -475,15 +408,6 @@ export default function App() {
     setCurrentUser(null)
     setAuthForm({name:'',pin:'',confirmPin:'',goal:'david_laid'})
     setAuthMsg('');setSelectedUser(null)
-  }
-
-  // CSS variables for theme
-  const cssVars = {
-    '--bg':T.bg,'--bg2':T.bg2,'--bg3':T.bg3,
-    '--border':T.border,'--border2':T.border2,
-    '--text':T.text,'--text2':T.text2,'--text3':T.text3,
-    '--accent':T.accent,'--accent-dim':T.accentDim,
-    '--card':T.card,'--input':T.input,'--noise':T.noise,
   }
 
   if(screen==='app'&&currentUser) return (
@@ -498,83 +422,74 @@ export default function App() {
       onSkip={u=>{setCurrentUser(u);setPendingUser(null);setShowOnboarding(true)}} />
   )
 
+  // ── Login / Register screen ──
   return (
-    <div className="arise-bg" style={{...cssVars,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'100vh',padding:24,position:'relative',overflow:'hidden'}}>
+    <div className="arise-bg" style={{...cssVars,minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,position:'relative',overflow:'hidden'}}>
       <style>{GLOBAL_CSS}</style>
-      <div className="hero-grid" />
+      {/* Soft radial bg */}
+      <div style={{position:'absolute',top:'-20%',left:'50%',transform:'translateX(-50%)',width:500,height:500,borderRadius:'50%',background:`radial-gradient(circle,${T.accent}18 0%,transparent 70%)`,pointerEvents:'none'}} />
 
-      <div style={{width:'100%',maxWidth:420,position:'relative',zIndex:1}}>
+      <div style={{width:'100%',maxWidth:400,position:'relative',zIndex:1}}>
         {/* Logo */}
-        <div style={{textAlign:'center',marginBottom:36}}>
-          <div style={{fontFamily:'Bebas Neue',fontSize:72,letterSpacing:8,color:T.text,lineHeight:0.9,textShadow:T.darkMode?'0 0 40px rgba(255,59,59,0.3)':'none'}}>
-            ARISE
-          </div>
-          <div style={{fontSize:11,letterSpacing:6,color:T.accent,fontWeight:700,textTransform:'uppercase',marginTop:6}}>Physique Tracker</div>
-          <div style={{width:40,height:2,background:T.accent,margin:'10px auto 0',borderRadius:1}} />
+        <div style={{textAlign:'center',marginBottom:32}}>
+          <div style={{fontFamily:'Bebas Neue',fontSize:72,letterSpacing:8,color:T.text,lineHeight:0.9,textShadow:T.darkMode?`0 0 40px ${T.accent}33`:''}}> ARISE</div>
+          <div style={{fontSize:13,letterSpacing:4,color:T.accent,fontWeight:700,marginTop:8}}>PHYSIQUE TRACKER</div>
         </div>
 
-        {/* Theme toggle on auth screen */}
-        <div style={{position:'absolute',top:0,right:0}}>
-          <button onClick={()=>setSettings(s=>({...s,darkMode:!s.darkMode}))} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:'6px 12px',cursor:'pointer',fontSize:14,color:T.text2}}>
-            {settings.darkMode?'☀️':'🌙'}
-          </button>
-        </div>
+        {/* Theme toggle */}
+        <button onClick={()=>setSettings(s=>({...s,darkMode:!s.darkMode}))}
+          style={{position:'absolute',top:0,right:0,background:T.bg2,border:`1px solid ${T.border}`,borderRadius:12,padding:'6px 10px',cursor:'pointer',fontSize:16,color:T.text2}}>
+          {settings.darkMode?'☀️':'🌙'}
+        </button>
 
-        {!selectedUser ? (
+        {screen==='register' ? (
+          <RegisterForm authForm={authForm} setAuthForm={setAuthForm} authMsg={authMsg}
+            authLoading={authLoading} onRegister={handleRegister}
+            onBack={()=>{setScreen('login');setAuthMsg('')}} T={T} />
+        ) : !selectedUser ? (
           <div>
-            <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:12}}>Select Profile</div>
             {users.length===0
-              ?<div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:24,textAlign:'center',color:T.text3,marginBottom:16,fontSize:14}}>No accounts yet. Create the first one below.</div>
-              :<div className="stagger" style={{display:'flex',flexDirection:'column',gap:8,marginBottom:16}}>
-                {users.map(u=>{
-                  const goal=GOALS.find(g=>g.id===(u.goal||'general'))
-                  return(
-                    <button key={u.id} className="btn-press hover-lift" onClick={()=>{setSelectedUser(u);setAuthForm(f=>({...f,pin:''}));setAuthMsg('')}}
-                      style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:'14px 16px',display:'flex',alignItems:'center',gap:12,textAlign:'left',width:'100%',cursor:'pointer'}}>
-                      <div style={{width:44,height:44,borderRadius:22,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,fontWeight:700,color:'#fff',flexShrink:0,fontFamily:'Bebas Neue',letterSpacing:1}}>{u.name[0].toUpperCase()}</div>
-                      <div style={{flex:1}}>
-                        <div style={{fontSize:17,fontWeight:700,color:T.text,fontFamily:'Rajdhani'}}>{u.name}</div>
-                        <div style={{fontSize:12,color:T.text3}}>{goal?.icon} {goal?.label}</div>
-                      </div>
-                      <div style={{color:T.text3,fontSize:22}}>›</div>
-                    </button>
-                  )
-                })}
-              </div>
-            }
-            {screen==='register'?(
-              <RegisterForm authForm={authForm} setAuthForm={setAuthForm} authMsg={authMsg} authLoading={authLoading} onRegister={handleRegister} onBack={()=>{setScreen('login');setAuthMsg('')}} T={T} />
-            ):(
-              <button className="btn-press" onClick={()=>{setScreen('register');setAuthMsg('');setSelectedUser(null)}}
-                style={{width:'100%',background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:13,fontSize:13,fontWeight:700,letterSpacing:2}}>
-                CREATE NEW ACCOUNT
-              </button>
-            )}
-          </div>
-        ):(
-          <div>
-            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:20,marginBottom:14}}>
-              <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:20}}>
-                <div style={{width:48,height:48,borderRadius:24,background:avatarColor(selectedUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:700,color:'#fff',fontFamily:'Bebas Neue',letterSpacing:1}}>{selectedUser.name[0].toUpperCase()}</div>
-                <div>
-                  <div style={{fontSize:20,fontWeight:700,color:T.text}}>{selectedUser.name}</div>
-                  <button onClick={()=>{setSelectedUser(null);setAuthMsg('')}} style={{background:'none',border:'none',color:T.text3,fontSize:12,cursor:'pointer',padding:0,fontFamily:'Rajdhani',letterSpacing:1}}>← Back</button>
+              ? <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:20,textAlign:'center',color:T.text3,marginBottom:16,fontSize:14}}>No accounts yet. Be the first!</div>
+              : <div className="stagger" style={{display:'flex',flexDirection:'column',gap:8,marginBottom:16}}>
+                  {users.map(u=>{
+                    const goal=GOALS.find(g=>g.id===(u.goal||'general'))
+                    return(
+                      <button key={u.id} className="lift btn" onClick={()=>{setSelectedUser(u);setAuthForm(f=>({...f,pin:''}));setAuthMsg('')}}
+                        style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:'14px 16px',display:'flex',alignItems:'center',gap:12,textAlign:'left',width:'100%'}}>
+                        <div style={{width:44,height:44,borderRadius:22,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,fontWeight:900,color:'#fff',flexShrink:0,fontFamily:'Bebas Neue'}}>{u.name[0].toUpperCase()}</div>
+                        <div style={{flex:1}}>
+                          <div style={{fontSize:17,fontWeight:700,color:T.text}}>{u.name}</div>
+                          <div style={{fontSize:12,color:T.text3,marginTop:1}}>{goal?.icon} {goal?.label}</div>
+                        </div>
+                        <div style={{color:T.text3,fontSize:20}}>›</div>
+                      </button>
+                    )
+                  })}
                 </div>
+            }
+            <button className="btn" onClick={()=>{setScreen('register');setAuthMsg('')}}
+              style={{width:'100%',background:'transparent',border:`1px solid ${T.border}`,borderRadius:12,color:T.text3,padding:13,fontSize:14,fontWeight:700,letterSpacing:1}}>
+              + Create Account
+            </button>
+          </div>
+        ) : (
+          <div className="fade-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:20}}>
+            <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:20}}>
+              <div style={{width:48,height:48,borderRadius:24,background:avatarColor(selectedUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue'}}>{selectedUser.name[0].toUpperCase()}</div>
+              <div>
+                <div style={{fontSize:20,fontWeight:800,color:T.text}}>{selectedUser.name}</div>
+                <button onClick={()=>{setSelectedUser(null);setAuthMsg('')}} style={{background:'none',border:'none',color:T.text3,fontSize:12,cursor:'pointer',padding:0,fontFamily:'Nunito'}}>← Back</button>
               </div>
-              <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:8}}>PIN</div>
-              <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
-                value={authForm.pin} onChange={e=>setAuthForm(f=>({...f,pin:e.target.value}))}
-                onKeyDown={e=>e.key==='Enter'&&handleLogin(selectedUser.id)}
-                style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'14px',fontSize:28,letterSpacing:10,textAlign:'center',marginBottom:14}} />
-              {authMsg&&<div style={{color:T.accent,fontSize:13,marginBottom:12,textAlign:'center'}}>{authMsg}</div>}
-              <button className="btn-press" onClick={()=>handleLogin(selectedUser.id)} disabled={authLoading}
-                style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:14,fontSize:16,fontWeight:700,letterSpacing:3}}>
-                {authLoading?<span className="spin">◈</span>:'SIGN IN'}
-              </button>
             </div>
-            <button className="btn-press" onClick={()=>{setScreen('register');setSelectedUser(null);setAuthMsg('')}}
-              style={{width:'100%',background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:12,fontSize:13,fontWeight:700,letterSpacing:2}}>
-              CREATE NEW ACCOUNT
+            <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:8}}>PIN</div>
+            <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
+              value={authForm.pin} onChange={e=>setAuthForm(f=>({...f,pin:e.target.value}))}
+              onKeyDown={e=>e.key==='Enter'&&handleLogin(selectedUser.id)}
+              style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:14,fontSize:28,letterSpacing:10,textAlign:'center',marginBottom:14}} />
+            {authMsg&&<div style={{color:T.accent,fontSize:13,marginBottom:12,textAlign:'center'}}>{authMsg}</div>}
+            <button className="btn" onClick={()=>handleLogin(selectedUser.id)} disabled={authLoading}
+              style={{width:'100%',background:T.accent,borderRadius:12,color:'#fff',padding:14,fontSize:16,fontWeight:800,letterSpacing:2,boxShadow:`0 4px 16px ${T.accent}44`}}>
+              {authLoading?<span className="spin">◈</span>:'Sign In'}
             </button>
           </div>
         )}
@@ -585,160 +500,129 @@ export default function App() {
 
 function RegisterForm({authForm,setAuthForm,authMsg,authLoading,onRegister,onBack,T}){
   return(
-    <div className="slide-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:20,marginTop:12}}>
-      <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:4}}>Create Account</div>
-      <div style={{fontSize:13,color:T.text3,marginBottom:20,fontFamily:'Inter'}}>Set up your profile and choose your goal.</div>
-      <div style={{display:'flex',flexDirection:'column',gap:14}}>
+    <div className="fade-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:20}}>
+      <div style={{fontSize:20,fontWeight:800,color:T.text,marginBottom:4}}>Create Account</div>
+      <div style={{fontSize:13,color:T.text3,marginBottom:20}}>Choose your goal and set a PIN.</div>
+      <div style={{display:'flex',flexDirection:'column',gap:12}}>
         <div>
-          <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Name</div>
+          <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:6}}>NAME</div>
           <input placeholder="Your name" value={authForm.name} onChange={e=>setAuthForm(f=>({...f,name:e.target.value}))}
-            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:16}} />
+            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:15}} />
         </div>
         <div>
-          <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:8}}>Goal</div>
+          <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:8}}>GOAL</div>
           <div style={{display:'flex',flexDirection:'column',gap:6}}>
             {GOALS.map(g=>(
-              <button key={g.id} onClick={()=>setAuthForm(f=>({...f,goal:g.id}))}
-                style={{background:authForm.goal===g.id?T.accentDim:T.input,border:`1px solid ${authForm.goal===g.id?T.accent:T.border}`,borderRadius:10,padding:'10px 12px',display:'flex',alignItems:'center',gap:10,textAlign:'left',width:'100%',cursor:'pointer',transition:'all 0.15s'}}>
+              <button key={g.id} onClick={()=>setAuthForm(f=>({...f,goal:g.id}))} className="btn"
+                style={{background:authForm.goal===g.id?T.accentDim:T.input,border:`1.5px solid ${authForm.goal===g.id?T.accent:T.border}`,borderRadius:12,padding:'10px 12px',display:'flex',alignItems:'center',gap:10,textAlign:'left',width:'100%',transition:'all .15s'}}>
                 <span style={{fontSize:18}}>{g.icon}</span>
                 <div>
                   <div style={{fontSize:14,fontWeight:700,color:authForm.goal===g.id?T.accent:T.text}}>{g.label}</div>
-                  <div style={{fontSize:11,color:T.text3,fontFamily:'Inter'}}>{g.desc}</div>
+                  <div style={{fontSize:11,color:T.text3}}>{g.desc}</div>
                 </div>
-                {authForm.goal===g.id&&<span style={{marginLeft:'auto',color:T.accent,fontSize:16}}>✓</span>}
+                {authForm.goal===g.id&&<span style={{marginLeft:'auto',color:T.accent}}>✓</span>}
               </button>
             ))}
           </div>
         </div>
         <div>
-          <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>PIN (4-8 digits)</div>
+          <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:6}}>PIN (4-8 digits)</div>
           <input type="password" inputMode="numeric" maxLength={8} placeholder="••••" value={authForm.pin} onChange={e=>setAuthForm(f=>({...f,pin:e.target.value}))}
-            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:24,letterSpacing:8,textAlign:'center'}} />
+            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:22,letterSpacing:6,textAlign:'center'}} />
         </div>
         <div>
-          <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Confirm PIN</div>
+          <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:6}}>CONFIRM PIN</div>
           <input type="password" inputMode="numeric" maxLength={8} placeholder="••••" value={authForm.confirmPin} onChange={e=>setAuthForm(f=>({...f,confirmPin:e.target.value}))} onKeyDown={e=>e.key==='Enter'&&onRegister()}
-            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:24,letterSpacing:8,textAlign:'center'}} />
+            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:22,letterSpacing:6,textAlign:'center'}} />
         </div>
         {authMsg&&<div style={{color:T.accent,fontSize:13,textAlign:'center'}}>{authMsg}</div>}
-        <button className="btn-press" onClick={onRegister} disabled={authLoading}
-          style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:14,fontSize:16,fontWeight:700,letterSpacing:3}}>
-          {authLoading?'...':'CREATE ACCOUNT'}
+        <button className="btn" onClick={onRegister} disabled={authLoading}
+          style={{background:T.accent,borderRadius:12,color:'#fff',padding:14,fontSize:16,fontWeight:800,letterSpacing:2,boxShadow:`0 4px 16px ${T.accent}44`}}>
+          {authLoading?'...':'Create Account'}
         </button>
-        <button className="btn-press" onClick={onBack}
-          style={{background:'transparent',border:'none',color:T.text3,fontSize:12,fontWeight:700,letterSpacing:1,padding:4,cursor:'pointer'}}>
-          ← Back to login
-        </button>
+        <button className="btn" onClick={onBack} style={{background:'transparent',color:T.text3,padding:4,fontSize:13,fontWeight:600}}>← Back</button>
       </div>
     </div>
   )
 }
 
-// ─── Calibration Screen ───────────────────────────────────────────────────────
+// ─── Calibration ─────────────────────────────────────────────────────────────
 function CalibrationScreen({user,T,cssVars,onDone,onSkip}){
-  const [lifts,setLifts]   = useState({})
-  const [saving,setSaving] = useState(false)
-  const [step,setStep]     = useState(0)
-
+  const [lifts,setLifts]=useState({})
+  const [saving,setSaving]=useState(false)
+  const [step,setStep]=useState(0)
   const CALIB=[
-    {muscle:'chest',     name:'Bench Press',      placeholder:'e.g. 80'},
-    {muscle:'back',      name:'Deadlift',          placeholder:'e.g. 100'},
-    {muscle:'legs',      name:'Squat',             placeholder:'e.g. 90'},
-    {muscle:'shoulders', name:'Overhead Press',    placeholder:'e.g. 60'},
-    {muscle:'arms',      name:'Barbell Curl',      placeholder:'e.g. 40'},
-    {muscle:'core',      name:'Hanging Leg Raise', placeholder:'reps only'},
+    {muscle:'chest',     name:'Bench Press',    placeholder:'e.g. 80'},
+    {muscle:'back',      name:'Deadlift',        placeholder:'e.g. 100'},
+    {muscle:'legs',      name:'Squat',           placeholder:'e.g. 90'},
+    {muscle:'shoulders', name:'Overhead Press',  placeholder:'e.g. 60'},
+    {muscle:'arms',      name:'Barbell Curl',    placeholder:'e.g. 40'},
+    {muscle:'core',      name:'Hanging Leg Raise',placeholder:'reps only'},
   ]
-
-  async function handleSave(){
+  async function save(){
     setSaving(true)
-    const rows=Object.entries(lifts).filter(([,v])=>v&&parseFloat(v)>0).map(([muscle,weight])=>{
-      const ex=CALIB.find(e=>e.muscle===muscle)
-      return{user_id:user.id,muscle,exercise:ex?.name||muscle,weight:parseFloat(weight),reps:1,sets:1}
-    })
+    const rows=Object.entries(lifts).filter(([,v])=>v&&parseFloat(v)>0).map(([muscle,weight])=>({user_id:user.id,muscle,exercise:CALIB.find(e=>e.muscle===muscle)?.name||muscle,weight:parseFloat(weight),reps:1,sets:1}))
     if(rows.length>0) await supabase.from('workouts').insert(rows)
-    setSaving(false)
-    onDone(user)
+    setSaving(false);onDone(user)
   }
-
   if(step===0) return(
-    <div className="arise-bg" style={{...cssVars,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'100vh',padding:24,position:'relative',overflow:'hidden'}}>
+    <div className="arise-bg" style={{...cssVars,minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24}}>
       <style>{GLOBAL_CSS}</style>
-      <div className="hero-grid" />
-      <div style={{width:'100%',maxWidth:400,textAlign:'center',position:'relative',zIndex:1}}>
-        <div style={{fontSize:64,marginBottom:16}}>🏋️</div>
-        <div style={{fontFamily:'Bebas Neue',fontSize:36,letterSpacing:4,color:T.text,marginBottom:8}}>Welcome, {user.name}</div>
-        <div style={{fontSize:15,color:T.text2,fontFamily:'Inter',lineHeight:1.7,marginBottom:32}}>
-          Have you been training before?<br/>We can set your starting rank based on where you actually are — not start everyone at Beginner.
-        </div>
+      <div style={{width:'100%',maxWidth:400,textAlign:'center'}}>
+        <div style={{fontSize:60,marginBottom:16}}>🏋️</div>
+        <div style={{fontFamily:'Bebas Neue',fontSize:34,letterSpacing:3,color:T.text,marginBottom:8}}>Hey {user.name}!</div>
+        <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:28}}>Been training before? We can set your starting rank based on where you actually are right now.</div>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
-          <button className="btn-press" onClick={()=>setStep(1)}
-            style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:16,fontSize:16,fontWeight:700,letterSpacing:3}}>
-            YES, SET MY STARTING RANK
-          </button>
-          <button className="btn-press" onClick={()=>onSkip(user)}
-            style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:12,color:T.text3,padding:14,fontSize:14,fontWeight:600,letterSpacing:2}}>
-            I'M NEW — START FROM SCRATCH
-          </button>
+          <button className="btn" onClick={()=>setStep(1)} style={{background:T.accent,borderRadius:14,color:'#fff',padding:16,fontSize:16,fontWeight:800,letterSpacing:2,boxShadow:`0 4px 16px ${T.accent}44`}}>Yes, set my starting rank</button>
+          <button className="btn" onClick={()=>onSkip(user)} style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:14,color:T.text3,padding:14,fontSize:14,fontWeight:600}}>I'm new — start from scratch</button>
         </div>
       </div>
     </div>
   )
-
   return(
     <div className="arise-bg" style={{...cssVars,minHeight:'100vh',paddingBottom:40}}>
       <style>{GLOBAL_CSS}</style>
       <div style={{background:T.bg2,borderBottom:`1px solid ${T.border}`,padding:'20px 20px 16px'}}>
-        <div style={{fontSize:11,letterSpacing:4,color:T.accent,fontWeight:700,marginBottom:4}}>CALIBRATION</div>
-        <div style={{fontFamily:'Bebas Neue',fontSize:30,letterSpacing:2,color:T.text}}>Set Your Starting Rank</div>
-        <div style={{fontSize:13,color:T.text2,marginTop:4,fontFamily:'Inter'}}>Enter your current best working weight. Skip any you don't know.</div>
+        <div style={{fontSize:11,letterSpacing:4,color:T.accent,fontWeight:700,marginBottom:4}}>SETUP</div>
+        <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text}}>Set Your Starting Rank</div>
+        <div style={{fontSize:13,color:T.text2,marginTop:4}}>Enter your current working weight. Skip any you don't know.</div>
       </div>
-      <div style={{padding:'20px 16px'}}>
-        <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,marginBottom:20}}>
-          <div style={{fontSize:11,color:T.accent,letterSpacing:2,textTransform:'uppercase',marginBottom:6}}>How this works</div>
-          <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',lineHeight:1.6}}>Enter the weight you normally train with for a solid working set. We'll estimate your 1RM and assign your starting rank. Leave blank to start from scratch on that muscle.</div>
-        </div>
+      <div style={{padding:'16px 16px'}}>
         <div className="stagger" style={{display:'flex',flexDirection:'column',gap:10,marginBottom:20}}>
           {CALIB.map(ex=>{
             const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
             const val=lifts[ex.muscle]||''
-            const est1RM=val?calc1RM(parseFloat(val),5):0
-            const ps=est1RM>0?Math.min((est1RM/200)*100*0.6+Math.min((parseFloat(val)*5*3/10000)*100,100)*0.4,100):0
+            const est=val?calc1RM(parseFloat(val),5):0
+            const ps=est>0?Math.min((est/200)*100*0.6+Math.min((parseFloat(val)*5*3/10000)*100,100)*0.4,100):0
             const pr=getRank(ps)
             return(
-              <div key={ex.muscle} style={{background:T.card,border:`1px solid ${val?pr.color+'55':T.border}`,borderRadius:12,padding:14,transition:'border-color 0.3s'}}>
+              <div key={ex.muscle} style={{background:T.bg2,border:`1.5px solid ${val?pr.color+'55':T.border}`,borderRadius:16,padding:14,transition:'border-color .3s'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-                  <div>
-                    <div style={{fontSize:16,fontWeight:700,color:T.text}}>{mg?.icon} {mg?.name}</div>
-                    <div style={{fontSize:12,color:T.text3}}>{ex.name}</div>
-                  </div>
-                  {val?(
-                    <div style={{textAlign:'right'}}>
-                      <div style={{fontSize:14,fontWeight:700,color:pr.color}}>{pr.icon} {pr.name}</div>
-                      <div style={{fontSize:10,color:T.text3}}>starting rank</div>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <div style={{width:32,height:32,borderRadius:10,background:mg?.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>{mg?.icon}</div>
+                    <div>
+                      <div style={{fontSize:15,fontWeight:700,color:T.text}}>{mg?.name}</div>
+                      <div style={{fontSize:11,color:T.text3}}>{ex.name}</div>
                     </div>
-                  ):<div style={{fontSize:12,color:T.text3}}>◈ Beginner</div>}
+                  </div>
+                  {val?<div style={{fontSize:13,fontWeight:700,color:pr.color}}>{pr.icon} {pr.name}</div>
+                      :<div style={{fontSize:12,color:T.text3}}>◈ Beginner</div>}
                 </div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:8,alignItems:'center'}}>
+                <div style={{display:'flex',gap:8,alignItems:'center'}}>
                   <input type="number" min="0" inputMode="decimal" placeholder={ex.placeholder} value={val}
                     onChange={e=>setLifts(l=>({...l,[ex.muscle]:e.target.value}))}
-                    style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,padding:'10px 12px',fontSize:20,fontWeight:700,textAlign:'center'}} />
-                  <div style={{fontSize:13,color:T.text3,fontWeight:700}}>kg</div>
+                    style={{flex:1,background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:20,fontWeight:700,textAlign:'center'}} />
+                  <span style={{fontSize:13,color:T.text3,fontWeight:700}}>kg</span>
                 </div>
-                {val&&<div style={{marginTop:6,fontSize:11,color:T.text3}}>Est. 1RM: <span style={{color:pr.color,fontWeight:700}}>{Math.round(est1RM)}kg</span></div>}
+                {val&&<div style={{fontSize:11,color:T.text3,marginTop:6}}>Est. 1RM: <span style={{color:pr.color,fontWeight:700}}>{Math.round(est)}kg</span></div>}
               </div>
             )
           })}
         </div>
-        <div style={{display:'flex',flexDirection:'column',gap:10}}>
-          <button className="btn-press" onClick={handleSave} disabled={saving}
-            style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:16,fontSize:16,fontWeight:700,letterSpacing:3}}>
-            {saving?'...':'SAVE & START'}
-          </button>
-          <button className="btn-press" onClick={()=>onSkip(user)}
-            style={{background:'transparent',border:'none',color:T.text3,padding:10,fontSize:13,fontWeight:600,letterSpacing:1,cursor:'pointer'}}>
-            Skip — I'll log naturally
-          </button>
-        </div>
+        <button className="btn" onClick={save} disabled={saving} style={{width:'100%',background:T.accent,borderRadius:14,color:'#fff',padding:16,fontSize:16,fontWeight:800,letterSpacing:2,boxShadow:`0 4px 16px ${T.accent}44`}}>
+          {saving?'Saving...':'Save & Start'}
+        </button>
+        <button className="btn" onClick={()=>onSkip(user)} style={{display:'block',width:'100%',background:'transparent',color:T.text3,padding:12,fontSize:13,fontWeight:600,marginTop:8,textAlign:'center'}}>Skip</button>
       </div>
     </div>
   )
@@ -746,1237 +630,650 @@ function CalibrationScreen({user,T,cssVars,onDone,onSkip}){
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
 function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,onRecalibrate,showOnboarding,onOnboardingDone}){
-  const [tab,setTab]                 = useState('dashboard')
-  const [showMore,setShowMore]           = useState(false)
-  const [perHand,setPerHand]             = useState(false)
+  const [tab,setTab]                   = useState('today')
+  const [workouts,setWorkouts]         = useState([])
+  const [allWorkouts,setAllWorkouts]   = useState([])
+  const [loading,setLoading]           = useState(true)
+  const [logSuccess,setLogSuccess]     = useState(false)
+
+  // Log form
+  const [logOpen,setLogOpen]           = useState(false)
+  const [logForm,setLogForm]           = useState({muscle:'chest',exercise:'',weight:'',reps:'',sets:'3'})
+  const [customEx,setCustomEx]         = useState('')
+  const [perHand,setPerHand]           = useState(false)
+  const [logLoading,setLogLoading]     = useState(false)
+  const [logMsg,setLogMsg]             = useState('')
+
+  // Templates
+  const [templates,setTemplates]       = useState([])
+  const [activeTemplate,setActiveTemplate] = useState(null)
+  const [checked,setChecked]           = useState({})
+  const [confirmEx,setConfirmEx]       = useState(null)
+  const [confirmW,setConfirmW]         = useState('')
+  const [confirmR,setConfirmR]         = useState('')
+  const [confirmS,setConfirmS]         = useState('')
+  const [showCreateTmpl,setShowCreateTmpl] = useState(false)
+  const [newTmplName,setNewTmplName]   = useState('')
+  const [newTmplExs,setNewTmplExs]     = useState([])
+  const [addingEx,setAddingEx]         = useState(false)
+  const [exForm,setExForm]             = useState({muscle:'chest',exercise:'',sets:'3',reps:'8',weight:''})
+  const [customExTmpl,setCustomExTmpl] = useState('')
+
+  // Body weight
+  const [bodyWeights,setBodyWeights]   = useState([])
+  const [bwInput,setBwInput]           = useState('')
+  const [bwUnit,setBwUnit]             = useState('kg')
+  const [bwLoading,setBwLoading]       = useState(false)
+
+  // Community
+  const [lbLoading,setLbLoading]       = useState(true)
   const [viewingProfile,setViewingProfile] = useState(null)
-  const [onboardStep,setOnboardStep]       = useState(0)
-  const [workouts,setWorkouts]       = useState([])
-  const [allWorkouts,setAllWorkouts] = useState([])
-  const [loading,setLoading]         = useState(true)
-  const [lbLoading,setLbLoading]     = useState(true)
-  const [logForm,setLogForm]         = useState({muscle:'chest',exercise:'',weight:'',reps:'',sets:''})
-  const [logMsg,setLogMsg]           = useState('')
-  const [logLoading,setLogLoading]   = useState(false)
-  const [logSuccess,setLogSuccess]       = useState(false)
-  const [templates,setTemplates]           = useState([])
-  const [currentSession,setCurrentSession]   = useState([])
-  const [showSaveTemplate,setShowSaveTemplate] = useState(false)
-  const [templateName,setTemplateName]       = useState('')
-  // New template builder
-  const [showCreateTemplate,setShowCreateTemplate] = useState(false)
-  const [editingTemplate,setEditingTemplate]   = useState(null) // template being built/edited
-  const [newTmplName,setNewTmplName]           = useState('')
-  const [newTmplExercises,setNewTmplExercises] = useState([])
-  const [addingExercise,setAddingExercise]     = useState(false)
-  const [exForm,setExForm]                     = useState({muscle:'chest',exercise:'',sets:'3',reps:'8',weight:''})
-  // Active template session (checklist mode)
-  const [activeTemplate,setActiveTemplate]     = useState(null) // template currently being worked out
-  const [checkedExercises,setCheckedExercises] = useState({}) // {exIdx: true/false}
-  const [confirmEx,setConfirmEx]               = useState(null) // {tmplId, exIdx, ex} waiting confirm
-  const [confirmWeight,setConfirmWeight]       = useState('')
-  const [confirmReps,setConfirmReps]           = useState('')
-  const [confirmSets,setConfirmSets]           = useState('')
-  const [customExercise,setCustomExercise]     = useState('') // free-text override in log tab
-  const [customExInTemplate,setCustomExInTemplate] = useState('') // free-text in template builder
-  const [chartExercise,setChartExercise] = useState('')
-  const [chartMuscle,setChartMuscle]    = useState('chest')
-  const [challenges,setChallenges]       = useState([])
-  const [myParticipations,setMyParticipations] = useState([])
-  const [challengeForm,setChallengeForm] = useState({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30})
-  const [showCreateChallenge,setShowCreateChallenge] = useState(false)
-  const [challengeLoading,setChallengeLoading] = useState(false)
+  const [challenges,setChallenges]     = useState([])
+  const [myParts,setMyParts]           = useState([])
   const [allUsersWorkouts,setAllUsersWorkouts] = useState([])
-  const [bodyWeights,setBodyWeights] = useState([])
-  const [bwInput,setBwInput]         = useState('')
-  const [bwUnit,setBwUnit]           = useState('kg')
-  const [bwMsg,setBwMsg]             = useState('')
-  const [bwLoading,setBwLoading]     = useState(false)
-  const [histFilter,setHistFilter]   = useState('all')
-  const [planDay,setPlanDay]         = useState(0)
-  const [expandedEx,setExpandedEx]   = useState(null)
-  const [deletePin,setDeletePin]     = useState('')
-  const [deleteMsg,setDeleteMsg]     = useState('')
+  const [showCreateChallenge,setShowCreateChallenge] = useState(false)
+  const [challengeForm,setChallengeForm] = useState({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30})
+  const [challengeLoading,setChallengeLoading] = useState(false)
+
+  // Progress sub-section
+  const [progressSection,setProgressSection] = useState('ranks') // ranks|history|charts|stats|body|achievements
+  const [histFilter,setHistFilter]     = useState('all')
+  const [chartMuscle,setChartMuscle]   = useState('chest')
+  const [chartEx,setChartEx]           = useState('')
+
+  // Settings panel
+  const [showSettings,setShowSettings] = useState(false)
+  const [deletePin,setDeletePin]       = useState('')
+  const [deleteMsg,setDeleteMsg]       = useState('')
   const [deleteLoading,setDeleteLoading] = useState(false)
   const [showDeleteConfirm,setShowDeleteConfirm] = useState(false)
 
-  const unit = settings.unit
-  const plan = PLANS[currentUser.goal||'general']
-  const numDays = settings.trainingDays.length||4
-  const activePlanDays = getActiveDays(plan.days,numDays)
-  const splitLabel = {1:'1-day Full Body',2:'2-day Upper/Lower',3:'3-day Push/Pull/Legs',4:'4-day split',5:'5-day split',6:'6-day split',7:'7-day split'}[numDays]||`${numDays}-day split`
-  useEffect(()=>{if(planDay>=activePlanDays.length)setPlanDay(0)},[numDays])
+  // Onboarding
+  const [obStep,setObStep]             = useState(0)
+  const [showMore,setShowMore]         = useState(false)
 
-  const fetchWorkouts=useCallback(async()=>{
+  const unit = settings.unit
+
+  const fetchWorkouts = useCallback(async()=>{
     setLoading(true)
-    const{data,error}=await supabase.from('workouts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false})
-    if(!error&&data)setWorkouts(data)
+    const{data}=await supabase.from('workouts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false})
+    if(data) setWorkouts(data)
     setLoading(false)
   },[currentUser.id])
 
-  const fetchAllWorkouts=useCallback(async()=>{
+  const fetchCommunity = useCallback(async()=>{
     setLbLoading(true)
-    const{data,error}=await supabase.from('workouts').select('user_id,muscle,weight,reps,sets')
-    if(!error&&data)setAllWorkouts(data)
-    setLbLoading(false)
-  },[])
-
-  useEffect(()=>{fetchWorkouts()},[fetchWorkouts])
-  useEffect(()=>{if(tab==='leaderboard')fetchAllWorkouts()},[tab,fetchAllWorkouts])
-
-  const fetchChallenges = useCallback(async()=>{
-    const{data:ch}=await supabase.from('challenges').select('*').order('created_at',{ascending:false})
-    const{data:pa}=await supabase.from('challenge_participants').select('*').eq('user_id',currentUser.id)
-    const{data:aw}=await supabase.from('workouts').select('user_id,muscle,exercise,weight,reps,sets,created_at')
-    if(ch) setChallenges(ch)
-    if(pa) setMyParticipations(pa)
+    const[{data:aw},{data:ch},{data:pa}]=await Promise.all([
+      supabase.from('workouts').select('user_id,muscle,exercise,weight,reps,sets,created_at'),
+      supabase.from('challenges').select('*').order('created_at',{ascending:false}),
+      supabase.from('challenge_participants').select('*').eq('user_id',currentUser.id),
+    ])
+    if(aw) setAllWorkouts(aw)
     if(aw) setAllUsersWorkouts(aw)
+    if(ch) setChallenges(ch)
+    if(pa) setMyParts(pa)
+    setLbLoading(false)
   },[currentUser.id])
 
-  useEffect(()=>{if(tab==='challenges'||tab==='achievements') fetchChallenges()},[tab,fetchChallenges])
-
-  async function handleJoinChallenge(challengeId){
-    await supabase.from('challenge_participants').insert([{challenge_id:challengeId,user_id:currentUser.id}])
-    fetchChallenges()
-  }
-
-  async function handleCreateChallenge(){
-    const{title,description,muscle,metric,target,days}=challengeForm
-    if(!title.trim()||!target) return
-    setChallengeLoading(true)
-    const endsAt=new Date();endsAt.setDate(endsAt.getDate()+parseInt(days))
-    await supabase.from('challenges').insert([{
-      created_by:currentUser.id,title:title.trim(),description:description.trim(),
-      muscle,metric,target:parseFloat(target),unit,ends_at:endsAt.toISOString()
-    }])
-    setChallengeLoading(false)
-    setShowCreateChallenge(false)
-    setChallengeForm({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30})
-    fetchChallenges()
-  }
-
-  const fetchBodyWeights=useCallback(async()=>{
+  const fetchBodyWeights = useCallback(async()=>{
     const{data}=await supabase.from('bodyweight').select('*').eq('user_id',currentUser.id).order('logged_at',{ascending:true})
     if(data) setBodyWeights(data)
   },[currentUser.id])
 
+  useEffect(()=>{fetchWorkouts()},[fetchWorkouts])
+  useEffect(()=>{if(tab==='community') fetchCommunity()},[tab,fetchCommunity])
   useEffect(()=>{fetchBodyWeights()},[fetchBodyWeights])
-
-  // Templates stored in localStorage per user
   useEffect(()=>{
-    try{
-      const saved=JSON.parse(localStorage.getItem(`arise_templates_${currentUser.id}`)||'[]')
-      setTemplates(saved)
-    }catch{}
+    try{const s=JSON.parse(localStorage.getItem(`arise_templates_${currentUser.id}`)||'[]');setTemplates(s)}catch{}
   },[currentUser.id])
 
-  function saveTemplates(tmpl){
-    setTemplates(tmpl)
-    localStorage.setItem(`arise_templates_${currentUser.id}`,JSON.stringify(tmpl))
-  }
-
-  // ── New template builder functions ──
-  function handleAddExerciseToTemplate(){
-    if(!exForm.exercise||!exForm.weight) return
-    const ex={muscle:exForm.muscle,exercise:exForm.exercise,sets:parseInt(exForm.sets)||3,reps:parseInt(exForm.reps)||8,weight:parseFloat(exForm.weight)}
-    setNewTmplExercises(prev=>[...prev,ex])
-    setExForm(f=>({...f,exercise:'',weight:''}))
-    setAddingExercise(false)
-  }
-
-  function handleSaveNewTemplate(){
-    if(!newTmplName.trim()||newTmplExercises.length===0) return
-    const tmpl={id:Date.now(),name:newTmplName.trim(),exercises:newTmplExercises,created:new Date().toISOString()}
-    saveTemplates([tmpl,...templates])
-    setNewTmplName('');setNewTmplExercises([]);setShowCreateTemplate(false)
-  }
-
-  function handleDeleteTemplate(id){
-    if(activeTemplate?.id===id) setActiveTemplate(null)
-    saveTemplates(templates.filter(t=>t.id!==id))
-  }
-
-  function handleUpdateExWeight(tmplId,exIdx,newWeight){
-    const updated=templates.map(t=>{
-      if(t.id!==tmplId) return t
-      const exs=[...t.exercises]
-      exs[exIdx]={...exs[exIdx],weight:parseFloat(newWeight)||exs[exIdx].weight}
-      return{...t,exercises:exs}
-    })
-    saveTemplates(updated)
-    if(activeTemplate?.id===tmplId){
-      const tmpl=updated.find(t=>t.id===tmplId)
-      setActiveTemplate(tmpl)
-    }
-  }
-
-  function handleRemoveExFromNew(idx){
-    setNewTmplExercises(prev=>prev.filter((_,i)=>i!==idx))
-  }
-
-  function handleOpenTemplate(tmpl){
-    setActiveTemplate(tmpl)
-    setCheckedExercises({})
-    setConfirmEx(null)
-  }
-
-  function handleCheckExercise(exIdx,ex){
-    setConfirmEx({exIdx,ex})
-    setConfirmWeight(String(cvt(ex.weight,unit)))
-    setConfirmReps(String(ex.reps))
-    setConfirmSets(String(ex.sets))
-  }
-
-  async function handleConfirmLog(){
-    if(!confirmEx||!activeTemplate) return
-    const wKg=unit==='lbs'?parseFloat(confirmWeight)/2.205:parseFloat(confirmWeight)
-    const{error}=await supabase.from('workouts').insert([{
-      user_id:currentUser.id,
-      muscle:confirmEx.ex.muscle,
-      exercise:confirmEx.ex.exercise,
-      weight:Math.round(wKg*10)/10,
-      reps:parseInt(confirmReps),
-      sets:parseInt(confirmSets),
-    }])
-    if(!error){
-      setCheckedExercises(prev=>({...prev,[confirmEx.exIdx]:true}))
-      // Update template weight to what was actually logged
-      handleUpdateExWeight(activeTemplate.id,confirmEx.exIdx,wKg)
-      fetchWorkouts()
-    }
-    setConfirmEx(null)
-  }
-
-  // Old save from session (kept for backward compat)
-  function handleSaveTemplate(){
-    if(!templateName.trim()||currentSession.length===0) return
-    const newTmpl={id:Date.now(),name:templateName.trim(),exercises:currentSession,created:new Date().toISOString()}
-    saveTemplates([newTmpl,...templates])
-    setTemplateName('');setShowSaveTemplate(false)
-  }
-
-  async function handleLogBodyWeight(){
-    if(!bwInput||parseFloat(bwInput)<=0){setBwMsg('Enter a valid weight.');return}
-    setBwLoading(true)
-    const wKg = bwUnit==='lbs' ? parseFloat(bwInput)/2.205 : parseFloat(bwInput)
-    const{error}=await supabase.from('bodyweight').insert([{user_id:currentUser.id,weight:Math.round(wKg*10)/10,unit:'kg'}])
-    if(error){setBwMsg('Error saving. Try again.')}
-    else{setBwMsg('✓ Weight logged!');setBwInput('');fetchBodyWeights()}
-    setBwLoading(false)
-    setTimeout(()=>setBwMsg(''),3000)
-  }
+  function saveTemplates(t){setTemplates(t);localStorage.setItem(`arise_templates_${currentUser.id}`,JSON.stringify(t))}
 
   async function handleLog(){
     const{muscle,exercise,weight,reps,sets}=logForm
-    if(!exercise||!weight||!reps||!sets){setLogMsg('⚠ Fill in all fields.');return}
+    if(!exercise||!weight||!reps||!sets){setLogMsg('Fill in all fields.');return}
     setLogLoading(true)
-    const rawW = parseFloat(weight) * (perHand ? 2 : 1)
+    const rawW=parseFloat(weight)*(perHand?2:1)
     const wKg=unit==='lbs'?rawW/2.205:rawW
     const{error}=await supabase.from('workouts').insert([{user_id:currentUser.id,muscle,exercise,weight:Math.round(wKg*10)/10,reps:parseInt(reps),sets:parseInt(sets)}])
-    if(error){console.error(error);setLogMsg(`✗ Error: ${error.message}`)}
+    if(error){setLogMsg('Error saving. Try again.')}
     else{
-      setLogSuccess(true)
-      setTimeout(()=>setLogSuccess(false),2200)
-      setLogMsg(`✓ ${exercise} — ${weight}${unit} × ${reps} × ${sets}`)
-      setCurrentSession(s=>[...s,{muscle,exercise,weight:parseFloat(weight),reps:parseInt(reps),sets:parseInt(sets)}])
-      setLogForm(f=>({...f,exercise:'',weight:'',reps:'',sets:''}))
-      fetchWorkouts()
+      setLogSuccess(true);setTimeout(()=>setLogSuccess(false),2000)
+      setLogMsg('');setLogForm(f=>({...f,exercise:'',weight:'',reps:'',sets:'3'}));setCustomEx('');setPerHand(false)
+      setLogOpen(false);fetchWorkouts()
     }
     setLogLoading(false)
-    setTimeout(()=>setLogMsg(''),4000)
   }
 
+  // Template helpers
+  function addExToTemplate(){
+    if(!exForm.exercise||!exForm.weight) return
+    const ex={muscle:exForm.muscle,exercise:exForm.exercise,sets:parseInt(exForm.sets)||3,reps:parseInt(exForm.reps)||8,weight:parseFloat(exForm.weight)}
+    setNewTmplExs(p=>[...p,ex]);setExForm(f=>({...f,exercise:'',weight:''}));setAddingEx(false);setCustomExTmpl('')
+  }
+  function saveTmpl(){
+    if(!newTmplName.trim()||newTmplExs.length===0) return
+    saveTemplates([{id:Date.now(),name:newTmplName.trim(),exercises:newTmplExs,created:new Date().toISOString()},...templates])
+    setNewTmplName('');setNewTmplExs([]);setShowCreateTmpl(false)
+  }
+  function updateExWeight(tmplId,idx,w){
+    const up=templates.map(t=>{if(t.id!==tmplId)return t;const e=[...t.exercises];e[idx]={...e[idx],weight:parseFloat(w)||e[idx].weight};return{...t,exercises:e}})
+    saveTemplates(up);if(activeTemplate?.id===tmplId)setActiveTemplate(up.find(t=>t.id===tmplId))
+  }
+  async function confirmLog(){
+    if(!confirmEx||!activeTemplate) return
+    const wKg=unit==='lbs'?parseFloat(confirmW)/2.205:parseFloat(confirmW)
+    const{error}=await supabase.from('workouts').insert([{user_id:currentUser.id,muscle:confirmEx.ex.muscle,exercise:confirmEx.ex.exercise,weight:Math.round(wKg*10)/10,reps:parseInt(confirmR),sets:parseInt(confirmS)}])
+    if(!error){setChecked(p=>({...p,[confirmEx.i]:true}));updateExWeight(activeTemplate.id,confirmEx.i,wKg);fetchWorkouts()}
+    setConfirmEx(null)
+  }
+  async function handleJoinChallenge(id){
+    await supabase.from('challenge_participants').insert([{challenge_id:id,user_id:currentUser.id}]);fetchCommunity()
+  }
+  async function createChallenge(){
+    const{title,description,muscle,metric,target,days}=challengeForm
+    if(!title||!target) return
+    setChallengeLoading(true)
+    const endsAt=new Date();endsAt.setDate(endsAt.getDate()+parseInt(days))
+    await supabase.from('challenges').insert([{created_by:currentUser.id,title:title.trim(),description:description.trim(),muscle,metric,target:parseFloat(target),unit,ends_at:endsAt.toISOString()}])
+    setChallengeLoading(false);setShowCreateChallenge(false);setChallengeForm({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30});fetchCommunity()
+  }
   async function handleDeleteAccount(){
-    if(!deletePin){setDeleteMsg('Enter your PIN to confirm.');return}
+    if(!deletePin){setDeleteMsg('Enter your PIN.');return}
     setDeleteLoading(true)
-    const{data,error}=await supabase.from('users').select('id').eq('id',currentUser.id).eq('pin',deletePin).single()
-    if(error||!data){setDeleteMsg('Wrong PIN. Try again.');setDeleteLoading(false);return}
+    const{data}=await supabase.from('users').select('id').eq('id',currentUser.id).eq('pin',deletePin).single()
+    if(!data){setDeleteMsg('Wrong PIN.');setDeleteLoading(false);return}
     await supabase.from('workouts').delete().eq('user_id',currentUser.id)
     await supabase.from('users').delete().eq('id',currentUser.id)
-    setDeleteLoading(false)
-    onLogout()
+    setDeleteLoading(false);onLogout()
   }
 
-  // ── Personal Records: best 1RM per exercise ──
-  const personalRecords = workouts.reduce((acc,w)=>{
-    const rm=calc1RM(w.weight,w.reps)
-    if(!acc[w.exercise]||rm>acc[w.exercise].rm)
-      acc[w.exercise]={rm,weight:w.weight,reps:w.reps,date:w.created_at,id:w.id}
-    return acc
-  },{})
-
-  // ── Streak: consecutive weeks with at least 1 workout ──
-  const trainingStreak=(()=>{
-    if(workouts.length===0) return 0
-    const getWeek=d=>{const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toDateString()}
-    const weeks=[...new Set(workouts.map(w=>getWeek(w.created_at)))].sort((a,b)=>new Date(b)-new Date(a))
-    let streak=0,cur=new Date()
-    cur.setDate(cur.getDate()-cur.getDay()+(cur.getDay()===0?-6:1))
-    for(let i=0;i<weeks.length;i++){
-      const wk=new Date(weeks[i])
-      const diff=Math.round((cur-wk)/(7*24*60*60*1000))
-      if(diff===i) streak++
-      else break
-    }
-    return streak
-  })()
-
-  // ── Weekly Summary: last week's stats ──
-  const weeklySummary=(()=>{
-    const now=new Date()
-    const dayOfWeek=now.getDay()
-    const startOfThisWeek=new Date(now);startOfThisWeek.setDate(now.getDate()-dayOfWeek+(dayOfWeek===0?-6:1));startOfThisWeek.setHours(0,0,0,0)
-    const startOfLastWeek=new Date(startOfThisWeek);startOfLastWeek.setDate(startOfThisWeek.getDate()-7)
-    const lastWeek=workouts.filter(w=>{const d=new Date(w.created_at);return d>=startOfLastWeek&&d<startOfThisWeek})
-    const vol=lastWeek.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
-    const prs=lastWeek.filter(w=>{const rm=calc1RM(w.weight,w.reps);const prev=workouts.filter(x=>x.exercise===w.exercise&&new Date(x.created_at)<startOfLastWeek);return prev.length>0&&rm>Math.max(...prev.map(x=>calc1RM(x.weight,x.reps)))})
-    const muscles=[...new Set(lastWeek.map(w=>w.muscle))]
-    return{sessions:lastWeek.length,volume:vol,prs:prs.length,muscles,days:[...new Set(lastWeek.map(w=>new Date(w.created_at).toLocaleDateString('en-US',{weekday:'short'})))]}
-  })()
-
-  // ── Achievements ──────────────────────────────────────────────────────────
-  const ACHIEVEMENTS = [
-    // Logging milestones
-    {id:'first_log',    icon:'🌱', name:'First Rep',        desc:'Log your very first set',                  check:()=>workouts.length>=1},
-    {id:'log_10',       icon:'📝', name:'Getting Started',  desc:'Log 10 total sets',                        check:()=>workouts.length>=10},
-    {id:'log_50',       icon:'💪', name:'Consistent',       desc:'Log 50 total sets',                        check:()=>workouts.length>=50},
-    {id:'log_100',      icon:'🔥', name:'Dedicated',        desc:'Log 100 total sets',                       check:()=>workouts.length>=100},
-    {id:'log_250',      icon:'⚡', name:'Obsessed',         desc:'Log 250 total sets',                       check:()=>workouts.length>=250},
-    {id:'log_500',      icon:'👑', name:'Legend Grinder',   desc:'Log 500 total sets',                       check:()=>workouts.length>=500},
-    // Streak
-    {id:'streak_2',     icon:'🔥', name:'On a Roll',        desc:'Train 2 weeks in a row',                   check:()=>trainingStreak>=2},
-    {id:'streak_4',     icon:'💯', name:'Monthly Warrior',  desc:'Train 4 weeks in a row',                   check:()=>trainingStreak>=4},
-    {id:'streak_8',     icon:'🏆', name:'Iron Discipline',  desc:'Train 8 weeks in a row',                   check:()=>trainingStreak>=8},
-    {id:'streak_12',    icon:'🌟', name:'Unstoppable',      desc:'Train 12 weeks in a row',                  check:()=>trainingStreak>=12},
-    // PRs
-    {id:'first_pr',     icon:'⭐', name:'New Heights',      desc:'Set your first personal record',            check:()=>Object.keys(personalRecords).length>=1},
-    {id:'pr_5',         icon:'🌠', name:'PR Machine',       desc:'Set 5 personal records',                   check:()=>Object.keys(personalRecords).length>=5},
-    {id:'pr_10',        icon:'💎', name:'Record Breaker',   desc:'Set 10 personal records',                  check:()=>Object.keys(personalRecords).length>=10},
-    // Rank milestones
-    {id:'rank_novice',  icon:'◆', name:'Novice',            desc:'Reach Novice rank on any muscle',          check:()=>Object.values(scores||{}).some(s=>s>=20)},
-    {id:'rank_inter',   icon:'◉', name:'Intermediate',      desc:'Reach Intermediate on any muscle',         check:()=>Object.values(scores||{}).some(s=>s>=40)},
-    {id:'rank_adv',     icon:'✦', name:'Advanced',          desc:'Reach Advanced on any muscle',             check:()=>Object.values(scores||{}).some(s=>s>=60)},
-    {id:'rank_elite',   icon:'★', name:'Elite',             desc:'Reach Elite on any muscle',                check:()=>Object.values(scores||{}).some(s=>s>=80)},
-    {id:'rank_legend',  icon:'⬡', name:'Legend',            desc:'Reach Legend on any muscle',               check:()=>Object.values(scores||{}).some(s=>s>=95)},
-    {id:'all_novice',   icon:'🎯', name:'Well Rounded',     desc:'Reach Novice on ALL muscle groups',        check:()=>Object.values(scores||{}).every(s=>s>=20)},
-    {id:'all_inter',    icon:'🏅', name:'Complete Athlete', desc:'Reach Intermediate on ALL muscle groups',  check:()=>Object.values(scores||{}).every(s=>s>=40)},
-    // Volume
-    {id:'vol_100k',     icon:'📦', name:'100k Club',        desc:'Lift 100,000kg total volume',              check:()=>workouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)>=100000},
-    {id:'vol_500k',     icon:'🚀', name:'Half Million',     desc:'Lift 500,000kg total volume',              check:()=>workouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)>=500000},
-    // All muscles logged
-    {id:'all_muscles',  icon:'🧬', name:'Full Body',        desc:'Log at least one set for every muscle group', check:()=>MUSCLE_GROUPS.every(mg=>workouts.some(w=>w.muscle===mg.id))},
-  ]
-  const unlockedAchievements = ACHIEVEMENTS.filter(a=>{try{return a.check()}catch{return false}})
-  const lockedAchievements   = ACHIEVEMENTS.filter(a=>{try{return !a.check()}catch{return true}})
-
+  // Computed
   const byMuscle=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:workouts.filter(w=>w.muscle===mg.id)}),{})
   const scores=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:calcScore(byMuscle[mg.id])}),{})
   const totalScore=MUSCLE_GROUPS.reduce((s,mg)=>s+scores[mg.id],0)/MUSCLE_GROUPS.length
   const overallRank=getRank(totalScore)
-  const filtered=histFilter==='all'?workouts:workouts.filter(w=>w.muscle===histFilter)
-  const sortedDays=[...settings.trainingDays].sort((a,b)=>({Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[a]-{Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[b]))
+
+  const personalRecords=workouts.reduce((acc,w)=>{
+    const rm=calc1RM(w.weight,w.reps)
+    if(!acc[w.exercise]||rm>acc[w.exercise].rm) acc[w.exercise]={rm,weight:w.weight,reps:w.reps,date:w.created_at,id:w.id}
+    return acc
+  },{})
+
+  const getWeek=d=>{const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toDateString()}
+  const trainingWeeks=[...new Set(workouts.map(w=>getWeek(w.created_at)))].sort((a,b)=>new Date(b)-new Date(a))
+  let streak=0,cur=new Date();cur.setDate(cur.getDate()-cur.getDay()+(cur.getDay()===0?-6:1))
+  for(let i=0;i<trainingWeeks.length;i++){const wk=new Date(trainingWeeks[i]);if(Math.round((cur-wk)/(7*24*60*60*1000))===i)streak++;else break}
+
+  const now=new Date();const dow=now.getDay();const sow=new Date(now);sow.setDate(now.getDate()-dow+(dow===0?-6:1));sow.setHours(0,0,0,0)
+  const sowLast=new Date(sow);sowLast.setDate(sow.getDate()-7)
+  const lastWeekW=workouts.filter(w=>{const d=new Date(w.created_at);return d>=sowLast&&d<sow})
+
+  const ACHIEVEMENTS=[
+    {id:'first',icon:'🌱',name:'First Rep',desc:'Log your first set',check:()=>workouts.length>=1},
+    {id:'log10',icon:'📝',name:'Getting Started',desc:'Log 10 sets',check:()=>workouts.length>=10},
+    {id:'log50',icon:'💪',name:'Consistent',desc:'Log 50 sets',check:()=>workouts.length>=50},
+    {id:'log100',icon:'🔥',name:'Dedicated',desc:'Log 100 sets',check:()=>workouts.length>=100},
+    {id:'log250',icon:'⚡',name:'Obsessed',desc:'Log 250 sets',check:()=>workouts.length>=250},
+    {id:'log500',icon:'👑',name:'Legend Grinder',desc:'Log 500 sets',check:()=>workouts.length>=500},
+    {id:'s2',icon:'🔥',name:'On a Roll',desc:'2 weeks in a row',check:()=>streak>=2},
+    {id:'s4',icon:'💯',name:'Monthly Warrior',desc:'4 weeks in a row',check:()=>streak>=4},
+    {id:'s8',icon:'🏆',name:'Iron Discipline',desc:'8 weeks in a row',check:()=>streak>=8},
+    {id:'s12',icon:'🌟',name:'Unstoppable',desc:'12 weeks in a row',check:()=>streak>=12},
+    {id:'pr1',icon:'⭐',name:'New Heights',desc:'First personal record',check:()=>Object.keys(personalRecords).length>=1},
+    {id:'pr5',icon:'🌠',name:'PR Machine',desc:'5 personal records',check:()=>Object.keys(personalRecords).length>=5},
+    {id:'pr10',icon:'💎',name:'Record Breaker',desc:'10 personal records',check:()=>Object.keys(personalRecords).length>=10},
+    {id:'rn',icon:'◆',name:'Novice',desc:'Reach Novice on any muscle',check:()=>Object.values(scores).some(s=>s>=20)},
+    {id:'ri',icon:'◉',name:'Intermediate',desc:'Reach Intermediate',check:()=>Object.values(scores).some(s=>s>=40)},
+    {id:'ra',icon:'✦',name:'Advanced',desc:'Reach Advanced',check:()=>Object.values(scores).some(s=>s>=60)},
+    {id:'re',icon:'★',name:'Elite',desc:'Reach Elite',check:()=>Object.values(scores).some(s=>s>=80)},
+    {id:'rl',icon:'⬡',name:'Legend',desc:'Reach Legend',check:()=>Object.values(scores).some(s=>s>=95)},
+    {id:'all',icon:'🧬',name:'Full Body',desc:'Log every muscle group',check:()=>MUSCLE_GROUPS.every(mg=>workouts.some(w=>w.muscle===mg.id))},
+  ]
+  const unlocked=ACHIEVEMENTS.filter(a=>{try{return a.check()}catch{return false}})
+  const locked=ACHIEVEMENTS.filter(a=>{try{return !a.check()}catch{return true}})
+
+  const plan=PLANS[currentUser.goal||'general']
+  const numDays=settings.trainingDays?.length||4
+  const activePlanDays=getActiveDays(plan.days,numDays)
+  const todayDayIdx=now.getDay()
+  const sortedTrainingDays=[...(settings.trainingDays||[])].sort((a,b)=>({Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[a]-{Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[b]))
+  const dayNames={0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'}
+  const todayShort=dayNames[todayDayIdx]
+  const todayPlanIdx=sortedTrainingDays.indexOf(todayShort)
+  const todayPlan=todayPlanIdx>=0?activePlanDays[todayPlanIdx]:null
 
   const leaderboard=allUsers.map(u=>{
     const uw=allWorkouts.filter(w=>w.user_id===u.id)
     const ms=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:calcScore(uw.filter(w=>w.muscle===mg.id))}),{})
     const ov=MUSCLE_GROUPS.reduce((s,mg)=>s+ms[mg.id],0)/MUSCLE_GROUPS.length
-    const top=MUSCLE_GROUPS.reduce((b,mg)=>ms[mg.id]>ms[b.id]?mg:b,MUSCLE_GROUPS[0])
-    return{...u,overall:ov,muscleScores:ms,topMuscle:top,rank:getRank(ov),goal:GOALS.find(g=>g.id===(u.goal||'general'))}
+    return{...u,overall:ov,muscleScores:ms,rank:getRank(ov),goal:GOALS.find(g=>g.id===(u.goal||'general'))}
   }).sort((a,b)=>b.overall-a.overall)
 
-  // ── Render ──
-  return(
-    <div className="arise-bg" style={{...cssVars,paddingBottom:80,position:'relative'}}>
+  // ── Shared component helpers ──────────────────────────────────────────────
+  const Input=(props)=><input {...props} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:15,...(props.style||{})}} />
+  const Label=({children})=><div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,textTransform:'uppercase',marginBottom:6}}>{children}</div>
+  const Card=({children,style={},...rest})=><div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:18,padding:16,...style}} {...rest}>{children}</div>
+  const Section=({title,children,action})=>(
+    <div style={{marginBottom:24}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+        <div style={{fontSize:13,fontWeight:800,color:T.text3,letterSpacing:1,textTransform:'uppercase'}}>{title}</div>
+        {action}
+      </div>
+      {children}
+    </div>
+  )
+
+  return (
+    <div className="arise-bg" style={{...cssVars,paddingBottom:90,minHeight:'100vh',position:'relative'}}>
       <style>{GLOBAL_CSS}</style>
 
-      {/* Log success overlay */}
+      {/* ── LOG SUCCESS FLASH ── */}
       {logSuccess&&(
-        <div className="log-flash" style={{position:'fixed',inset:0,zIndex:999,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none',background:T.darkMode?'rgba(255,59,59,0.08)':'rgba(224,32,32,0.05)'}}>
-          <div style={{background:T.accent,borderRadius:20,padding:'20px 40px',textAlign:'center',boxShadow:`0 0 60px ${T.accent}55`}}>
-            <div style={{fontSize:36,marginBottom:4}}>💪</div>
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:3,color:'#fff'}}>SET LOGGED</div>
+        <div className="log-flash" style={{position:'fixed',inset:0,zIndex:999,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none',background:T.darkMode?'rgba(255,77,109,.07)':'rgba(229,25,58,.04)'}}>
+          <div style={{background:T.accent,borderRadius:20,padding:'20px 36px',textAlign:'center',boxShadow:`0 0 60px ${T.accent}55`}}>
+            <div style={{fontSize:32,marginBottom:4}}>💪</div>
+            <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:3,color:'#fff'}}>LOGGED!</div>
+          </div>
+        </div>
+      )}
+
+      {/* ── ONBOARDING ── */}
+      {showOnboarding&&(
+        <div style={{position:'fixed',inset:0,zIndex:600,background:'rgba(0,0,0,.82)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+          <div className="fade-up" style={{width:'100%',maxWidth:400,background:T.bg2,borderRadius:24,overflow:'hidden',boxShadow:'0 24px 80px rgba(0,0,0,.5)'}}>
+            <div style={{display:'flex',justifyContent:'center',gap:8,padding:'20px 0 0'}}>
+              {[0,1,2,3].map(i=><div key={i} style={{width:i===obStep?24:8,height:8,borderRadius:4,background:i===obStep?T.accent:T.bg3,transition:'all .3s'}} />)}
+            </div>
+            <div style={{padding:'20px 24px 0'}}>
+              {obStep===0&&<div className="fade-up" style={{textAlign:'center'}}>
+                <div style={{fontSize:56,marginBottom:12}}>👋</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:30,letterSpacing:3,color:T.text,marginBottom:8}}>Welcome to ARISE</div>
+                <div style={{fontSize:14,color:T.text2,lineHeight:1.7,marginBottom:20}}>Your gym tracker that turns every lift into a ranking. The more you train, the higher you climb.</div>
+                {[{i:'📈',t:'Track every lift'},{i:'🏅',t:'Rank up from Beginner to Legend'},{i:'⚔️',t:'Compete with your crew'}].map(({i,t})=>(
+                  <div key={t} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:12,padding:'10px 14px',marginBottom:8,textAlign:'left'}}>
+                    <span style={{fontSize:18}}>{i}</span><span style={{fontSize:14,color:T.text2}}>{t}</span>
+                  </div>
+                ))}
+              </div>}
+              {obStep===1&&<div className="fade-up" style={{textAlign:'center'}}>
+                <div style={{fontSize:48,marginBottom:12}}>🏅</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How Ranks Work</div>
+                <div style={{fontSize:13,color:T.text2,lineHeight:1.6,marginBottom:16}}>Each muscle group has its own rank. Lift heavier and do more volume to score higher.</div>
+                {RANKS.map(r=>(
+                  <div key={r.name} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'8px 12px',marginBottom:6}}>
+                    <div style={{width:28,height:28,borderRadius:8,background:r.gradient,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0}}>{r.icon}</div>
+                    <span style={{fontWeight:700,color:r.color,fontSize:14,flex:1,textAlign:'left'}}>{r.name}</span>
+                    <span style={{fontSize:11,color:T.text3}}>≥ {r.min} pts</span>
+                  </div>
+                ))}
+              </div>}
+              {obStep===2&&<div className="fade-up" style={{textAlign:'center'}}>
+                <div style={{fontSize:48,marginBottom:12}}>💪</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>3 Simple Steps</div>
+                {[{n:'1',t:'Open Today tab',d:'See your workout for today and start a session.'},{n:'2',t:'Check off each exercise',d:'Log your sets as you go. Tap an exercise and enter your weight.'},{n:'3',t:'Watch your rank rise',d:'Your score updates live. Keep pushing to level up.'}].map(({n,t,d})=>(
+                  <div key={n} style={{display:'flex',gap:12,background:T.bg3,borderRadius:12,padding:'12px 14px',marginBottom:10,textAlign:'left'}}>
+                    <div style={{width:28,height:28,borderRadius:14,background:T.accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color:'#fff',flexShrink:0}}>{n}</div>
+                    <div><div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:2}}>{t}</div><div style={{fontSize:12,color:T.text3,lineHeight:1.5}}>{d}</div></div>
+                  </div>
+                ))}
+              </div>}
+              {obStep===3&&<div className="fade-up" style={{textAlign:'center'}}>
+                <div style={{fontSize:56,marginBottom:12}}>🚀</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:30,letterSpacing:3,color:T.text,marginBottom:8}}>You're Ready!</div>
+                <div style={{fontSize:14,color:T.text2,lineHeight:1.7,marginBottom:16}}>Head to the <strong style={{color:T.accent}}>Today</strong> tab. Your workout plan is waiting. Tap any exercise to start logging.</div>
+                <div style={{background:T.bg3,borderRadius:12,padding:12,textAlign:'left'}}>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text3,marginBottom:4}}>TIP</div>
+                  <div style={{fontSize:13,color:T.text2}}>Use the <strong style={{color:T.text}}>Workouts</strong> tab to create your own templates and check them off as you train.</div>
+                </div>
+              </div>}
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:obStep===0?'1fr':'auto 1fr',gap:10,padding:'20px 24px 24px'}}>
+              {obStep>0&&<button className="btn" onClick={()=>setObStep(s=>s-1)} style={{background:T.bg3,borderRadius:12,color:T.text2,padding:'12px 16px',fontSize:14,fontWeight:700}}>←</button>}
+              <button className="btn" onClick={()=>{if(obStep<3)setObStep(s=>s+1);else{onOnboardingDone();setObStep(0)}}} style={{background:T.accent,borderRadius:12,color:'#fff',padding:14,fontSize:14,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 14px ${T.accent}44`}}>
+                {obStep===3?'Start Training 💪':'Next →'}
+              </button>
+            </div>
+            {obStep<3&&<button onClick={()=>{onOnboardingDone();setObStep(0)}} style={{display:'block',width:'100%',background:'none',border:'none',color:T.text3,fontSize:12,padding:'0 0 16px',cursor:'pointer',fontFamily:'Nunito',textAlign:'center'}}>Skip intro</button>}
           </div>
         </div>
       )}
 
       {/* ── HEADER ── */}
-      <div style={{background:T.navBg||T.bg2,borderBottom:`1.5px solid ${T.border}`,position:'sticky',top:0,zIndex:100,backdropFilter:'blur(12px)'}}>
-        {/* Hero strip */}
-        <div style={{position:'relative',overflow:'hidden',padding:'12px 16px 0'}}>
-          <div className="hero-grid" style={{opacity:0.15}} />
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',position:'relative',zIndex:1}}>
-            {/* Left: brand + rank */}
-            <div style={{display:'flex',alignItems:'center',gap:12}}>
-              <div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:4,color:T.text,lineHeight:1,textShadow:T.darkMode?`0 0 20px ${T.accent}44`:'none'}}>ARISE</div>
-                <div style={{fontSize:9,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:'uppercase',marginTop:-2}}>PHYSIQUE TRACKER</div>
-              </div>
-              {!loading&&(
-                <div style={{background:overallRank.gradient,borderRadius:10,padding:'4px 10px',display:'flex',alignItems:'center',gap:6,boxShadow:`0 0 14px ${overallRank.color}44`}}>
-                  <span style={{fontSize:14}}>{overallRank.icon}</span>
-                  <div>
-                    <div style={{fontSize:12,fontWeight:700,color:'#fff',lineHeight:1}}>{overallRank.name}</div>
-                    <div style={{fontSize:9,color:'rgba(255,255,255,0.7)',letterSpacing:1}}>{Math.round(totalScore)} pts</div>
-                  </div>
-                </div>
-              )}
-            </div>
-            {/* Right: controls */}
-            <div style={{display:'flex',alignItems:'center',gap:8}}>
-              {/* Theme toggle */}
-              <button onClick={()=>setSettings(s=>({...s,darkMode:!s.darkMode}))} style={{background:T.bg3,border:`1px solid ${T.border}`,borderRadius:20,width:34,height:34,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:14}}>
-                {settings.darkMode?'☀️':'🌙'}
-              </button>
-              {/* Unit toggle */}
-              <div style={{display:'flex',background:T.bg3,border:`1px solid ${T.border}`,borderRadius:20,overflow:'hidden'}}>
-                {['kg','lbs'].map(u=>(
-                  <button key={u} onClick={()=>setSettings(s=>({...s,unit:u}))}
-                    style={{padding:'4px 10px',border:'none',fontSize:10,fontWeight:700,letterSpacing:1,cursor:'pointer',background:unit===u?T.accent:'transparent',color:unit===u?'#fff':T.text3,transition:'all 0.2s'}}>
-                    {u.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-              {/* Avatar */}
-              <div style={{display:'flex',alignItems:'center',gap:6}}>
-                <div style={{width:28,height:28,borderRadius:14,background:avatarColor(currentUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,color:'#fff',fontFamily:'Bebas Neue',letterSpacing:1}}>{currentUser.name[0].toUpperCase()}</div>
-                <button onClick={onLogout} style={{background:'none',border:'none',color:T.text3,fontSize:10,cursor:'pointer',letterSpacing:1,fontFamily:'Rajdhani',fontWeight:600}}>OUT</button>
-              </div>
-            </div>
+      <div style={{background:T.bg2,borderBottom:`1px solid ${T.border}`,padding:'14px 16px 12px',position:'sticky',top:0,zIndex:100}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div>
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:4,color:T.text,lineHeight:1}}>ARISE</div>
+            {!loading&&<div style={{fontSize:12,color:overallRank.color,fontWeight:700,marginTop:1}}>{overallRank.icon} {overallRank.name} · {Math.round(totalScore)} pts</div>}
           </div>
-
-          {/* Overall progress bar */}
-          {!loading&&(
-            <div style={{marginTop:10,marginBottom:6,position:'relative',zIndex:1}}>
-              <div style={{background:T.bg3,borderRadius:4,height:4,overflow:'hidden',position:'relative'}}>
-                <div className="bar-fill" style={{'--pct':`${totalScore}%`,height:'100%',background:overallRank.gradient,borderRadius:4}} />
-                <div className="bar-streak" style={{position:'absolute',top:0,width:'40%',height:'100%',background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)'}} />
-              </div>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            {/* Theme */}
+            <button onClick={()=>setSettings(s=>({...s,darkMode:!s.darkMode}))} style={{background:T.bg3,border:`1px solid ${T.border}`,borderRadius:12,width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:16}}>
+              {settings.darkMode?'☀️':'🌙'}
+            </button>
+            {/* KG/LBS */}
+            <div style={{display:'flex',background:T.bg3,border:`1px solid ${T.border}`,borderRadius:12,overflow:'hidden'}}>
+              {['kg','lbs'].map(u=><button key={u} onClick={()=>setSettings(s=>({...s,unit:u}))} style={{padding:'6px 10px',border:'none',fontSize:11,fontWeight:700,cursor:'pointer',background:unit===u?T.accent:'transparent',color:unit===u?'#fff':T.text3,transition:'all .2s',fontFamily:'Nunito'}}>{u}</button>)}
             </div>
-          )}
+            {/* Avatar / settings */}
+            <button onClick={()=>setShowSettings(true)} style={{width:36,height:36,borderRadius:18,background:avatarColor(currentUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:15,fontWeight:900,color:'#fff',border:'none',cursor:'pointer',fontFamily:'Bebas Neue'}}>{currentUser.name[0].toUpperCase()}</button>
+          </div>
         </div>
-
-
       </div>
 
       {/* ── CONTENT ── */}
-      <div style={{padding:'20px 16px 100px 16px',position:'relative',zIndex:1}}>
+      <div style={{padding:'16px 16px 0'}}>
 
-        {/* DASHBOARD */}
-        {tab==='dashboard'&&(
-          <div className="slide-up">
-            {/* Hero rank card */}
-            {!loading&&(
-              <div style={{background:overallRank.gradient,borderRadius:20,padding:'20px 20px 16px',marginBottom:20,position:'relative',overflow:'hidden',boxShadow:`0 8px 32px ${overallRank.color}33`}}>
-                <div style={{position:'absolute',top:-20,right:-20,fontSize:100,opacity:0.08,lineHeight:1}}>{overallRank.icon}</div>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-                  <div>
-                    <div style={{fontSize:11,letterSpacing:3,color:'rgba(255,255,255,0.7)',textTransform:'uppercase',marginBottom:4}}>Overall Rank</div>
-                    <div style={{fontFamily:'Bebas Neue',fontSize:44,letterSpacing:3,color:'#fff',lineHeight:1}}>{overallRank.name}</div>
-                    <div style={{fontSize:13,color:'rgba(255,255,255,0.7)',marginTop:2}}>Score: {Math.round(totalScore)} / 100</div>
-                  </div>
-                  <div className="rank-glow" style={{'--rc':overallRank.color,'--rc-dim':overallRank.color+'44',width:64,height:64,borderRadius:32,background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,border:`2px solid rgba(255,255,255,0.3)`}}>
-                    {overallRank.icon}
-                  </div>
-                </div>
-                <div style={{marginTop:14,background:'rgba(0,0,0,0.2)',borderRadius:6,height:6,overflow:'hidden',position:'relative'}}>
-                  <div className="bar-fill" style={{'--pct':`${totalScore}%`,height:'100%',background:'rgba(255,255,255,0.7)',borderRadius:6}} />
-                  <div className="bar-streak" style={{position:'absolute',top:0,width:'40%',height:'100%',background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent)'}} />
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:10,color:'rgba(255,255,255,0.5)'}}>
-                  <span>0</span><span>100</span>
-                </div>
+        {/* ══ TODAY TAB ══════════════════════════════════════════════════════ */}
+        {tab==='today'&&(
+          <div className="fade-up">
+            {/* Greeting */}
+            <div style={{marginBottom:20}}>
+              <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:2,color:T.text,lineHeight:1}}>
+                {new Date().getHours()<12?'Good Morning':new Date().getHours()<17?'Good Afternoon':'Good Evening'}{currentUser.name.split(' ')[0]?`, ${currentUser.name.split(' ')[0]}`:''} 👋 👋
               </div>
-            )}
+              <div style={{fontSize:14,color:T.text3,marginTop:4}}>
+                {new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}
+              </div>
+            </div>
 
-            {/* Streak + Weekly Summary row */}
-            {!loading&&(
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
-                {/* Streak */}
-                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
-                  <div style={{position:'absolute',top:-10,right:-6,fontSize:52,opacity:0.07}}>🔥</div>
-                  <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:4}}>Training Streak</div>
-                  <div style={{fontFamily:'Bebas Neue',fontSize:40,letterSpacing:2,color:trainingStreak>0?'#F59E0B':T.text3,lineHeight:1}}>{trainingStreak}</div>
-                  <div style={{fontSize:11,color:T.text3,marginTop:2}}>{trainingStreak===1?'week in a row':trainingStreak>1?'weeks in a row':'Start your streak!'}</div>
-                  {trainingStreak>=3&&<div style={{marginTop:6,fontSize:10,color:'#F59E0B',fontWeight:700}}>🔥 ON FIRE</div>}
-                </div>
-                {/* This week snapshot */}
-                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
-                  <div style={{position:'absolute',top:-10,right:-6,fontSize:52,opacity:0.07}}>📅</div>
-                  <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:4}}>Last Week</div>
-                  {weeklySummary.sessions===0?(
-                    <div style={{fontSize:13,color:T.text3,marginTop:8,fontFamily:'Inter',lineHeight:1.5}}>No sessions last week.</div>
-                  ):(
-                    <>
-                      <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:T.accent,lineHeight:1}}>{weeklySummary.sessions}</div>
-                      <div style={{fontSize:11,color:T.text3}}>{weeklySummary.sessions===1?'session':'sessions'}</div>
-                      <div style={{display:'flex',gap:6,marginTop:8,flexWrap:'wrap'}}>
-                        {weeklySummary.prs>0&&<span style={{background:'#F59E0B22',border:'1px solid #F59E0B44',borderRadius:6,padding:'2px 6px',fontSize:10,color:'#F59E0B',fontWeight:700}}>⭐ {weeklySummary.prs} PR{weeklySummary.prs>1?'s':''}</span>}
-                        <span style={{background:T.bg3,borderRadius:6,padding:'2px 6px',fontSize:10,color:T.text3}}>{Math.round(cvt(weeklySummary.volume,unit)/1000*10)/10}k {unit}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {loading?(
-              <div style={{textAlign:'center',padding:60,color:T.text3}}>
-                <div className="spin" style={{fontSize:28,marginBottom:10,display:'inline-block'}}>◈</div>
-                <div style={{fontSize:14}}>Loading your data...</div>
-              </div>
-            ):(
+            {/* Today's workout card */}
+            {loading?<div style={{textAlign:'center',padding:40,color:T.text3}}><span className="spin" style={{fontSize:24}}>◈</span></div>:(
               <>
-                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:12}}>Muscle Rankings</div>
-                <div className="stagger" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:20}}>
-                  {MUSCLE_GROUPS.map(mg=>{
-                    const score=scores[mg.id],rank=getRank(score),next=getNextRank(score)
-                    const pct=next?((score-rank.min)/(next.min-rank.min))*100:100
-                    return(
-                      <div key={mg.id} className="hover-lift" style={{background:T.bg2,border:`1.5px solid ${mg.color}33`,borderRadius:20,padding:16,position:'relative',overflow:'hidden',cursor:'default'}}>
-                        {/* Colored top strip */}
-                        <div style={{position:'absolute',top:0,left:0,right:0,height:4,background:`linear-gradient(90deg,${mg.color},${mg.color}66)`,borderRadius:'20px 20px 0 0'}} />
-                        {/* Big icon watermark */}
-                        <div style={{position:'absolute',bottom:-8,right:-4,fontSize:52,opacity:0.12,lineHeight:1}}>{mg.icon}</div>
-                        <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10,marginTop:4}}>
-                          <div style={{width:32,height:32,borderRadius:10,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>{mg.icon}</div>
-                          <div style={{fontSize:14,fontWeight:800,color:T.text}}>{mg.name}</div>
+                {/* Quick rank overview */}
+                <Card style={{marginBottom:16,position:'relative',overflow:'hidden',background:overallRank.gradient,border:'none'}}>
+                  <div style={{position:'absolute',top:-10,right:-10,fontSize:80,opacity:.08,lineHeight:1}}>{overallRank.icon}</div>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                    <div>
+                      <div style={{fontSize:12,color:'rgba(255,255,255,.7)',letterSpacing:1,textTransform:'uppercase'}}>Overall Rank</div>
+                      <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:2,color:'#fff',lineHeight:1.1}}>{overallRank.name}</div>
+                    </div>
+                    <div className="rank-glow" style={{'--rc':overallRank.color,'--rc-dim':overallRank.color+'44',width:56,height:56,borderRadius:28,background:'rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,border:'2px solid rgba(255,255,255,.25)'}}>{overallRank.icon}</div>
+                  </div>
+                  <div style={{background:'rgba(0,0,0,.2)',borderRadius:6,height:6,overflow:'hidden',position:'relative'}}>
+                    <div className="bar" style={{'--w':`${totalScore}%`,height:'100%',background:'rgba(255,255,255,.7)',borderRadius:6}} />
+                    <div className="streak" style={{position:'absolute',top:0,width:'35%',height:'100%',background:'linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent)'}} />
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:10,color:'rgba(255,255,255,.5)'}}>
+                    <span>Beginner</span><span>{Math.round(totalScore)} / 100</span><span>Legend</span>
+                  </div>
+                </Card>
+
+                {/* Today's plan */}
+                {todayPlan?(
+                  <Section title="Today's Workout">
+                    <Card style={{padding:0,overflow:'hidden'}}>
+                      <div style={{padding:'14px 16px 10px',borderBottom:`1px solid ${T.border}`}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                          <div>
+                            <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:T.text}}>{todayPlan.label}</div>
+                            <div style={{fontSize:12,color:T.text3}}>{todayPlan.focus}</div>
+                          </div>
+                          <div style={{background:T.accentDim,border:`1px solid ${T.accent}44`,borderRadius:8,padding:'3px 10px',fontSize:11,color:T.accent,fontWeight:700}}>{todayShort}</div>
                         </div>
-                        <div style={{display:'flex',alignItems:'baseline',gap:4,marginBottom:6}}>
-                          <div style={{fontSize:22,fontWeight:900,color:mg.color,lineHeight:1}}>{rank.icon}</div>
-                          <div style={{fontSize:15,fontWeight:800,color:mg.color}}>{rank.name}</div>
-                        </div>
-                        <div style={{background:T.bg3,borderRadius:6,height:6,overflow:'hidden',marginBottom:6,position:'relative'}}>
-                          <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}99)`,borderRadius:6}} />
-                        </div>
-                        {next
-                          ?<div style={{fontSize:11,color:T.text3,fontWeight:600}}>→ {next.name} · {Math.round(score)}/100</div>
-                          :<div style={{fontSize:11,color:mg.color,fontWeight:700}}>MAX RANK ✦</div>}
                       </div>
-                    )
-                  })}
+                      <div style={{padding:'10px 16px 14px'}}>
+                        {todayPlan.exercises.slice(0,4).map((ex,i)=>{
+                          const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+                          return(
+                            <div key={i} style={{display:'flex',alignItems:'center',gap:10,padding:'7px 0',borderBottom:i<3?`1px solid ${T.border}`:'none'}}>
+                              <div style={{width:28,height:28,borderRadius:9,background:mg?.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14}}>{mg?.icon}</div>
+                              <div style={{flex:1}}>
+                                <div style={{fontSize:14,fontWeight:600,color:T.text}}>{ex.name}</div>
+                                <div style={{fontSize:11,color:T.text3}}>{ex.sets} sets · {ex.reps} reps</div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                        {todayPlan.exercises.length>4&&<div style={{fontSize:12,color:T.text3,textAlign:'center',paddingTop:8}}>+{todayPlan.exercises.length-4} more</div>}
+                        <button className="btn" onClick={()=>setTab('workouts')} style={{width:'100%',marginTop:12,background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,borderRadius:12,color:'#fff',padding:13,fontSize:15,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 14px ${T.accent}33`}}>
+                          Start Workout →
+                        </button>
+                      </div>
+                    </Card>
+                  </Section>
+                ):(
+                  <Section title="Today">
+                    <Card style={{textAlign:'center',padding:24}}>
+                      <div style={{fontSize:36,marginBottom:8}}>😴</div>
+                      <div style={{fontSize:16,fontWeight:700,color:T.text,marginBottom:4}}>Rest Day</div>
+                      <div style={{fontSize:13,color:T.text3,marginBottom:16}}>No workout scheduled today. Enjoy the recovery!</div>
+                      <button className="btn" onClick={()=>setLogOpen(true)} style={{background:T.bg3,border:`1px solid ${T.border}`,borderRadius:12,color:T.text2,padding:'10px 20px',fontSize:14,fontWeight:700}}>
+                        Log anyway
+                      </button>
+                    </Card>
+                  </Section>
+                )}
+
+                {/* Streak + last week */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:24}}>
+                  <Card>
+                    <div style={{fontSize:28,marginBottom:4}}>🔥</div>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:1,color:streak>0?'#F59E0B':T.text3,lineHeight:1}}>{streak}</div>
+                    <div style={{fontSize:12,fontWeight:600,color:T.text3,marginTop:2}}>{streak===1?'week streak':streak>1?'week streak':'No streak yet'}</div>
+                    {streak>=3&&<div style={{fontSize:11,color:'#F59E0B',fontWeight:700,marginTop:4}}>ON FIRE 🔥</div>}
+                  </Card>
+                  <Card>
+                    <div style={{fontSize:28,marginBottom:4}}>📅</div>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:1,color:lastWeekW.length>0?T.accent:T.text3,lineHeight:1}}>{lastWeekW.length}</div>
+                    <div style={{fontSize:12,fontWeight:600,color:T.text3,marginTop:2}}>Last week</div>
+                    {lastWeekW.length>0&&<div style={{fontSize:11,color:T.text3,marginTop:4}}>{Math.round(cvt(lastWeekW.reduce((s,w)=>s+w.weight*w.reps*w.sets,0),unit)/1000*10)/10}k {unit} volume</div>}
+                  </Card>
                 </div>
 
-                {/* Rank tier legend */}
-                <div style={{background:T.bg2,border:`1.5px solid ${T.border}`,borderRadius:18,padding:16}}>
-                  <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:12}}>Rank Tiers</div>
-                  {RANKS.map((r,i)=>(
-                    <div key={r.name} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<RANKS.length-1?`1px solid ${T.border}`:'none'}}>
-                      <div style={{width:28,height:28,borderRadius:14,background:r.gradient,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,boxShadow:`0 0 8px ${r.color}44`,flexShrink:0}}>{r.icon}</div>
-                      <span style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:r.color,flex:1}}>{r.name}</span>
-                      <span style={{fontSize:11,color:T.text3}}>Score ≥ {r.min}</span>
-                    </div>
-                  ))}
-                </div>
+                {/* Muscle rank grid — compact */}
+                <Section title="Muscle Ranks" action={<button onClick={()=>{setTab('progress');setProgressSection('ranks')}} style={{background:'none',border:'none',color:T.accent,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Nunito'}}>See all →</button>}>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
+                    {MUSCLE_GROUPS.map(mg=>{
+                      const s=scores[mg.id],r=getRank(s),next=getNextRank(s)
+                      const pct=next?((s-r.min)/(next.min-r.min))*100:100
+                      return(
+                        <Card key={mg.id} style={{padding:12,position:'relative',overflow:'hidden',border:`1.5px solid ${mg.color}22`}}>
+                          <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${mg.color},${mg.color}66)`}} />
+                          <div style={{fontSize:22,marginBottom:4,marginTop:2}}>{mg.icon}</div>
+                          <div style={{fontSize:11,fontWeight:700,color:T.text,marginBottom:2}}>{mg.name}</div>
+                          <div style={{fontSize:12,fontWeight:800,color:mg.color,marginBottom:6}}>{r.name}</div>
+                          <div style={{background:T.bg3,borderRadius:4,height:4,overflow:'hidden'}}>
+                            <div className="bar" style={{'--w':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}88)`,borderRadius:4}} />
+                          </div>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                </Section>
               </>
             )}
           </div>
         )}
 
-
-        {/* BODY WEIGHT */}
-        {tab==='body'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>BODY WEIGHT</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Track your weight over time.</div>
-
-            {/* Log input */}
-            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
-              <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Log Today's Weight</div>
-              <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:10}}>
-                <input type="number" min="0" inputMode="decimal" placeholder="0.0"
-                  value={bwInput} onChange={e=>setBwInput(e.target.value)}
-                  style={{flex:1,background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:28,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:2}} />
-                <div style={{display:'flex',flexDirection:'column',gap:4}}>
-                  {['kg','lbs'].map(u=>(
-                    <button key={u} onClick={()=>setBwUnit(u)}
-                      style={{background:bwUnit===u?T.accent:'transparent',border:`1px solid ${bwUnit===u?T.accent:T.border}`,borderRadius:8,color:bwUnit===u?'#fff':T.text3,padding:'6px 10px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
-                      {u.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {bwMsg&&<div style={{color:bwMsg.startsWith('✓')?'#10B981':T.accent,fontSize:13,textAlign:'center',marginBottom:10}}>{bwMsg}</div>}
-              <button className="btn-press" onClick={handleLogBodyWeight} disabled={bwLoading}
-                style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:12,fontSize:15,fontWeight:700,letterSpacing:3,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                {bwLoading?'...':'LOG WEIGHT'}
-              </button>
-            </div>
-
-            {/* Chart */}
-            {bodyWeights.length>1&&(()=>{
-              const dispWeights=bodyWeights.map(w=>({...w,display:Math.round(cvt(w.weight,unit)*10)/10}))
-              const vals=dispWeights.map(w=>w.display)
-              const minV=Math.min(...vals),maxV=Math.max(...vals)
-              const range=maxV-minV||1
-              const W=340,H=120,PAD=12
-              const pts=dispWeights.slice(-30).map((w,i,arr)=>{
-                const x=PAD+(i/(arr.length-1||1))*(W-PAD*2)
-                const y=H-PAD-(((w.display-minV)/range)*(H-PAD*2))
-                return{x,y,w}
-              })
-              const pathD=pts.map((p,i)=>i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`).join(' ')
-              const areaD=`${pathD} L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`
-              const latest=dispWeights[dispWeights.length-1]
-              const first=dispWeights[0]
-              const diff=Math.round((latest.display-first.display)*10)/10
-              return(
-                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
-                    <div>
-                      <div style={{fontSize:11,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:2}}>Current Weight</div>
-                      <div style={{fontFamily:'Bebas Neue',fontSize:36,letterSpacing:2,color:T.text,lineHeight:1}}>{latest.display} <span style={{fontSize:18,color:T.text3}}>{unit}</span></div>
-                    </div>
-                    <div style={{textAlign:'right'}}>
-                      <div style={{fontSize:11,color:T.text3,marginBottom:2}}>Total change</div>
-                      <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:diff<0?'#10B981':diff>0?T.accent:T.text3}}>{diff>0?'+':''}{diff} {unit}</div>
-                    </div>
-                  </div>
-                  <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',display:'block'}}>
-                    <defs>
-                      <linearGradient id="bwGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={T.accent} stopOpacity="0.3"/>
-                        <stop offset="100%" stopColor={T.accent} stopOpacity="0.02"/>
-                      </linearGradient>
-                    </defs>
-                    <path d={areaD} fill="url(#bwGrad)" />
-                    <path d={pathD} fill="none" stroke={T.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    {pts.map((p,i)=>i===pts.length-1&&(
-                      <circle key={i} cx={p.x} cy={p.y} r="5" fill={T.accent} stroke={T.bg2} strokeWidth="2"/>
-                    ))}
-                  </svg>
-                  <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:T.text3,marginTop:4}}>
-                    <span>{new Date(bodyWeights[Math.max(0,bodyWeights.length-30)].logged_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
-                    <span>Today</span>
-                  </div>
-                </div>
-              )
-            })()}
-
-            {/* History list */}
-            {bodyWeights.length===0?(
-              <div style={{textAlign:'center',padding:40,color:T.text3}}>
-                <div style={{fontSize:32,marginBottom:8}}>⚖️</div>
-                <div>Log your first weight above.</div>
-              </div>
-            ):(
-              <div>
-                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>History</div>
-                <div style={{display:'flex',flexDirection:'column',gap:6}}>
-                  {[...bodyWeights].reverse().slice(0,20).map((w,i)=>{
-                    const prev=[...bodyWeights].reverse()[i+1]
-                    const diff=prev?Math.round((cvt(w.weight,unit)-cvt(prev.weight,unit))*10)/10:null
-                    return(
-                      <div key={w.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,padding:'10px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                        <div style={{fontSize:13,color:T.text2}}>{new Date(w.logged_at).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>
-                        <div style={{display:'flex',alignItems:'center',gap:10}}>
-                          {diff!==null&&<div style={{fontSize:11,color:diff<0?'#10B981':diff>0?T.accent:T.text3,fontWeight:700}}>{diff>0?'+':''}{diff}</div>}
-                          <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text}}>{Math.round(cvt(w.weight,unit)*10)/10} {unit}</div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* PLAN */}
-        {tab==='plan'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>{plan.title}</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>{settings.ownSplit?'Your own split · rank targets below':`${splitLabel} · ${numDays} days selected`}</div>
-
-            {/* Own split toggle */}
-            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,marginBottom:16}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <div>
-                  <div style={{fontSize:14,fontWeight:700,color:T.text}}>I have my own split</div>
-                  <div style={{fontSize:12,color:T.text3,fontFamily:'Inter',marginTop:2}}>Just show me rank targets, not a program</div>
-                </div>
-                <button onClick={()=>setSettings(s=>({...s,ownSplit:!s.ownSplit}))}
-                  style={{width:50,height:28,borderRadius:14,border:'none',cursor:'pointer',position:'relative',background:settings.ownSplit?T.accent:T.bg3,transition:'background 0.2s',flexShrink:0}}>
-                  <div style={{position:'absolute',top:4,left:settings.ownSplit?26:4,width:20,height:20,borderRadius:10,background:'#fff',transition:'left 0.2s',boxShadow:'0 1px 4px rgba(0,0,0,0.3)'}} />
-                </button>
-              </div>
-            </div>
-
-            {settings.ownSplit?(
-              <div className="stagger" style={{display:'flex',flexDirection:'column',gap:10}}>
-                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:4}}>Rank Targets — What to hit next</div>
-                {MUSCLE_GROUPS.map(mg=>{
-                  const ms=scores[mg.id],rank=getRank(ms),next=getNextRank(ms)
-                  const sessions=byMuscle[mg.id]||[]
-                  const best1RM=sessions.length>0?Math.max(...sessions.map(s=>calc1RM(s.weight,s.reps))):0
-                  const tw=next?Math.round(cvt((next.min/100)*200*0.75,unit)):null
-                  const pct=next?((ms-rank.min)/(next.min-rank.min))*100:100
-                  const rankBg=settings.darkMode?rank.darkBg:rank.lightBg
-                  return(
-                    <div key={mg.id} style={{background:rankBg,border:`1px solid ${rank.color}33`,borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
-                      <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:rank.gradient}} />
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,marginTop:4}}>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text}}>{mg.icon} {mg.name}</div>
-                        <div style={{fontSize:13,fontWeight:700,color:rank.color}}>{rank.icon} {rank.name}</div>
-                      </div>
-                      <div style={{background:'rgba(0,0,0,0.15)',borderRadius:3,height:4,overflow:'hidden',marginBottom:10,position:'relative'}}>
-                        <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:rank.gradient,borderRadius:3}} />
-                      </div>
-                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:next?10:0}}>
-                        <div style={{background:'rgba(0,0,0,0.15)',borderRadius:10,padding:'8px',textAlign:'center'}}>
-                          <div style={{fontSize:10,color:T.text3,marginBottom:2}}>YOUR BEST 1RM</div>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:rank.color}}>{best1RM>0?`${Math.round(cvt(best1RM,unit))}${unit}`:'—'}</div>
-                        </div>
-                        <div style={{background:'rgba(0,0,0,0.15)',borderRadius:10,padding:'8px',textAlign:'center'}}>
-                          <div style={{fontSize:10,color:T.text3,marginBottom:2}}>TARGET TO RANK UP</div>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:next?T.accent:'#F59E0B'}}>{next&&tw?`${tw}${unit}`:'🏆 MAX'}</div>
-                        </div>
-                      </div>
-                      {next&&tw&&(
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.1)',borderRadius:8,padding:'8px 10px'}}>
-                          <div style={{fontSize:12,color:T.text2}}>Next: {next.icon} {next.name}</div>
-                          <button onClick={()=>{setLogForm(f=>({...f,muscle:mg.id,exercise:''}));setTab('log')}}
-                            style={{background:T.accent,border:'none',borderRadius:6,color:'#fff',padding:'4px 10px',fontSize:11,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'Rajdhani'}}>LOG →</button>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            ):(
-              <div>
-                {/* Training days */}
-                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,marginBottom:16}}>
-                  <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Training Days</div>
-                  <div style={{display:'flex',gap:5}}>
-                    {DAYS_OF_WEEK.map(day=>{
-                      const active=settings.trainingDays.includes(day)
-                      return(
-                        <button key={day} onClick={()=>setSettings(s=>{const d=s.trainingDays.includes(day)?s.trainingDays.filter(x=>x!==day):[...s.trainingDays,day];return{...s,trainingDays:d}})}
-                          style={{flex:1,padding:'8px 2px',border:`1px solid ${active?T.accent:T.border}`,borderRadius:8,background:active?T.accentDim:'transparent',color:active?T.accent:T.text3,fontSize:10,fontWeight:700,cursor:'pointer',transition:'all 0.15s'}}>
-                          {day}
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <div style={{fontSize:11,color:T.text3,marginTop:8}}>{settings.trainingDays.length} days · tap to toggle</div>
-                </div>
-
-                {/* Day tabs */}
-                <div style={{display:'flex',gap:8,marginBottom:16,overflowX:'auto',paddingBottom:4}}>
-                  {activePlanDays.map((d,i)=>(
-                    <button key={i} onClick={()=>{setPlanDay(i);setExpandedEx(null)}}
-                      style={{padding:'8px 14px',border:`1px solid ${planDay===i?T.accent:T.border}`,borderRadius:20,background:planDay===i?T.accent:'transparent',color:planDay===i?'#fff':T.text3,fontSize:11,fontWeight:700,letterSpacing:1,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.15s'}}>
-                      {d.day}: {d.label}
-                    </button>
-                  ))}
-                </div>
-
-                {(()=>{
-                  const d=activePlanDays[planDay]||activePlanDays[0],aDay=sortedDays[planDay]
-                  return(
-                    <div>
-                      {/* Day header */}
-                      <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:16,marginBottom:12,position:'relative',overflow:'hidden'}}>
-                        <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},transparent)`}} />
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
-                          <div>
-                            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginTop:4}}>{d.label}</div>
-                            <div style={{fontSize:12,color:T.text3}}>{d.focus}</div>
-                          </div>
-                          {aDay&&<div style={{background:T.accentDim,border:`1px solid ${T.accent}44`,borderRadius:8,padding:'4px 12px',fontSize:12,color:T.accent,fontWeight:700}}>{aDay}</div>}
-                        </div>
-                        <div style={{background:T.bg3,borderRadius:10,padding:12,borderLeft:`3px solid ${T.accent}`}}>
-                          <div style={{fontSize:10,color:T.accent,letterSpacing:2,textTransform:'uppercase',marginBottom:4}}>Tip</div>
-                          <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',lineHeight:1.6}}>{d.tip}</div>
-                        </div>
-                      </div>
-
-                      <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Exercises — tap to expand</div>
-                      <div className="stagger" style={{display:'flex',flexDirection:'column',gap:8}}>
-                        {d.exercises.map((ex,i)=>{
-                          const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
-                          const ms=scores[ex.muscle],rank=getRank(ms),next=getNextRank(ms)
-                          const sess=byMuscle[ex.muscle]||[]
-                          const b1=sess.length>0?Math.max(...sess.map(s=>calc1RM(s.weight,s.reps))):0
-                          const tw=next?Math.round(cvt((next.min/100)*200*0.75,unit)):null
-                          const isExp=expandedEx===`${planDay}-${i}`
-                          return(
-                            <div key={i} onClick={()=>setExpandedEx(isExp?null:`${planDay}-${i}`)}
-                              style={{background:T.bg2,border:`1px solid ${isExp?rank.color+'44':T.border}`,borderRadius:12,overflow:'hidden',cursor:'pointer',transition:'border-color 0.2s'}}>
-                              <div style={{padding:'12px 14px'}}>
-                                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                                  <div style={{flex:1}}>
-                                    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:2}}>
-                                      <span style={{fontSize:11,color:T.text3,fontWeight:700,width:18}}>{i+1}</span>
-                                      <span style={{fontSize:16,fontWeight:700,color:T.text}}>{ex.name}</span>
-                                    </div>
-                                    <div style={{fontSize:12,color:T.text3,marginLeft:26}}>{mg?.icon} {ex.sets}×{ex.reps}</div>
-                                  </div>
-                                  <div style={{textAlign:'right',marginLeft:8}}>
-                                    <div style={{fontSize:12,color:rank.color,fontWeight:700}}>{rank.icon} {rank.name}</div>
-                                    <div style={{fontSize:11,color:T.text3,marginTop:1}}>{isExp?'▲':'▼'}</div>
-                                  </div>
-                                </div>
-                              </div>
-                              {isExp&&(
-                                <div style={{borderTop:`1px solid ${T.border}`,padding:14,background:T.bg3}}>
-                                  <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',marginBottom:12,lineHeight:1.6}}>💡 {ex.note}</div>
-                                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
-                                    <div style={{background:T.bg2,borderRadius:10,padding:10,textAlign:'center',border:`1px solid ${T.border}`}}>
-                                      <div style={{fontSize:10,color:T.text3,marginBottom:4}}>YOUR BEST 1RM</div>
-                                      <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:1,color:rank.color}}>{b1>0?`${Math.round(cvt(b1,unit))}${unit}`:'—'}</div>
-                                    </div>
-                                    <div style={{background:T.bg2,borderRadius:10,padding:10,textAlign:'center',border:`1px solid ${T.border}`}}>
-                                      <div style={{fontSize:10,color:T.text3,marginBottom:4}}>TARGET TO RANK UP</div>
-                                      <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:1,color:next?T.accent:'#F59E0B'}}>{next&&tw?`${tw}${unit}`:'🏆 MAX'}</div>
-                                    </div>
-                                  </div>
-                                  {next&&tw&&(
-                                    <div style={{background:T.bg2,borderRadius:10,padding:12,borderLeft:`3px solid ${next.color}`,marginBottom:10,border:`1px solid ${T.border}`}}>
-                                      <div style={{fontSize:12,color:next.color,fontWeight:700,marginBottom:4}}>To reach {next.icon} {next.name}:</div>
-                                      <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',lineHeight:1.5}}>Work up to ~{tw}{unit}. Log every session to track progress.</div>
-                                    </div>
-                                  )}
-                                  <button onClick={e=>{e.stopPropagation();setLogForm({muscle:ex.muscle,exercise:ex.name,weight:'',reps:'',sets:''});setTab('log')}}
-                                    style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:11,fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                                    LOG THIS EXERCISE →
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })()}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* LOG */}
-        {tab==='log'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:30,letterSpacing:2,color:T.text,marginBottom:2}}>LOG A SET</div>
-            <div style={{fontSize:14,color:T.text2,marginBottom:20}}>Weight in <span style={{color:T.accent,fontWeight:800}}>{unit.toUpperCase()}</span></div>
-            <div style={{display:'flex',flexDirection:'column',gap:16}}>
-              {/* Muscle group — big tap targets */}
-              <div>
-                <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Muscle Group</div>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
-                  {MUSCLE_GROUPS.map(mg=>(
-                    <button key={mg.id} className="muscle-chip btn-press" onClick={()=>{setLogForm(f=>({...f,muscle:mg.id,exercise:''}));setCustomExercise('')}}
-                      style={{background:logForm.muscle===mg.id?mg.colorDim:T.bg2,border:`2px solid ${logForm.muscle===mg.id?mg.color:T.border}`,borderRadius:14,padding:'10px 6px',display:'flex',flexDirection:'column',alignItems:'center',gap:4,transition:'all 0.15s'}}>
-                      <span style={{fontSize:22}}>{mg.icon}</span>
-                      <span style={{fontSize:12,fontWeight:700,color:logForm.muscle===mg.id?mg.color:T.text2}}>{mg.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Exercise</div>
-                <select value={customExercise?'__custom__':logForm.exercise}
-                  onChange={e=>{
-                    if(e.target.value==='__custom__'){setCustomExercise(' ');setLogForm(f=>({...f,exercise:''}))}
-                    else{setCustomExercise('');setLogForm(f=>({...f,exercise:e.target.value}))}
-                  }}
-                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani',marginBottom:customExercise?8:0}}>
-                  <option value="">Select exercise...</option>
-                  {MUSCLE_GROUPS.find(m=>m.id===logForm.muscle)?.exercises.map(ex=><option key={ex} value={ex}>{ex}</option>)}
-                  <option value="__custom__">✏️ Type my own...</option>
-                </select>
-                {customExercise!==''&&(
-                  <input autoFocus placeholder="Exercise name..." value={customExercise.trim()?customExercise:''}
-                    onChange={e=>{setCustomExercise(e.target.value);setLogForm(f=>({...f,exercise:e.target.value}))}}
-                    style={{width:'100%',background:T.input,border:`1px solid ${T.accent}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani'}} />
-                )}
-              </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-                {[['weight',`WT (${unit})`],['reps','REPS'],['sets','SETS']].map(([field,label])=>(
-                  <div key={field}>
-                    <div style={{fontSize:10,letterSpacing:2,color:T.text3,textTransform:'uppercase',marginBottom:6}}>{label}</div>
-                    <input type="number" min="0" value={logForm[field]} onChange={e=>setLogForm(f=>({...f,[field]:e.target.value}))} placeholder="0"
-                      style={{width:'100%',background:T.bg3,border:`2px solid ${T.border}`,borderRadius:14,color:T.text,padding:'14px 6px',fontSize:28,fontWeight:900,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
-                  </div>
-                ))}
-              </div>
-              {/* Per-hand toggle for dumbbells */}
-              <div style={{background:T.bg2,border:`1.5px solid ${T.border}`,borderRadius:14,padding:'12px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <div>
-                  <div style={{fontSize:14,fontWeight:700,color:T.text}}>Dumbbell / Per Hand?</div>
-                  <div style={{fontSize:12,color:T.text3,marginTop:2}}>{perHand?`Logging ${logForm.weight}${unit} per hand = ${Math.round(parseFloat(logForm.weight||0)*2*10)/10}${unit} total`:'Logging total weight (barbell / machine)'}</div>
-                </div>
-                <button onClick={()=>setPerHand(p=>!p)}
-                  style={{width:50,height:28,borderRadius:14,border:'none',cursor:'pointer',position:'relative',background:perHand?T.accent:T.bg3,transition:'background 0.2s',flexShrink:0}}>
-                  <div style={{position:'absolute',top:4,left:perHand?26:4,width:20,height:20,borderRadius:10,background:'#fff',transition:'left 0.2s',boxShadow:'0 1px 4px rgba(0,0,0,0.25)'}} />
-                </button>
-              </div>
-
-              {logForm.weight&&logForm.reps&&(
-                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,textAlign:'center',position:'relative',overflow:'hidden'}}>
-                  <div style={{position:'absolute',top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`}} />
-                  <div style={{fontSize:11,color:T.text3,letterSpacing:2,marginBottom:4}}>ESTIMATED 1RM{perHand?' (total)':''}</div>
-                  <div style={{fontFamily:'Bebas Neue',fontSize:40,letterSpacing:2,color:T.accent,textShadow:T.darkMode?`0 0 20px ${T.accent}44`:'none'}}>
-                    {Math.round(calc1RM(parseFloat(logForm.weight)*(perHand?2:1),parseInt(logForm.reps)))} {unit}
-                  </div>
-                  {perHand&&<div style={{fontSize:12,color:T.text3,marginBottom:4}}>{logForm.weight}{unit} × 2 hands</div>}
-                  <div style={{fontSize:11,color:T.text3,marginTop:2}}>
-                    {getRank(Math.min((calc1RM(parseFloat(logForm.weight)*(perHand?2:1),parseInt(logForm.reps))/200)*100*0.6+Math.min((parseFloat(logForm.weight)*(perHand?2:1)*parseInt(logForm.reps)*(parseInt(logForm.sets)||1)/10000)*100,100)*0.4,100)).icon} {getRank(Math.min((calc1RM(parseFloat(logForm.weight)*(perHand?2:1),parseInt(logForm.reps))/200)*100*0.6+Math.min((parseFloat(logForm.weight)*(perHand?2:1)*parseInt(logForm.reps)*(parseInt(logForm.sets)||1)/10000)*100,100)*0.4,100)).name} level
-                  </div>
-                </div>
-              )}
-              <button className="btn-press" onClick={handleLog} disabled={logLoading}
-                style={{background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,border:'none',borderRadius:16,color:'#fff',padding:18,fontSize:20,fontWeight:900,letterSpacing:4,cursor:'pointer',textTransform:'uppercase',fontFamily:'Bebas Neue',boxShadow:`0 6px 24px ${T.accent}44`,width:'100%'}}>
-                {logLoading?<span className="spin">◈</span>:'💪 LOG SET'}
-              </button>
-              {logMsg&&(
-                <div style={{background:logMsg.startsWith('✓')?T.darkMode?'#052218':'#ECFDF5':T.darkMode?'#2A0505':'#FFF5F5',border:`1px solid ${logMsg.startsWith('✓')?'#10B981':T.accent}`,borderRadius:10,padding:12,color:logMsg.startsWith('✓')?'#10B981':T.accent,fontSize:14,textAlign:'center'}}>
-                  {logMsg}
-                </div>
-              )}
-
-              {/* Current session summary */}
-              {currentSession.length>0&&(
-                <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-                    <div style={{fontSize:11,color:T.text3,letterSpacing:2,textTransform:'uppercase'}}>This Session ({currentSession.length} sets)</div>
-                    <button onClick={()=>setCurrentSession([])} style={{background:'none',border:'none',color:T.text3,fontSize:11,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>CLEAR</button>
-                  </div>
-                  <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:12}}>
-                    {currentSession.map((s,i)=>{
-                      const mg=MUSCLE_GROUPS.find(m=>m.id===s.muscle)
-                      return(
-                        <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:`1px solid ${T.border}`}}>
-                          <div>
-                            <div style={{fontSize:13,fontWeight:700,color:T.text}}>{s.exercise}</div>
-                            <div style={{fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</div>
-                          </div>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:15,letterSpacing:1,color:T.text2}}>{cvt(s.weight,unit)}{unit} × {s.reps} × {s.sets}</div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                  {!showSaveTemplate?(
-                    <button className="btn-press" onClick={()=>setShowSaveTemplate(true)}
-                      style={{width:'100%',background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text2,padding:10,fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                      💾 SAVE AS TEMPLATE
-                    </button>
-                  ):(
-                    <div style={{display:'flex',gap:8}}>
-                      <input placeholder="Template name..." value={templateName} onChange={e=>setTemplateName(e.target.value)}
-                        onKeyDown={e=>e.key==='Enter'&&handleSaveTemplate()}
-                        style={{flex:1,background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}} />
-                      <button className="btn-press" onClick={handleSaveTemplate}
-                        style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:'10px 16px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',whiteSpace:'nowrap'}}>
-                        SAVE
-                      </button>
-                      <button onClick={()=>{setShowSaveTemplate(false);setTemplateName('')}}
-                        style={{background:'none',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:'10px 12px',fontSize:13,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-
-        {/* TEMPLATES */}
-        {tab==='templates'&&(
-          <div className="slide-up">
-
-            {/* ── CONFIRM LOG MODAL ── */}
+        {/* ══ WORKOUTS TAB ════════════════════════════════════════════════════ */}
+        {tab==='workouts'&&(
+          <div className="fade-up">
+            {/* Confirm log modal */}
             {confirmEx&&activeTemplate&&(
-              <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:500,display:'flex',alignItems:'flex-end',justifyContent:'center',padding:'0 16px 24px'}}>
-                <div className="slide-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:20,width:'100%',maxWidth:420}}>
-                  <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},#F59E0B)`,borderRadius:'20px 20px 0 0'}} />
-                  <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:2,color:T.text,marginBottom:4,marginTop:4}}>LOG SET</div>
-                  <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',marginBottom:16}}>{confirmEx.ex.exercise}</div>
+              <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.7)',zIndex:500,display:'flex',alignItems:'flex-end',justifyContent:'center',padding:'0 16px 24px'}}>
+                <div className="fade-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:20,width:'100%',maxWidth:420}}>
+                  <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:2,color:T.text,marginBottom:2}}>Log Set</div>
+                  <div style={{fontSize:13,color:T.text2,marginBottom:16}}>{confirmEx.ex.exercise}</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:16}}>
-                    {[
-                      [`WT (${unit})`,confirmWeight,setConfirmWeight],
-                      ['REPS',confirmReps,setConfirmReps],
-                      ['SETS',confirmSets,setConfirmSets],
-                    ].map(([label,val,setter])=>(
+                    {[[`Weight (${unit})`,confirmW,setConfirmW],['Reps',confirmR,setConfirmR],['Sets',confirmS,setConfirmS]].map(([label,val,setter])=>(
                       <div key={label}>
-                        <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:6,textAlign:'center'}}>{label}</div>
+                        <div style={{fontSize:11,color:T.text3,fontWeight:700,marginBottom:6,textAlign:'center'}}>{label}</div>
                         <input type="number" min="0" value={val} onChange={e=>setter(e.target.value)}
-                          style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 6px',fontSize:24,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
+                          style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 6px',fontSize:22,fontWeight:800,textAlign:'center'}} />
                       </div>
                     ))}
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-                    <button className="btn-press" onClick={()=>setConfirmEx(null)}
-                      style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:12,color:T.text3,padding:13,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
-                      CANCEL
-                    </button>
-                    <button className="btn-press" onClick={handleConfirmLog}
-                      style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:13,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                      LOG ✓
-                    </button>
+                    <button className="btn" onClick={()=>setConfirmEx(null)} style={{background:T.bg3,borderRadius:12,color:T.text2,padding:13,fontSize:14,fontWeight:700}}>Cancel</button>
+                    <button className="btn" onClick={confirmLog} style={{background:T.accent,borderRadius:12,color:'#fff',padding:13,fontSize:14,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 12px ${T.accent}44`}}>Log ✓</button>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* ── ACTIVE TEMPLATE SESSION ── */}
             {activeTemplate?(
+              /* ── Active session checklist ── */
               <div>
-                <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
-                  <button onClick={()=>{setActiveTemplate(null);setCheckedExercises({})}}
-                    style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,color:T.text2,padding:'8px 12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
-                    ← BACK
-                  </button>
-                  <div>
-                    <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:2,color:T.text,lineHeight:1}}>{activeTemplate.name}</div>
-                    <div style={{fontSize:12,color:T.text3}}>{Object.values(checkedExercises).filter(Boolean).length} / {activeTemplate.exercises.length} done</div>
+                <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:16}}>
+                  <button className="btn" onClick={()=>{setActiveTemplate(null);setChecked({})}} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,color:T.text2,padding:'8px 12px',fontSize:13,fontWeight:700}}>← Back</button>
+                  <div style={{flex:1}}>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:T.text,lineHeight:1}}>{activeTemplate.name}</div>
+                    <div style={{fontSize:12,color:T.text3}}>{Object.values(checked).filter(Boolean).length} / {activeTemplate.exercises.length} done</div>
                   </div>
                 </div>
-
-                {/* Session progress bar */}
-                <div style={{background:T.bg3,borderRadius:4,height:6,overflow:'hidden',marginBottom:16,position:'relative'}}>
-                  <div className="bar-fill" style={{'--pct':`${(Object.values(checkedExercises).filter(Boolean).length/activeTemplate.exercises.length)*100}%`,height:'100%',background:`linear-gradient(90deg,${T.accent},#10B981)`,borderRadius:4}} />
-                  <div className="bar-streak" style={{position:'absolute',top:0,width:'40%',height:'100%',background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)'}} />
+                <div style={{background:T.bg3,borderRadius:6,height:8,overflow:'hidden',marginBottom:16,position:'relative'}}>
+                  <div className="bar" style={{'--w':`${(Object.values(checked).filter(Boolean).length/activeTemplate.exercises.length)*100}%`,height:'100%',background:`linear-gradient(90deg,${T.accent},#10B981)`,borderRadius:6}} />
                 </div>
-
-                {/* Exercise checklist */}
                 <div style={{display:'flex',flexDirection:'column',gap:10}}>
                   {activeTemplate.exercises.map((ex,i)=>{
                     const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
-                    const done=checkedExercises[i]===true
+                    const done=checked[i]===true
                     const rank=getRank(scores[ex.muscle]||0)
                     return(
-                      <div key={i} style={{background:done?T.bg3:T.bg2,border:`1px solid ${done?T.border:rank.color+'33'}`,borderRadius:14,padding:14,opacity:done?0.6:1,transition:'all 0.2s',position:'relative',overflow:'hidden'}}>
-                        {!done&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:rank.gradient}} />}
+                      <Card key={i} style={{opacity:done?.6:1,transition:'all .2s',border:`1.5px solid ${done?T.border:mg?.color+'33'}`,position:'relative',overflow:'hidden',padding:14}}>
+                        {!done&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${mg?.color},${mg?.color}66)`}} />}
                         <div style={{display:'flex',alignItems:'center',gap:12}}>
-                          {/* Checkbox */}
-                          <button onClick={()=>!done&&handleCheckExercise(i,ex)}
-                            style={{width:32,height:32,borderRadius:16,border:`2px solid ${done?'#10B981':rank.color}`,background:done?'#10B981':T.input,display:'flex',alignItems:'center',justifyContent:'center',cursor:done?'default':'pointer',flexShrink:0,transition:'all 0.2s'}}>
+                          <button onClick={()=>!done&&(()=>{setConfirmEx({i,ex});setConfirmW(String(cvt(ex.weight,unit)));setConfirmR(String(ex.reps));setConfirmS(String(ex.sets))})()}
+                            style={{width:36,height:36,borderRadius:18,border:`2px solid ${done?'#10B981':mg?.color}`,background:done?'#10B981':T.input,display:'flex',alignItems:'center',justifyContent:'center',cursor:done?'default':'pointer',flexShrink:0,transition:'all .2s'}}>
                             {done&&<span style={{color:'#fff',fontSize:16,fontWeight:700}}>✓</span>}
+                            {!done&&<span style={{fontSize:15}}>{mg?.icon}</span>}
                           </button>
                           <div style={{flex:1}}>
                             <div style={{fontSize:15,fontWeight:700,color:done?T.text3:T.text,textDecoration:done?'line-through':'none'}}>{ex.exercise}</div>
-                            <div style={{fontSize:11,color:T.text3,marginTop:2}}>{mg?.icon} {mg?.name}</div>
+                            <div style={{fontSize:12,color:T.text3,marginTop:1}}>{ex.sets} sets · {ex.reps} reps</div>
                           </div>
-                          {/* Weight — editable inline */}
                           <div style={{textAlign:'right'}}>
-                            <div style={{display:'flex',alignItems:'center',gap:4,justifyContent:'flex-end',marginBottom:2}}>
-                              <input type="number" value={cvt(ex.weight,unit)}
-                                onChange={e=>handleUpdateExWeight(activeTemplate.id,i,unit==='lbs'?parseFloat(e.target.value)/2.205:parseFloat(e.target.value))}
-                                style={{width:60,background:'transparent',border:`1px solid ${T.border}`,borderRadius:6,color:T.text,padding:'3px 6px',fontSize:14,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
-                              <span style={{fontSize:11,color:T.text3}}>{unit}</span>
-                            </div>
-                            <div style={{fontSize:11,color:T.text3}}>{ex.sets} sets × {ex.reps} reps</div>
+                            <input type="number" value={cvt(ex.weight,unit)} onChange={e=>updateExWeight(activeTemplate.id,i,unit==='lbs'?parseFloat(e.target.value)/2.205:parseFloat(e.target.value))}
+                              style={{width:60,background:'transparent',border:`1px solid ${T.border}`,borderRadius:8,color:T.text,padding:'4px 6px',fontSize:15,fontWeight:700,textAlign:'center'}} />
+                            <div style={{fontSize:10,color:T.text3,marginTop:2}}>{unit}</div>
                           </div>
                         </div>
                         {!done&&(
-                          <button className="btn-press" onClick={()=>handleCheckExercise(i,ex)}
-                            style={{width:'100%',marginTop:10,background:rank.gradient,border:'none',borderRadius:8,color:'#fff',padding:'9px',fontSize:12,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                            MARK DONE + LOG
+                          <button className="btn" onClick={()=>{setConfirmEx({i,ex});setConfirmW(String(cvt(ex.weight,unit)));setConfirmR(String(ex.reps));setConfirmS(String(ex.sets))}}
+                            style={{width:'100%',marginTop:10,background:`linear-gradient(135deg,${mg?.color},${mg?.color}AA)`,borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:700,letterSpacing:1}}>
+                            Mark Done + Log
                           </button>
                         )}
-                      </div>
+                      </Card>
                     )
                   })}
                 </div>
-
-                {/* Done state */}
-                {Object.values(checkedExercises).filter(Boolean).length===activeTemplate.exercises.length&&activeTemplate.exercises.length>0&&(
-                  <div style={{background:'#052218',border:'1px solid #10B981',borderRadius:14,padding:20,marginTop:16,textAlign:'center'}}>
+                {Object.values(checked).filter(Boolean).length===activeTemplate.exercises.length&&activeTemplate.exercises.length>0&&(
+                  <div style={{background:'#052218',border:'1px solid #10B981',borderRadius:18,padding:20,marginTop:16,textAlign:'center'}}>
                     <div style={{fontSize:36,marginBottom:8}}>🎉</div>
-                    <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:2,color:'#10B981',marginBottom:4}}>SESSION COMPLETE!</div>
-                    <div style={{fontSize:13,color:'#10B981',fontFamily:'Inter'}}>All exercises logged. Great work.</div>
-                    <button className="btn-press" onClick={()=>{setActiveTemplate(null);setCheckedExercises({})}}
-                      style={{marginTop:14,background:'#10B981',border:'none',borderRadius:10,color:'#fff',padding:'12px 24px',fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                      FINISH
-                    </button>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:2,color:'#10B981',marginBottom:4}}>Session Complete!</div>
+                    <div style={{fontSize:13,color:'#10B981',marginBottom:14}}>All exercises logged. Great work.</div>
+                    <button className="btn" onClick={()=>{setActiveTemplate(null);setChecked({})}} style={{background:'#10B981',borderRadius:12,color:'#fff',padding:'12px 28px',fontSize:15,fontWeight:800,letterSpacing:1}}>Finish</button>
                   </div>
                 )}
               </div>
-
-            /* ── TEMPLATE LIST ── */
             ):(
+              /* ── Template list ── */
               <div>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
                   <div>
-                    <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,lineHeight:1}}>TEMPLATES</div>
-                    <div style={{fontSize:13,color:T.text2,fontFamily:'Inter'}}>{templates.length} saved</div>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,lineHeight:1}}>Workouts</div>
+                    <div style={{fontSize:13,color:T.text3}}>{templates.length} templates saved</div>
                   </div>
-                  <button className="btn-press" onClick={()=>setShowCreateTemplate(true)}
-                    style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',width:44,height:44,fontSize:24,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:`0 4px 14px ${T.accent}44`}}>
-                    +
-                  </button>
+                  <button className="btn press" onClick={()=>setShowCreateTmpl(true)}
+                    style={{width:44,height:44,borderRadius:22,background:T.accent,color:'#fff',fontSize:22,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',boxShadow:`0 4px 14px ${T.accent}44`}}>+</button>
                 </div>
 
-                {/* ── CREATE TEMPLATE PANEL ── */}
-                {showCreateTemplate&&(
-                  <div className="slide-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:16,padding:16,marginBottom:16,position:'relative',overflow:'hidden'}}>
-                    <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},transparent)`}} />
-                    <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text,marginBottom:12,marginTop:4}}>New Template</div>
-
-                    {/* Name */}
-                    <div style={{marginBottom:12}}>
-                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Template Name</div>
-                      <input placeholder="e.g. Push Day, Monday Workout..." value={newTmplName}
-                        onChange={e=>setNewTmplName(e.target.value)}
-                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'11px 14px',fontSize:15,fontFamily:'Rajdhani'}} />
-                    </div>
-
-                    {/* Added exercises */}
-                    {newTmplExercises.length>0&&(
+                {showCreateTmpl&&(
+                  <Card style={{marginBottom:16}}>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text,marginBottom:14}}>New Template</div>
+                    <Label>Name</Label>
+                    <input placeholder="e.g. Push Day" value={newTmplName} onChange={e=>setNewTmplName(e.target.value)}
+                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:15,marginBottom:14}} />
+                    {newTmplExs.length>0&&(
                       <div style={{marginBottom:12}}>
-                        <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:8}}>Exercises ({newTmplExercises.length})</div>
-                        <div style={{display:'flex',flexDirection:'column',gap:6}}>
-                          {newTmplExercises.map((ex,i)=>{
-                            const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
-                            return(
-                              <div key={i} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'10px 12px'}}>
-                                <span style={{fontSize:16}}>{mg?.icon}</span>
-                                <div style={{flex:1}}>
-                                  <div style={{fontSize:14,fontWeight:700,color:T.text}}>{ex.exercise}</div>
-                                  <div style={{fontSize:11,color:T.text3}}>{ex.sets}×{ex.reps} · {ex.weight}{unit}</div>
-                                </div>
-                                <button onClick={()=>handleRemoveExFromNew(i)}
-                                  style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'0 4px'}}>✕</button>
+                        <Label>Exercises ({newTmplExs.length})</Label>
+                        {newTmplExs.map((ex,i)=>{
+                          const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
+                          return(
+                            <div key={i} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'10px 12px',marginBottom:6}}>
+                              <span style={{fontSize:18}}>{mg?.icon}</span>
+                              <div style={{flex:1}}>
+                                <div style={{fontSize:14,fontWeight:700,color:T.text}}>{ex.exercise}</div>
+                                <div style={{fontSize:11,color:T.text3}}>{ex.sets}×{ex.reps} · {ex.weight}{unit}</div>
                               </div>
-                            )
-                          })}
-                        </div>
+                              <button onClick={()=>setNewTmplExs(p=>p.filter((_,j)=>j!==i))} style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'0 4px'}}>✕</button>
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
-
-                    {/* Add exercise form */}
-                    {addingExercise?(
+                    {addingEx?(
                       <div style={{background:T.bg3,borderRadius:12,padding:12,marginBottom:12}}>
-                        <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Add Exercise</div>
-                        <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                          <select value={exForm.muscle} onChange={e=>{setExForm(f=>({...f,muscle:e.target.value,exercise:''}));setCustomExInTemplate('')}}
-                            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
-                            {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
-                          </select>
-                          <select value={customExInTemplate?'__custom__':exForm.exercise}
-                            onChange={e=>{
-                              if(e.target.value==='__custom__'){setCustomExInTemplate(' ');setExForm(f=>({...f,exercise:''}))}
-                              else{setCustomExInTemplate('');setExForm(f=>({...f,exercise:e.target.value}))}
-                            }}
-                            style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
-                            <option value="">Select exercise...</option>
-                            {MUSCLE_GROUPS.find(m=>m.id===exForm.muscle)?.exercises.map(ex=><option key={ex} value={ex}>{ex}</option>)}
-                            <option value="__custom__">✏️ Type my own...</option>
-                          </select>
-                          {customExInTemplate!==''&&(
-                            <input autoFocus placeholder="Exercise name..." value={customExInTemplate.trim()?customExInTemplate:''}
-                              onChange={e=>{setCustomExInTemplate(e.target.value);setExForm(f=>({...f,exercise:e.target.value}))}}
-                              style={{width:'100%',background:T.input,border:`1px solid ${T.accent}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani',marginTop:6}} />
-                          )}
-                          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
-                            {[
-                              [`WT (${unit})`,exForm.weight,'weight'],
-                              ['REPS',exForm.reps,'reps'],
-                              ['SETS',exForm.sets,'sets'],
-                            ].map(([label,val,field])=>(
-                              <div key={field}>
-                                <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:4,textAlign:'center'}}>{label}</div>
-                                <input type="number" min="0" value={val} onChange={e=>setExForm(f=>({...f,[field]:e.target.value}))} placeholder="0"
-                                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,padding:'10px 6px',fontSize:20,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
-                              </div>
-                            ))}
-                          </div>
-                          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                            <button className="btn-press" onClick={()=>{setAddingExercise(false);setExForm(f=>({...f,exercise:'',weight:''}))}}
-                              style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:10,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                              CANCEL
-                            </button>
-                            <button className="btn-press" onClick={handleAddExerciseToTemplate}
-                              style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                              ADD
-                            </button>
-                          </div>
+                        <Label>Add Exercise</Label>
+                        <select value={exForm.muscle} onChange={e=>{setExForm(f=>({...f,muscle:e.target.value,exercise:''}));setCustomExTmpl('')}}
+                          style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,marginBottom:8}}>
+                          {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
+                        </select>
+                        <select value={customExTmpl?'__c__':exForm.exercise} onChange={e=>{if(e.target.value==='__c__'){setCustomExTmpl(' ');setExForm(f=>({...f,exercise:''}))}else{setCustomExTmpl('');setExForm(f=>({...f,exercise:e.target.value}))}}}
+                          style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,marginBottom:customExTmpl?8:8}}>
+                          <option value="">Select exercise...</option>
+                          {MUSCLE_GROUPS.find(m=>m.id===exForm.muscle)?.exercises.map(ex=><option key={ex} value={ex}>{ex}</option>)}
+                          <option value="__c__">✏️ Type my own...</option>
+                        </select>
+                        {customExTmpl!==''&&<input autoFocus placeholder="Exercise name..." value={customExTmpl.trim()?customExTmpl:''} onChange={e=>{setCustomExTmpl(e.target.value);setExForm(f=>({...f,exercise:e.target.value}))}} style={{width:'100%',background:T.input,border:`1px solid ${T.accent}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,marginBottom:8}} />}
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:10}}>
+                          {[['Weight',exForm.weight,'weight'],['Reps',exForm.reps,'reps'],['Sets',exForm.sets,'sets']].map(([label,val,field])=>(
+                            <div key={field}>
+                              <div style={{fontSize:11,color:T.text3,fontWeight:700,marginBottom:4,textAlign:'center'}}>{label}</div>
+                              <input type="number" min="0" value={val} onChange={e=>setExForm(f=>({...f,[field]:e.target.value}))} placeholder="0"
+                                style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:8,color:T.text,padding:'10px 6px',fontSize:20,fontWeight:800,textAlign:'center'}} />
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                          <button className="btn" onClick={()=>{setAddingEx(false);setCustomExTmpl('')}} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:10,color:T.text2,padding:10,fontSize:13,fontWeight:700}}>Cancel</button>
+                          <button className="btn" onClick={addExToTemplate} style={{background:T.accent,borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:700,letterSpacing:1}}>Add</button>
                         </div>
                       </div>
                     ):(
-                      <button className="btn-press" onClick={()=>setAddingExercise(true)}
-                        style={{width:'100%',background:'transparent',border:`1px dashed ${T.border}`,borderRadius:10,color:T.text3,padding:11,fontSize:13,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'Rajdhani',marginBottom:12}}>
-                        + ADD EXERCISE
-                      </button>
+                      <button className="btn" onClick={()=>setAddingEx(true)} style={{width:'100%',background:'transparent',border:`1.5px dashed ${T.border}`,borderRadius:12,color:T.text3,padding:11,fontSize:14,fontWeight:700,marginBottom:12}}>+ Add Exercise</button>
                     )}
-
-                    {/* Save / Cancel */}
                     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                      <button className="btn-press" onClick={()=>{setShowCreateTemplate(false);setNewTmplName('');setNewTmplExercises([]);setAddingExercise(false)}}
-                        style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                        CANCEL
-                      </button>
-                      <button className="btn-press" onClick={handleSaveNewTemplate}
-                        disabled={!newTmplName.trim()||newTmplExercises.length===0}
-                        style={{background:(!newTmplName.trim()||newTmplExercises.length===0)?T.bg3:T.accent,border:'none',borderRadius:10,color:(!newTmplName.trim()||newTmplExercises.length===0)?T.text3:'#fff',padding:12,fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                        SAVE TEMPLATE
-                      </button>
+                      <button className="btn" onClick={()=>{setShowCreateTmpl(false);setNewTmplName('');setNewTmplExs([]);setAddingEx(false)}} style={{background:T.bg3,borderRadius:12,color:T.text2,padding:12,fontSize:14,fontWeight:700}}>Cancel</button>
+                      <button className="btn" onClick={saveTmpl} disabled={!newTmplName.trim()||newTmplExs.length===0} style={{background:(!newTmplName.trim()||newTmplExs.length===0)?T.bg3:T.accent,borderRadius:12,color:(!newTmplName.trim()||newTmplExs.length===0)?T.text3:'#fff',padding:12,fontSize:14,fontWeight:800,letterSpacing:1}}>Save</button>
                     </div>
-                  </div>
+                  </Card>
                 )}
 
-                {/* Template cards */}
-                {templates.length===0&&!showCreateTemplate?(
+                {templates.length===0&&!showCreateTmpl?(
                   <div style={{textAlign:'center',padding:50,color:T.text3}}>
                     <div style={{fontSize:48,marginBottom:12}}>📋</div>
                     <div style={{fontSize:16,fontWeight:700,color:T.text2,marginBottom:8}}>No templates yet</div>
-                    <div style={{fontSize:13,fontFamily:'Inter',lineHeight:1.6,marginBottom:20}}>Tap the + button to create your first workout template.</div>
-                    <button className="btn-press" onClick={()=>setShowCreateTemplate(true)}
-                      style={{background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:'12px 28px',fontSize:15,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                      CREATE TEMPLATE
-                    </button>
+                    <div style={{fontSize:13,lineHeight:1.6,marginBottom:20}}>Create a template with your exercises, then tap it before your workout to check them off.</div>
+                    <button className="btn" onClick={()=>setShowCreateTmpl(true)} style={{background:T.accent,borderRadius:12,color:'#fff',padding:'12px 28px',fontSize:15,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 14px ${T.accent}44`}}>Create Template</button>
                   </div>
                 ):(
-                  <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                    {templates.map(tmpl=>{
-                      const muscles=[...new Set(tmpl.exercises.map(e=>e.muscle))]
-                      return(
-                        <div key={tmpl.id} className="hover-lift" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,position:'relative',overflow:'hidden',cursor:'pointer'}}
-                          onClick={()=>handleOpenTemplate(tmpl)}>
-                          <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},transparent)`}} />
-                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
-                            <div style={{flex:1}}>
-                              <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:T.text}}>{tmpl.name}</div>
+                  <div className="stagger" style={{display:'flex',flexDirection:'column',gap:10}}>
+                    {templates.map(tmpl=>(
+                      <Card key={tmpl.id} className="lift press" onClick={()=>{setActiveTemplate(tmpl);setChecked({})}} style={{cursor:'pointer',position:'relative',overflow:'hidden',padding:0}}>
+                        <div style={{position:'absolute',top:0,left:0,right:0,height:4,background:`linear-gradient(90deg,${T.accent},${T.accent}66)`}} />
+                        <div style={{padding:'16px 16px 12px'}}>
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+                            <div>
+                              <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text}}>{tmpl.name}</div>
                               <div style={{fontSize:12,color:T.text3}}>{tmpl.exercises.length} exercises</div>
                             </div>
-                            <div style={{display:'flex',gap:6,alignItems:'center'}}>
-                              <button onClick={e=>{e.stopPropagation();handleDeleteTemplate(tmpl.id)}}
-                                style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'4px 6px'}}>✕</button>
-                            </div>
+                            <button onClick={e=>{e.stopPropagation();saveTemplates(templates.filter(t=>t.id!==tmpl.id))}} style={{background:'none',border:'none',color:T.text3,fontSize:16,cursor:'pointer',padding:'0 4px'}}>✕</button>
                           </div>
-                          {/* Exercise preview */}
-                          <div style={{display:'flex',flexDirection:'column',gap:4,marginBottom:12}}>
-                            {tmpl.exercises.slice(0,4).map((ex,i)=>{
-                              const mg=MUSCLE_GROUPS.find(m=>m.id===ex.muscle)
-                              return(
-                                <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:`1px solid ${T.border}`}}>
-                                  <div style={{display:'flex',alignItems:'center',gap:8}}>
-                                    <span style={{fontSize:13}}>{mg?.icon}</span>
-                                    <span style={{fontSize:13,color:T.text}}>{ex.exercise}</span>
-                                  </div>
-                                  <span style={{fontSize:12,color:T.text3,fontFamily:'Bebas Neue',letterSpacing:1}}>{cvt(ex.weight,unit)}{unit} · {ex.sets}×{ex.reps}</span>
-                                </div>
-                              )
-                            })}
-                            {tmpl.exercises.length>4&&<div style={{fontSize:11,color:T.text3,textAlign:'center',paddingTop:4}}>+{tmpl.exercises.length-4} more</div>}
-                          </div>
-                          {/* Muscle chips */}
-                          <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
-                            {muscles.map(mid=>{
+                          <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:10}}>
+                            {[...new Set(tmpl.exercises.map(e=>e.muscle))].map(mid=>{
                               const mg=MUSCLE_GROUPS.find(m=>m.id===mid)
-                              return <span key={mid} style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</span>
+                              return <span key={mid} style={{background:mg?.colorDim,borderRadius:20,padding:'3px 10px',fontSize:11,color:mg?.color,fontWeight:700}}>{mg?.icon} {mg?.name}</span>
                             })}
                           </div>
-                          <div style={{background:T.accent,borderRadius:10,padding:'10px',textAlign:'center',boxShadow:`0 4px 12px ${T.accent}33`}}>
-                            <span style={{fontFamily:'Bebas Neue',fontSize:15,letterSpacing:3,color:'#fff'}}>START WORKOUT →</span>
+                          <div style={{background:T.accent,borderRadius:10,padding:'9px',textAlign:'center'}}>
+                            <span style={{fontFamily:'Bebas Neue',fontSize:14,letterSpacing:3,color:'#fff'}}>START WORKOUT →</span>
                           </div>
                         </div>
-                      )
-                    })}
+                      </Card>
+                    ))}
                   </div>
                 )}
               </div>
@@ -1984,1366 +1281,682 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
           </div>
         )}
 
-        {/* HISTORY */}
-        {tab==='history'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>HISTORY</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>{workouts.length} sessions logged.</div>
-            <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4,marginBottom:16}}>
-              {[['all','All',T.accent,null],...MUSCLE_GROUPS.map(mg=>[mg.id,mg.name,mg.color,mg])].map(([id,label,color,mg])=>(
-                <button key={id} onClick={()=>setHistFilter(id)}
-                  style={{background:histFilter===id?color:T.bg2,border:`1.5px solid ${histFilter===id?color:T.border}`,borderRadius:20,color:histFilter===id?'#fff':T.text3,padding:'7px 14px',fontSize:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.15s',display:'flex',alignItems:'center',gap:4}}>
-                  {mg&&<span>{mg.icon}</span>}{label}
+        {/* ══ PROGRESS TAB ════════════════════════════════════════════════════ */}
+        {tab==='progress'&&(
+          <div className="fade-up">
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:16,lineHeight:1}}>Progress</div>
+            {/* Section pills */}
+            <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4,marginBottom:20}}>
+              {[['ranks','🏅 Ranks'],['history','📝 History'],['charts','📈 Charts'],['stats','📊 Stats'],['body','⚖️ Body'],['achievements','🎖️ Awards']].map(([id,label])=>(
+                <button key={id} onClick={()=>setProgressSection(id)} className="btn"
+                  style={{background:progressSection===id?T.accent:T.bg2,border:`1px solid ${progressSection===id?T.accent:T.border}`,borderRadius:20,color:progressSection===id?'#fff':T.text3,padding:'7px 16px',fontSize:13,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',transition:'all .15s'}}>
+                  {label}
                 </button>
               ))}
             </div>
-            {loading?<div style={{textAlign:'center',padding:40,color:T.text3}}>Loading...</div>
-            :filtered.length===0?(
-              <div style={{textAlign:'center',padding:50,color:T.text3}}>
-                <div style={{fontSize:36,marginBottom:8}}>◈</div>
-                <div style={{fontSize:15}}>No sessions yet. Start logging.</div>
-              </div>
-            ):(
-              <div className="stagger" style={{display:'flex',flexDirection:'column',gap:8}}>
-                {filtered.map(s=>{
-                  const mg=MUSCLE_GROUPS.find(m=>m.id===s.muscle)
-                  const dW=cvt(s.weight,unit)
-                  const rm=Math.round(cvt(calc1RM(s.weight,s.reps),unit))
-                  const dt=new Date(s.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
-                  const rank=getRank(calcScore([s]))
-                  const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
+
+            {/* Ranks */}
+            {progressSection==='ranks'&&(
+              <div className="stagger">
+                {MUSCLE_GROUPS.map(mg=>{
+                  const s=scores[mg.id],r=getRank(s),next=getNextRank(s)
+                  const pct=next?((s-r.min)/(next.min-r.min))*100:100
+                  const tw=next?Math.round(cvt((next.min/100)*200*0.75,unit)):null
+                  const b1=byMuscle[mg.id]?.length>0?Math.max(...byMuscle[mg.id].map(w=>calc1RM(w.weight,w.reps))):0
                   return(
-                    <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:12,padding:'12px 14px',position:'relative',overflow:'hidden'}}>
-                      <div style={{position:'absolute',left:0,top:0,bottom:0,width:4,background:isPR?'linear-gradient(180deg,#F59E0B,#D97706)':`linear-gradient(180deg,${mg?.color||T.accent},${mg?.color||T.accent}66)`}} />
-                      {isPR&&<div style={{position:'absolute',top:8,right:10,background:'#F59E0B22',border:'1px solid #F59E0B55',borderRadius:6,padding:'2px 8px',fontSize:10,color:'#F59E0B',fontWeight:700,letterSpacing:1}}>⭐ PR</div>}
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginLeft:8}}>
-                        <div style={{flex:1,paddingRight:isPR?50:0}}>
-                          <div style={{fontSize:15,fontWeight:700,color:T.text}}>{s.exercise}</div>
-                          <div style={{fontSize:11,color:T.text3,marginTop:2}}>{mg?.icon} {mg?.name} · {dt}</div>
+                    <Card key={mg.id} style={{marginBottom:10,position:'relative',overflow:'hidden',border:`1.5px solid ${mg.color}33`}}>
+                      <div style={{position:'absolute',top:0,left:0,right:0,height:4,background:`linear-gradient(90deg,${mg.color},${mg.color}66)`}} />
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,marginTop:4}}>
+                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                          <div style={{width:36,height:36,borderRadius:12,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>{mg.icon}</div>
+                          <div>
+                            <div style={{fontSize:16,fontWeight:800,color:T.text}}>{mg.name}</div>
+                            <div style={{fontSize:12,fontWeight:700,color:mg.color}}>{r.icon} {r.name}</div>
+                          </div>
                         </div>
                         <div style={{textAlign:'right'}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:T.text}}>{dW}{unit} × {s.reps} × {s.sets}</div>
-                          <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:mg.color}}>{Math.round(s)}</div>
+                          <div style={{fontSize:10,color:T.text3}}>score</div>
                         </div>
                       </div>
-                    </div>
+                      <div style={{background:T.bg3,borderRadius:6,height:8,overflow:'hidden',marginBottom:8,position:'relative'}}>
+                        <div className="bar" style={{'--w':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}88)`,borderRadius:6}} />
+                      </div>
+                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                        <div style={{background:T.bg3,borderRadius:10,padding:'8px',textAlign:'center'}}>
+                          <div style={{fontSize:10,color:T.text3,marginBottom:2}}>Best 1RM</div>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:mg.color}}>{b1>0?`${Math.round(cvt(b1,unit))}${unit}`:'—'}</div>
+                        </div>
+                        <div style={{background:T.bg3,borderRadius:10,padding:'8px',textAlign:'center'}}>
+                          <div style={{fontSize:10,color:T.text3,marginBottom:2}}>To Rank Up</div>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:next?T.accent:'#F59E0B'}}>{next&&tw?`${tw}${unit}`:'MAX 🏆'}</div>
+                        </div>
+                      </div>
+                    </Card>
                   )
                 })}
               </div>
             )}
-          </div>
-        )}
 
-        {/* STATS */}
-        {tab==='stats'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>STATS</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Your strength breakdown.</div>
-            <div className="stagger" style={{display:'flex',flexDirection:'column',gap:10}}>
-              {MUSCLE_GROUPS.map(mg=>{
-                const sessions=byMuscle[mg.id]||[],score=scores[mg.id],rank=getRank(score),next=getNextRank(score)
-                const rankBg=settings.darkMode?rank.darkBg:rank.lightBg
-                if(sessions.length===0) return(
-                  <div key={mg.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:12,padding:14,opacity:.5}}>
-                    <div style={{display:'flex',justifyContent:'space-between'}}>
-                      <span style={{fontWeight:700,color:T.text}}>{mg.icon} {mg.name}</span>
-                      <span style={{fontSize:12,color:T.text3}}>No data yet</span>
-                    </div>
-                  </div>
-                )
-                const b1=Math.max(...sessions.map(s=>calc1RM(s.weight,s.reps)))
-                const tv=sessions.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
-                const topEx=sessions.reduce((a,s)=>{a[s.exercise]=(a[s.exercise]||0)+1;return a},{})
-                const fav=Object.entries(topEx).sort((a,b)=>b[1]-a[1])[0]?.[0]
-                const tw=next?Math.round(cvt((next.min/100)*200,unit)):null
-                return(
-                  <div key={mg.id} style={{background:rankBg,border:`1px solid ${rank.color}33`,borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
-                    <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:rank.gradient}} />
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12,marginTop:4}}>
-                      <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text}}>{mg.icon} {mg.name}</div>
-                      <div style={{background:rank.gradient,borderRadius:8,padding:'3px 10px',fontSize:12,fontWeight:700,color:'#fff',boxShadow:`0 0 10px ${rank.color}44`}}>{rank.icon} {rank.name}</div>
-                    </div>
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:8}}>
-                      {[['Best 1RM',`${Math.round(cvt(b1,unit))}${unit}`],['Total Vol.',`${Math.round(cvt(tv,unit)/1000)}k`],['Sessions',sessions.length]].map(([label,val])=>(
-                        <div key={label} style={{background:'rgba(0,0,0,0.15)',borderRadius:10,padding:'8px 6px',textAlign:'center'}}>
-                          <div style={{fontSize:10,color:T.text3,letterSpacing:1}}>{label}</div>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:rank.color}}>{val}</div>
-                        </div>
-                      ))}
-                    </div>
-                    {next&&tw&&(
-                      <div style={{background:'rgba(0,0,0,0.12)',borderRadius:8,padding:'8px 12px',display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                        <div style={{fontSize:12,color:T.text2}}>Target for {next.icon} {next.name}</div>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:next.color}}>{tw}{unit}</div>
-                      </div>
-                    )}
-                    {fav&&<div style={{fontSize:12,color:T.text3}}>Top exercise: <span style={{color:T.text2}}>{fav}</span></div>}
-                  </div>
-                )
-              })}
-            </div>
-            {/* Personal Records Summary */}
-            {Object.keys(personalRecords).length>0&&(
-              <div style={{background:T.bg2,border:'1px solid #F59E0B33',borderRadius:14,padding:16,marginTop:12,marginBottom:12}}>
-                <div style={{fontSize:11,letterSpacing:3,color:'#F59E0B',textTransform:'uppercase',marginBottom:12}}>⭐ Personal Records</div>
-                <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                  {Object.entries(personalRecords).sort((a,b)=>b[1].rm-a[1].rm).slice(0,8).map(([ex,pr])=>{
-                    const mg=MUSCLE_GROUPS.find(m=>m.exercises&&m.exercises.includes(ex))
+            {/* History */}
+            {progressSection==='history'&&(
+              <div>
+                <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4,marginBottom:14}}>
+                  {[['all','All'],...MUSCLE_GROUPS.map(mg=>[mg.id,`${mg.icon} ${mg.name}`])].map(([id,label])=>(
+                    <button key={id} onClick={()=>setHistFilter(id)} className="btn"
+                      style={{background:histFilter===id?T.accent:T.bg2,border:`1px solid ${histFilter===id?T.accent:T.border}`,borderRadius:20,color:histFilter===id?'#fff':T.text3,padding:'6px 14px',fontSize:12,fontWeight:700,whiteSpace:'nowrap',transition:'all .15s'}}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {(histFilter==='all'?workouts:workouts.filter(w=>w.muscle===histFilter)).length===0
+                  ?<div style={{textAlign:'center',padding:40,color:T.text3}}>No sessions yet.</div>
+                  :(histFilter==='all'?workouts:workouts.filter(w=>w.muscle===histFilter)).map(s=>{
+                    const mg=MUSCLE_GROUPS.find(m=>m.id===s.muscle)
+                    const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
+                    const rm=Math.round(cvt(calc1RM(s.weight,s.reps),unit))
+                    const dt=new Date(s.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})
                     return(
-                      <div key={ex} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:`1px solid ${T.border}`}}>
-                        <div>
-                          <div style={{fontSize:14,fontWeight:700,color:T.text}}>{ex}</div>
-                          <div style={{fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name} · {new Date(pr.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
-                        </div>
-                        <div style={{textAlign:'right'}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:'#F59E0B'}}>{Math.round(cvt(pr.rm,unit))}{unit}</div>
-                          <div style={{fontSize:10,color:T.text3}}>1RM</div>
+                      <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:14,padding:'12px 14px',marginBottom:8,position:'relative',overflow:'hidden'}}>
+                        <div style={{position:'absolute',left:0,top:0,bottom:0,width:4,background:isPR?'linear-gradient(180deg,#F59E0B,#D97706)':`linear-gradient(180deg,${mg?.color},${mg?.color}66)`}} />
+                        {isPR&&<div style={{position:'absolute',top:8,right:10,background:'#F59E0B22',border:'1px solid #F59E0B55',borderRadius:6,padding:'2px 8px',fontSize:10,color:'#F59E0B',fontWeight:700}}>⭐ PR</div>}
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginLeft:8,paddingRight:isPR?48:0}}>
+                          <div>
+                            <div style={{fontSize:15,fontWeight:700,color:T.text}}>{s.exercise}</div>
+                            <div style={{fontSize:11,color:T.text3,marginTop:1}}>{mg?.icon} {mg?.name} · {dt}</div>
+                          </div>
+                          <div style={{textAlign:'right'}}>
+                            <div style={{fontFamily:'Bebas Neue',fontSize:15,letterSpacing:1,color:T.text}}>{cvt(s.weight,unit)}{unit} × {s.reps} × {s.sets}</div>
+                            <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
+                          </div>
                         </div>
                       </div>
                     )
                   })}
-                </div>
               </div>
             )}
 
-            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginTop:12}}>
-              <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:12}}>Overall Totals</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-                {[['Sessions',workouts.length],['Total Sets',workouts.reduce((s,w)=>s+w.sets,0)],['Volume',`${Math.round(cvt(workouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0),unit)/1000)}k ${unit}`],['Score',Math.round(totalScore)]].map(([label,val])=>(
-                  <div key={label} style={{background:T.bg3,borderRadius:10,padding:'14px 10px',textAlign:'center'}}>
-                    <div style={{fontSize:10,color:T.text3,letterSpacing:1,marginBottom:4}}>{label}</div>
-                    <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:T.text}}>{val}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-
-        {/* CHARTS */}
-        {tab==='charts'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>PROGRESS CHARTS</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>Your 1RM over time per exercise.</div>
-
-            {/* Muscle filter */}
-            <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4,marginBottom:12}}>
-              {MUSCLE_GROUPS.map(mg=>(
-                <button key={mg.id} onClick={()=>{setChartMuscle(mg.id);setChartExercise('')}}
-                  style={{background:chartMuscle===mg.id?T.accent:T.bg2,border:`1px solid ${chartMuscle===mg.id?T.accent:T.border}`,borderRadius:20,color:chartMuscle===mg.id?'#fff':T.text3,padding:'6px 14px',fontSize:11,fontWeight:700,letterSpacing:1,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.15s',fontFamily:'Rajdhani'}}>
-                  {mg.icon} {mg.name}
-                </button>
-              ))}
-            </div>
-
-            {/* Exercise picker */}
-            {(()=>{
-              const mg=MUSCLE_GROUPS.find(m=>m.id===chartMuscle)
-              const exercisesLogged=[...new Set(workouts.filter(w=>w.muscle===chartMuscle).map(w=>w.exercise))]
-              const activeEx=chartExercise||exercisesLogged[0]||''
-              const exData=workouts.filter(w=>w.exercise===activeEx).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))
-              const rmData=exData.map(w=>({date:w.created_at,rm:calc1RM(w.weight,w.reps),weight:w.weight,reps:w.reps}))
-
-              return(
-                <div>
-                  {exercisesLogged.length===0?(
-                    <div style={{textAlign:'center',padding:50,color:T.text3}}>
-                      <div style={{fontSize:36,marginBottom:8}}>📈</div>
-                      <div>No {mg?.name} data yet. Log some sets first.</div>
-                    </div>
-                  ):(
+            {/* Charts */}
+            {progressSection==='charts'&&(
+              <div>
+                <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4,marginBottom:14}}>
+                  {MUSCLE_GROUPS.map(mg=>(
+                    <button key={mg.id} onClick={()=>{setChartMuscle(mg.id);setChartEx('')}} className="btn"
+                      style={{background:chartMuscle===mg.id?mg.color:T.bg2,border:`1px solid ${chartMuscle===mg.id?mg.color:T.border}`,borderRadius:20,color:chartMuscle===mg.id?'#fff':T.text3,padding:'6px 14px',fontSize:12,fontWeight:700,whiteSpace:'nowrap',transition:'all .15s'}}>
+                      {mg.icon} {mg.name}
+                    </button>
+                  ))}
+                </div>
+                {(()=>{
+                  const mg=MUSCLE_GROUPS.find(m=>m.id===chartMuscle)
+                  const exLogged=[...new Set(workouts.filter(w=>w.muscle===chartMuscle).map(w=>w.exercise))]
+                  const activeEx=chartEx||exLogged[0]||''
+                  const exData=workouts.filter(w=>w.exercise===activeEx).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))
+                  const rmData=exData.map(w=>({date:w.created_at,rm:calc1RM(w.weight,w.reps),weight:w.weight}))
+                  if(exLogged.length===0) return <div style={{textAlign:'center',padding:40,color:T.text3}}><div style={{fontSize:36,marginBottom:8}}>📈</div><div>No {mg?.name} data yet.</div></div>
+                  return(
                     <>
-                      {/* Exercise selector */}
-                      <div style={{marginBottom:16}}>
-                        <select value={activeEx} onChange={e=>setChartExercise(e.target.value)}
-                          style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:15,fontFamily:'Rajdhani'}}>
-                          {exercisesLogged.map(ex=><option key={ex} value={ex}>{ex}</option>)}
-                        </select>
-                      </div>
-
+                      <select value={activeEx} onChange={e=>setChartEx(e.target.value)} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:15,marginBottom:14}}>
+                        {exLogged.map(ex=><option key={ex} value={ex}>{ex}</option>)}
+                      </select>
                       {rmData.length>1&&(()=>{
                         const vals=rmData.map(d=>cvt(d.rm,unit))
-                        const minV=Math.min(...vals),maxV=Math.max(...vals)
-                        const range=maxV-minV||1
-                        const W=340,H=140,PAD=14
-                        const pts=rmData.map((d,i,arr)=>{
-                          const x=PAD+(i/(arr.length-1||1))*(W-PAD*2)
-                          const y=H-PAD-(((cvt(d.rm,unit)-minV)/range)*(H-PAD*2))
-                          return{x,y,d}
-                        })
+                        const minV=Math.min(...vals),maxV=Math.max(...vals),range=maxV-minV||1
+                        const W=340,H=130,P=14
+                        const pts=rmData.map((d,i,arr)=>({x:P+(i/(arr.length-1||1))*(W-P*2),y:H-P-(((cvt(d.rm,unit)-minV)/range)*(H-P*2)),d}))
                         const pathD=pts.map((p,i)=>i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`).join(' ')
                         const areaD=`${pathD} L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`
-                        const best=Math.max(...vals)
-                        const latest=vals[vals.length-1]
-                        const first=vals[0]
-                        const gain=Math.round((latest-first)*10)/10
-                        const rank=getRank(calcScore(exData))
+                        const rank=getRank(scores[chartMuscle])
+                        const gain=Math.round((vals[vals.length-1]-vals[0])*10)/10
                         return(
-                          <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
-                            {/* Stats row */}
-                            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:16}}>
-                              {[
-                                ['Best 1RM',`${Math.round(best)}${unit}`],
-                                ['Latest',`${Math.round(latest)}${unit}`],
-                                ['Total Gain',`${gain>0?'+':''}${gain}${unit}`],
-                              ].map(([label,val])=>(
-                                <div key={label} style={{background:T.bg3,borderRadius:10,padding:'8px 6px',textAlign:'center'}}>
-                                  <div style={{fontSize:10,color:T.text3,letterSpacing:1,marginBottom:2}}>{label}</div>
-                                  <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:label==='Best 1RM'?rank.color:label==='Total Gain'?gain>=0?'#10B981':T.accent:T.text}}>{val}</div>
+                          <Card style={{marginBottom:14}}>
+                            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:14}}>
+                              {[['Best 1RM',`${Math.round(Math.max(...vals))}${unit}`,mg?.color],['Latest',`${Math.round(vals[vals.length-1])}${unit}`,T.text],['Gained',`${gain>=0?'+':''}${gain}${unit}`,gain>=0?'#10B981':T.accent]].map(([l,v,c])=>(
+                                <div key={l} style={{background:T.bg3,borderRadius:10,padding:'8px 6px',textAlign:'center'}}>
+                                  <div style={{fontSize:10,color:T.text3,marginBottom:2}}>{l}</div>
+                                  <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:c}}>{v}</div>
                                 </div>
                               ))}
                             </div>
-                            {/* SVG Chart */}
                             <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',display:'block'}}>
                               <defs>
-                                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="0%" stopColor={rank.color} stopOpacity="0.35"/>
-                                  <stop offset="100%" stopColor={rank.color} stopOpacity="0.02"/>
+                                <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor={mg?.color} stopOpacity="0.35"/>
+                                  <stop offset="100%" stopColor={mg?.color} stopOpacity="0.02"/>
                                 </linearGradient>
                               </defs>
-                              {/* Grid lines */}
-                              {[0.25,0.5,0.75].map((f,i)=>(
-                                <line key={i} x1={PAD} y1={PAD+(f*(H-PAD*2))} x2={W-PAD} y2={PAD+(f*(H-PAD*2))}
-                                  stroke={T.border} strokeWidth="1" strokeDasharray="4,4"/>
-                              ))}
-                              {/* Y labels */}
-                              {[[0,maxV],[0.5,Math.round((minV+maxV)/2)],[1,minV]].map(([f,v])=>(
-                                <text key={f} x={PAD-2} y={PAD+(f*(H-PAD*2))+4} fill={T.text3} fontSize="9" textAnchor="end">{Math.round(cvt(v,unit))}</text>
-                              ))}
-                              <path d={areaD} fill="url(#chartGrad)" />
-                              <path d={pathD} fill="none" stroke={rank.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                              {/* Dots */}
-                              {pts.map((p,i)=>(
-                                <circle key={i} cx={p.x} cy={p.y} r={i===pts.length-1?5:3}
-                                  fill={i===pts.length-1?rank.color:T.bg2} stroke={rank.color} strokeWidth="2"/>
-                              ))}
+                              {[.25,.5,.75].map((f,i)=><line key={i} x1={P} y1={P+(f*(H-P*2))} x2={W-P} y2={P+(f*(H-P*2))} stroke={T.border} strokeWidth="1" strokeDasharray="4,4"/>)}
+                              <path d={areaD} fill="url(#cg)"/>
+                              <path d={pathD} fill="none" stroke={mg?.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              {pts.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={i===pts.length-1?5:3} fill={i===pts.length-1?mg?.color:T.bg2} stroke={mg?.color} strokeWidth="2"/>)}
                             </svg>
-                            {/* X axis labels */}
                             <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:T.text3,marginTop:4}}>
                               <span>{new Date(rmData[0].date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
                               <span>{rmData.length} sessions</span>
                               <span>{new Date(rmData[rmData.length-1].date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
                             </div>
-                          </div>
+                          </Card>
                         )
                       })()}
-
-                      {/* Session log for this exercise */}
-                      <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>All Sessions</div>
-                      <div style={{display:'flex',flexDirection:'column',gap:6}}>
-                        {[...exData].reverse().map((s,i)=>{
-                          const rm=Math.round(cvt(calc1RM(s.weight,s.reps),unit))
-                          const isPR=personalRecords[s.exercise]&&s.id===personalRecords[s.exercise].id
-                          return(
-                            <div key={s.id} style={{background:T.bg2,border:`1px solid ${isPR?'#F59E0B44':T.border}`,borderRadius:10,padding:'10px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                              <div>
-                                <div style={{fontSize:13,color:T.text}}>{new Date(s.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
-                                <div style={{fontSize:11,color:T.text3}}>{s.sets} sets × {s.reps} reps</div>
-                              </div>
-                              <div style={{textAlign:'right',display:'flex',alignItems:'center',gap:8}}>
-                                {isPR&&<span style={{background:'#F59E0B22',border:'1px solid #F59E0B44',borderRadius:6,padding:'2px 6px',fontSize:10,color:'#F59E0B',fontWeight:700}}>⭐ PR</span>}
-                                <div>
-                                  <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:T.text}}>{cvt(s.weight,unit)}{unit}</div>
-                                  <div style={{fontSize:11,color:T.accent}}>1RM ~{rm}{unit}</div>
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
                     </>
-                  )}
-                </div>
-              )
-            })()}
-          </div>
-        )}
-
-
-        {/* ACHIEVEMENTS */}
-        {tab==='achievements'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>ACHIEVEMENTS</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>{unlockedAchievements.length} / {ACHIEVEMENTS.length} unlocked</div>
-
-            {/* Progress bar */}
-            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,marginBottom:20}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                <div style={{fontSize:13,fontWeight:700,color:T.text}}>Overall Progress</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.accent}}>{Math.round(unlockedAchievements.length/ACHIEVEMENTS.length*100)}%</div>
-              </div>
-              <div style={{background:T.bg3,borderRadius:4,height:8,overflow:'hidden',position:'relative'}}>
-                <div className="bar-fill" style={{'--pct':`${unlockedAchievements.length/ACHIEVEMENTS.length*100}%`,height:'100%',background:`linear-gradient(90deg,${T.accent},#F59E0B)`,borderRadius:4}} />
-                <div className="bar-streak" style={{position:'absolute',top:0,width:'40%',height:'100%',background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)'}} />
-              </div>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginTop:12}}>
-                {[
-                  ['Unlocked',unlockedAchievements.length],
-                  ['Locked',lockedAchievements.length],
-                  ['Streak',`${trainingStreak}w`],
-                  ['PRs',Object.keys(personalRecords).length],
-                ].map(([l,v])=>(
-                  <div key={l} style={{background:T.bg3,borderRadius:8,padding:'6px',textAlign:'center'}}>
-                    <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text}}>{v}</div>
-                    <div style={{fontSize:9,color:T.text3,letterSpacing:1}}>{l.toUpperCase()}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Unlocked */}
-            {unlockedAchievements.length>0&&(
-              <div style={{marginBottom:20}}>
-                <div style={{fontSize:11,color:'#F59E0B',letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>⭐ Unlocked ({unlockedAchievements.length})</div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                  {unlockedAchievements.map(a=>(
-                    <div key={a.id} className="hover-lift" style={{background:`linear-gradient(135deg,${T.bg2},${T.bg3})`,border:'1px solid #F59E0B44',borderRadius:14,padding:14,position:'relative',overflow:'hidden'}}>
-                      <div style={{position:'absolute',top:0,left:0,right:0,height:2,background:'linear-gradient(90deg,#F59E0B,transparent)'}} />
-                      <div style={{fontSize:28,marginBottom:6}}>{a.icon}</div>
-                      <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:2}}>{a.name}</div>
-                      <div style={{fontSize:11,color:T.text3,fontFamily:'Inter',lineHeight:1.4}}>{a.desc}</div>
-                      <div style={{position:'absolute',bottom:8,right:10,fontSize:10,color:'#F59E0B',fontWeight:700}}>✓ DONE</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Locked */}
-            {lockedAchievements.length>0&&(
-              <div>
-                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>🔒 Locked ({lockedAchievements.length})</div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                  {lockedAchievements.map(a=>(
-                    <div key={a.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,opacity:0.55}}>
-                      <div style={{fontSize:28,marginBottom:6,filter:'grayscale(1)'}}>{a.icon}</div>
-                      <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:2}}>{a.name}</div>
-                      <div style={{fontSize:11,color:T.text3,fontFamily:'Inter',lineHeight:1.4}}>{a.desc}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-
-        {/* CHALLENGES */}
-        {tab==='challenges'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>CHALLENGES</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:16,fontFamily:'Inter'}}>Compete with your gym crew.</div>
-
-            {/* Create button */}
-            {!showCreateChallenge?(
-              <button className="btn-press" onClick={()=>setShowCreateChallenge(true)}
-                style={{width:'100%',background:T.accent,border:'none',borderRadius:12,color:'#fff',padding:14,fontSize:15,fontWeight:700,letterSpacing:3,cursor:'pointer',fontFamily:'Bebas Neue',marginBottom:16}}>
-                + CREATE CHALLENGE
-              </button>
-            ):(
-              <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:16}}>
-                <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text,marginBottom:14}}>New Challenge</div>
-                <div style={{display:'flex',flexDirection:'column',gap:12}}>
-                  <div>
-                    <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Title</div>
-                    <input placeholder="e.g. Bench Press Battle" value={challengeForm.title}
-                      onChange={e=>setChallengeForm(f=>({...f,title:e.target.value}))}
-                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:15,fontFamily:'Rajdhani'}} />
-                  </div>
-                  <div>
-                    <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Description</div>
-                    <input placeholder="e.g. Who hits the highest 1RM?" value={challengeForm.description}
-                      onChange={e=>setChallengeForm(f=>({...f,description:e.target.value}))}
-                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:15,fontFamily:'Rajdhani'}} />
-                  </div>
-                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-                    <div>
-                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Muscle</div>
-                      <select value={challengeForm.muscle} onChange={e=>setChallengeForm(f=>({...f,muscle:e.target.value}))}
-                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
-                        {MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Metric</div>
-                      <select value={challengeForm.metric} onChange={e=>setChallengeForm(f=>({...f,metric:e.target.value}))}
-                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
-                        <option value="1rm">Best 1RM</option>
-                        <option value="volume">Total Volume</option>
-                        <option value="sessions">Most Sessions</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-                    <div>
-                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Target ({unit})</div>
-                      <input type="number" min="0" placeholder="e.g. 100" value={challengeForm.target}
-                        onChange={e=>setChallengeForm(f=>({...f,target:e.target.value}))}
-                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:18,fontWeight:700,textAlign:'center',fontFamily:'Bebas Neue',letterSpacing:1}} />
-                    </div>
-                    <div>
-                      <div style={{fontSize:10,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:6}}>Duration</div>
-                      <select value={challengeForm.days} onChange={e=>setChallengeForm(f=>({...f,days:e.target.value}))}
-                        style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'10px 12px',fontSize:14,fontFamily:'Rajdhani'}}>
-                        {[7,14,30,60,90].map(d=><option key={d} value={d}>{d} days</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                    <button className="btn-press" onClick={()=>{setShowCreateChallenge(false);setChallengeForm({title:'',description:'',muscle:'chest',metric:'1rm',target:'',days:30})}}
-                      style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:1}}>
-                      CANCEL
-                    </button>
-                    <button className="btn-press" onClick={handleCreateChallenge} disabled={challengeLoading}
-                      style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani',letterSpacing:2}}>
-                      {challengeLoading?'...':'CREATE'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Challenge list */}
-            {challenges.length===0?(
-              <div style={{textAlign:'center',padding:50,color:T.text3}}>
-                <div style={{fontSize:48,marginBottom:12}}>⚔️</div>
-                <div style={{fontSize:16,fontWeight:700,color:T.text2,marginBottom:8}}>No challenges yet</div>
-                <div style={{fontSize:13,fontFamily:'Inter',lineHeight:1.6}}>Create the first one and challenge your crew.</div>
-              </div>
-            ):(
-              <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                {challenges.map(ch=>{
-                  const mg=MUSCLE_GROUPS.find(m=>m.id===ch.muscle)
-                  const isJoined=myParticipations.some(p=>p.challenge_id===ch.id)
-                  const isExpired=new Date(ch.ends_at)<new Date()
-                  const daysLeft=Math.max(0,Math.ceil((new Date(ch.ends_at)-new Date())/(1000*60*60*24)))
-                  const creator=allUsers.find(u=>u.id===ch.created_by)
-
-                  // Compute leaderboard for this challenge
-                  const challStart=new Date(ch.created_at)
-                  const challEnd=new Date(ch.ends_at)
-                  const participants=[...new Set([
-                    ...myParticipations.filter(p=>p.challenge_id===ch.id).map(p=>p.user_id),
-                    ch.created_by
-                  ])]
-
-                  const challBoard=allUsers.filter(u=>participants.includes(u.id)).map(u=>{
-                    const uw=allUsersWorkouts.filter(w=>w.user_id===u.id&&w.muscle===ch.muscle&&new Date(w.created_at)>=challStart&&new Date(w.created_at)<=challEnd)
-                    let score=0
-                    if(ch.metric==='1rm') score=uw.length>0?Math.max(...uw.map(w=>cvt(calc1RM(w.weight,w.reps),unit))):0
-                    else if(ch.metric==='volume') score=Math.round(cvt(uw.reduce((s,w)=>s+w.weight*w.reps*w.sets,0),unit))
-                    else if(ch.metric==='sessions') score=uw.length
-                    return{...u,score}
-                  }).sort((a,b)=>b.score-a.score)
-
-                  const myScore=challBoard.find(u=>u.id===currentUser.id)?.score||0
-                  const myPos=challBoard.findIndex(u=>u.id===currentUser.id)+1
-                  const metricLabel=ch.metric==='1rm'?`${unit} 1RM`:ch.metric==='volume'?`${unit} volume`:'sessions'
-
-                  return(
-                    <div key={ch.id} style={{background:T.bg2,border:`1px solid ${isExpired?T.border:T.accent+'44'}`,borderRadius:14,padding:16,position:'relative',overflow:'hidden'}}>
-                      <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:isExpired?T.bg3:`linear-gradient(90deg,${T.accent},#F59E0B)`}} />
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-                        <div style={{flex:1}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text}}>{ch.title}</div>
-                          <div style={{fontSize:12,color:T.text3,marginTop:2}}>{ch.description}</div>
-                        </div>
-                        <div style={{textAlign:'right',marginLeft:8}}>
-                          {isExpired
-                            ?<span style={{background:T.bg3,borderRadius:6,padding:'2px 8px',fontSize:10,color:T.text3,fontWeight:700}}>ENDED</span>
-                            :<span style={{background:T.accentDim,border:`1px solid ${T.accent}44`,borderRadius:6,padding:'2px 8px',fontSize:10,color:T.accent,fontWeight:700}}>{daysLeft}d left</span>
-                          }
-                        </div>
-                      </div>
-
-                      {/* Info chips */}
-                      <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
-                        <span style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name}</span>
-                        <span style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>
-                          {ch.metric==='1rm'?'Best 1RM':ch.metric==='volume'?'Total Volume':'Most Sessions'}
-                        </span>
-                        <span style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>by {creator?.name||'Unknown'}</span>
-                      </div>
-
-                      {/* Target bar */}
-                      <div style={{marginBottom:12}}>
-                        <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:T.text3,marginBottom:4}}>
-                          <span>Target: {ch.metric!=='sessions'?`${cvt(ch.target,unit)}${unit}`:ch.target}</span>
-                          <span>Your score: {myScore}{ch.metric!=='sessions'?unit:''}</span>
-                        </div>
-                        <div style={{background:T.bg3,borderRadius:4,height:6,overflow:'hidden'}}>
-                          <div style={{height:'100%',width:`${Math.min((myScore/(ch.metric!=='sessions'?cvt(ch.target,unit):ch.target))*100,100)}%`,background:myScore>=(ch.metric!=='sessions'?cvt(ch.target,unit):ch.target)?'#10B981':T.accent,borderRadius:4,transition:'width 1s ease'}} />
-                        </div>
-                      </div>
-
-                      {/* Mini leaderboard */}
-                      {challBoard.length>0&&(
-                        <div style={{background:T.bg3,borderRadius:10,padding:10,marginBottom:12}}>
-                          <div style={{fontSize:10,color:T.text3,letterSpacing:2,textTransform:'uppercase',marginBottom:8}}>Leaderboard</div>
-                          {challBoard.slice(0,3).map((u,i)=>{
-                            const medals=['🥇','🥈','🥉']
-                            const isMe=u.id===currentUser.id
-                            return(
-                              <div key={u.id} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 0',borderBottom:i<Math.min(challBoard.length,3)-1?`1px solid ${T.border}`:'none'}}>
-                                <span style={{fontSize:14}}>{medals[i]}</span>
-                                <div style={{width:24,height:24,borderRadius:12,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:'#fff',fontFamily:'Bebas Neue'}}>{u.name[0].toUpperCase()}</div>
-                                <span style={{flex:1,fontSize:13,color:isMe?T.accent:T.text,fontWeight:isMe?700:400}}>{u.name}{isMe?' (you)':''}</span>
-                                <span style={{fontFamily:'Bebas Neue',fontSize:14,letterSpacing:1,color:T.text}}>{u.score}{ch.metric!=='sessions'?unit:''}</span>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )}
-
-                      {/* My position */}
-                      {isJoined&&myPos>0&&(
-                        <div style={{fontSize:12,color:T.text3,marginBottom:10,textAlign:'center'}}>
-                          You are <span style={{color:T.accent,fontWeight:700}}>#{myPos}</span> out of {challBoard.length} participants
-                        </div>
-                      )}
-
-                      {/* Join button */}
-                      {!isJoined&&!isExpired&&ch.created_by!==currentUser.id&&(
-                        <button className="btn-press" onClick={()=>handleJoinChallenge(ch.id)}
-                          style={{width:'100%',background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:11,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Bebas Neue'}}>
-                          JOIN CHALLENGE
-                        </button>
-                      )}
-                      {(isJoined||ch.created_by===currentUser.id)&&(
-                        <div style={{textAlign:'center',fontSize:12,color:'#10B981',fontWeight:700,letterSpacing:1}}>✓ {ch.created_by===currentUser.id?'You created this':'Joined'}</div>
-                      )}
-                    </div>
                   )
-                })}
+                })()}
+              </div>
+            )}
+
+            {/* Stats */}
+            {progressSection==='stats'&&(
+              <div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
+                  {[['Sessions',workouts.length,'📝'],['Total Sets',workouts.reduce((s,w)=>s+w.sets,0),'💪'],['Volume',`${Math.round(cvt(workouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0),unit)/1000)}k ${unit}`,'📦'],['PRs',Object.keys(personalRecords).length,'⭐'],['Streak',`${streak} wks`,'🔥'],['Score',Math.round(totalScore),'🏅']].map(([l,v,i])=>(
+                    <Card key={l} style={{textAlign:'center'}}>
+                      <div style={{fontSize:24,marginBottom:4}}>{i}</div>
+                      <div style={{fontFamily:'Bebas Neue',fontSize:26,letterSpacing:1,color:T.text,lineHeight:1}}>{v}</div>
+                      <div style={{fontSize:11,fontWeight:600,color:T.text3,marginTop:4}}>{l}</div>
+                    </Card>
+                  ))}
+                </div>
+                {Object.keys(personalRecords).length>0&&(
+                  <Section title="Personal Records">
+                    {Object.entries(personalRecords).sort((a,b)=>b[1].rm-a[1].rm).slice(0,10).map(([ex,pr])=>{
+                      const mg=MUSCLE_GROUPS.find(m=>m.exercises?.includes(ex))
+                      return(
+                        <div key={ex} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:`1px solid ${T.border}`}}>
+                          <div>
+                            <div style={{fontSize:14,fontWeight:700,color:T.text}}>{ex}</div>
+                            <div style={{fontSize:11,color:T.text3}}>{mg?.icon} {mg?.name} · {new Date(pr.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+                          </div>
+                          <div style={{textAlign:'right'}}>
+                            <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:'#F59E0B'}}>{Math.round(cvt(pr.rm,unit))}{unit}</div>
+                            <div style={{fontSize:10,color:T.text3}}>1RM</div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </Section>
+                )}
+              </div>
+            )}
+
+            {/* Body weight */}
+            {progressSection==='body'&&(
+              <div>
+                <Card style={{marginBottom:14}}>
+                  <Label>Log Today's Weight</Label>
+                  <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:10}}>
+                    <input type="number" min="0" inputMode="decimal" placeholder="0.0" value={bwInput} onChange={e=>setBwInput(e.target.value)}
+                      style={{flex:1,background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'12px 14px',fontSize:26,fontWeight:800,textAlign:'center'}} />
+                    <div style={{display:'flex',flexDirection:'column',gap:4}}>
+                      {['kg','lbs'].map(u=><button key={u} onClick={()=>setBwUnit(u)} className="btn" style={{background:bwUnit===u?T.accent:'transparent',border:`1px solid ${bwUnit===u?T.accent:T.border}`,borderRadius:8,color:bwUnit===u?'#fff':T.text3,padding:'6px 10px',fontSize:11,fontWeight:700}}>{u}</button>)}
+                    </div>
+                  </div>
+                  <button className="btn" onClick={async()=>{if(!bwInput)return;setBwLoading(true);const wKg=bwUnit==='lbs'?parseFloat(bwInput)/2.205:parseFloat(bwInput);await supabase.from('bodyweight').insert([{user_id:currentUser.id,weight:Math.round(wKg*10)/10,unit:'kg'}]);setBwInput('');fetchBodyWeights();setBwLoading(false)}} disabled={bwLoading}
+                    style={{width:'100%',background:T.accent,borderRadius:12,color:'#fff',padding:12,fontSize:14,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 12px ${T.accent}33`}}>
+                    {bwLoading?'...':'Log Weight'}
+                  </button>
+                </Card>
+                {bodyWeights.length>1&&(()=>{
+                  const dW=bodyWeights.map(w=>({...w,d:Math.round(cvt(w.weight,unit)*10)/10}))
+                  const vals=dW.map(w=>w.d),minV=Math.min(...vals),maxV=Math.max(...vals),range=maxV-minV||1
+                  const W=340,H=110,P=12
+                  const pts=dW.slice(-30).map((w,i,arr)=>({x:P+(i/(arr.length-1||1))*(W-P*2),y:H-P-(((w.d-minV)/range)*(H-P*2)),w}))
+                  const pathD=pts.map((p,i)=>i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`).join(' ')
+                  const areaD=`${pathD} L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`
+                  const diff=Math.round((dW[dW.length-1].d-dW[0].d)*10)/10
+                  return(
+                    <Card style={{marginBottom:14}}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+                        <div>
+                          <div style={{fontSize:11,color:T.text3,letterSpacing:1,marginBottom:2}}>CURRENT</div>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:34,letterSpacing:2,color:T.text,lineHeight:1}}>{dW[dW.length-1].d} <span style={{fontSize:18,color:T.text3}}>{unit}</span></div>
+                        </div>
+                        <div style={{textAlign:'right'}}>
+                          <div style={{fontSize:11,color:T.text3,marginBottom:2}}>CHANGE</div>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:diff<0?'#10B981':diff>0?T.accent:T.text3}}>{diff>0?'+':''}{diff} {unit}</div>
+                        </div>
+                      </div>
+                      <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',display:'block'}}>
+                        <defs><linearGradient id="bwg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={T.accent} stopOpacity="0.3"/><stop offset="100%" stopColor={T.accent} stopOpacity="0.02"/></linearGradient></defs>
+                        <path d={areaD} fill="url(#bwg)"/>
+                        <path d={pathD} fill="none" stroke={T.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        {pts[pts.length-1]&&<circle cx={pts[pts.length-1].x} cy={pts[pts.length-1].y} r="5" fill={T.accent} stroke={T.bg2} strokeWidth="2"/>}
+                      </svg>
+                    </Card>
+                  )
+                })()}
+                <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                  {[...bodyWeights].reverse().slice(0,15).map((w,i,arr)=>{
+                    const prev=arr[i+1]
+                    const d=prev?Math.round((cvt(w.weight,unit)-cvt(prev.weight,unit))*10)/10:null
+                    return(
+                      <div key={w.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:12,padding:'10px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <div style={{fontSize:13,color:T.text2}}>{new Date(w.logged_at).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>
+                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                          {d!==null&&<span style={{fontSize:11,color:d<0?'#10B981':d>0?T.accent:T.text3,fontWeight:700}}>{d>0?'+':''}{d}</span>}
+                          <span style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text}}>{Math.round(cvt(w.weight,unit)*10)/10} {unit}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Achievements */}
+            {progressSection==='achievements'&&(
+              <div>
+                <Card style={{marginBottom:16}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                    <div style={{fontSize:14,fontWeight:700,color:T.text}}>{unlocked.length} / {ACHIEVEMENTS.length} unlocked</div>
+                    <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.accent}}>{Math.round(unlocked.length/ACHIEVEMENTS.length*100)}%</div>
+                  </div>
+                  <div style={{background:T.bg3,borderRadius:4,height:8,overflow:'hidden',position:'relative'}}>
+                    <div className="bar" style={{'--w':`${unlocked.length/ACHIEVEMENTS.length*100}%`,height:'100%',background:`linear-gradient(90deg,${T.accent},#F59E0B)`,borderRadius:4}} />
+                  </div>
+                </Card>
+                {unlocked.length>0&&<>
+                  <div style={{fontSize:12,fontWeight:700,color:'#F59E0B',letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>⭐ Unlocked</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:16}}>
+                    {unlocked.map(a=>(
+                      <Card key={a.id} style={{border:'1px solid #F59E0B33',position:'relative',overflow:'hidden'}}>
+                        <div style={{position:'absolute',top:0,left:0,right:0,height:2,background:'linear-gradient(90deg,#F59E0B,transparent)'}} />
+                        <div style={{fontSize:28,marginBottom:6}}>{a.icon}</div>
+                        <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:2}}>{a.name}</div>
+                        <div style={{fontSize:11,color:T.text3,lineHeight:1.4}}>{a.desc}</div>
+                        <div style={{position:'absolute',bottom:8,right:10,fontSize:10,color:'#F59E0B',fontWeight:700}}>✓</div>
+                      </Card>
+                    ))}
+                  </div>
+                </>}
+                {locked.length>0&&<>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>🔒 Locked</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                    {locked.map(a=>(
+                      <Card key={a.id} style={{opacity:.5}}>
+                        <div style={{fontSize:28,marginBottom:6,filter:'grayscale(1)'}}>{a.icon}</div>
+                        <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:2}}>{a.name}</div>
+                        <div style={{fontSize:11,color:T.text3,lineHeight:1.4}}>{a.desc}</div>
+                      </Card>
+                    ))}
+                  </div>
+                </>}
               </div>
             )}
           </div>
         )}
 
-        {/* LEADERBOARD */}
-        {tab==='leaderboard'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>LEADERBOARD</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Who's dominating the gym.</div>
+        {/* ══ COMMUNITY TAB ═══════════════════════════════════════════════════ */}
+        {tab==='community'&&(
+          <div className="fade-up">
+            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:16,lineHeight:1}}>Community</div>
             {lbLoading?(
-              <div style={{textAlign:'center',padding:40,color:T.text3}}><div className="spin" style={{fontSize:24,marginBottom:8,display:'inline-block'}}>◈</div><div>Loading...</div></div>
+              <div style={{textAlign:'center',padding:40,color:T.text3}}><span className="spin" style={{fontSize:24}}>◈</span></div>
             ):(
               <>
-                {/* Podium */}
-                {leaderboard.length>=2&&(
-                  <div style={{marginBottom:24}}>
-                    <div style={{display:'flex',alignItems:'flex-end',gap:8,justifyContent:'center'}}>
+                {/* Leaderboard */}
+                <Section title="Leaderboard">
+                  {leaderboard.length>=2&&(
+                    <div style={{display:'flex',alignItems:'flex-end',gap:8,justifyContent:'center',marginBottom:16}}>
                       {[leaderboard[1],leaderboard[0],leaderboard[2]].filter(Boolean).map((u,i)=>{
-                        const pos=i===0?2:i===1?1:3
-                        const heights=[105,140,88]
-                        const medals=['🥈','🥇','🥉']
-                        const mColors=['#C0C0C0','#FFD700','#CD7F32']
+                        const mC=['#C0C0C0','#FFD700','#CD7F32'],ms=['🥈','🥇','🥉'],hs=[100,136,84]
                         const isMe=u.id===currentUser.id
                         return(
-                          <div key={u.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
-                            <div style={{fontSize:24}}>{medals[i]}</div>
-                            <div onClick={()=>setViewingProfile(u)} style={{width:52,height:52,borderRadius:26,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:700,color:'#fff',border:`3px solid ${mColors[i]}`,boxShadow:`0 0 14px ${mColors[i]}55`,fontFamily:'Bebas Neue',letterSpacing:1,cursor:'pointer'}}>{u.name[0].toUpperCase()}</div>
-                            <div style={{fontSize:13,fontWeight:700,textAlign:'center',color:T.text,cursor:'pointer'}} onClick={()=>setViewingProfile(u)}>{u.name}</div>
+                          <div key={u.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}} onClick={()=>setViewingProfile(u)}>
+                            <div style={{fontSize:22}}>{ms[i]}</div>
+                            <div style={{width:48,height:48,borderRadius:24,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,fontWeight:900,color:'#fff',border:`2.5px solid ${mC[i]}`,boxShadow:`0 0 12px ${mC[i]}55`,cursor:'pointer',fontFamily:'Bebas Neue'}}>{u.name[0].toUpperCase()}</div>
+                            <div style={{fontSize:12,fontWeight:700,color:T.text,textAlign:'center',cursor:'pointer'}}>{u.name}</div>
                             <div style={{fontSize:11,color:u.rank.color}}>{u.rank.icon} {u.rank.name}</div>
-                            <div style={{width:'100%',height:heights[i],background:isMe?T.accentDim:T.bg2,border:`2px solid ${mColors[i]}55`,borderRadius:'10px 10px 0 0',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',overflow:'hidden'}}>
-                              <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,transparent,${mColors[i]},transparent)`}} />
-                              <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:2,color:mColors[i],textShadow:`0 0 10px ${mColors[i]}88`}}>{Math.round(u.overall)}</div>
+                            <div style={{width:'100%',height:hs[i],background:isMe?T.accentDim:T.bg2,border:`1.5px solid ${mC[i]}44`,borderRadius:'10px 10px 0 0',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:2,color:mC[i]}}>{Math.round(u.overall)}</div>
                             </div>
                           </div>
                         )
                       })}
                     </div>
-                    {/* Podium base */}
-                    <div style={{height:8,background:T.bg2,border:`1px solid ${T.border}`,borderRadius:'0 0 8px 8px',marginTop:-1}} />
-                  </div>
-                )}
-
-                {/* Full list */}
-                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>Overall Rankings</div>
-                <div className="stagger" style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
-                  {leaderboard.map((u,i)=>{
-                    const isMe=u.id===currentUser.id
-                    return(
-                      <div key={u.id} onClick={()=>setViewingProfile(u)} style={{background:isMe?T.accentDim:T.bg2,border:`1px solid ${isMe?T.accent+'44':T.border}`,borderRadius:14,padding:'12px 14px',position:'relative',overflow:'hidden',cursor:'pointer'}}>
-                        {isMe&&<div style={{position:'absolute',top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`}} />}
-                        <div style={{display:'flex',alignItems:'center',gap:12}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text3,width:26,textAlign:'center'}}>#{i+1}</div>
-                          <div style={{width:40,height:40,borderRadius:20,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,fontWeight:700,color:'#fff',flexShrink:0,fontFamily:'Bebas Neue',letterSpacing:1}}>{u.name[0].toUpperCase()}</div>
-                          <div style={{flex:1}}>
-                            <div style={{display:'flex',alignItems:'center',gap:8}}>
-                              <span style={{fontSize:16,fontWeight:700,color:T.text}}>{u.name}</span>
-                              {isMe&&<span style={{fontSize:9,background:T.accent,color:'#fff',padding:'2px 6px',borderRadius:10,fontWeight:700,letterSpacing:1}}>YOU</span>}
+                  )}
+                  <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
+                    {leaderboard.map((u,i)=>{
+                      const isMe=u.id===currentUser.id
+                      return(
+                        <div key={u.id} onClick={()=>setViewingProfile(u)} style={{background:isMe?T.accentDim:T.bg2,border:`1px solid ${isMe?T.accent+'44':T.border}`,borderRadius:14,padding:'12px 14px',cursor:'pointer',position:'relative',overflow:'hidden'}}>
+                          {isMe&&<div style={{position:'absolute',top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`}} />}
+                          <div style={{display:'flex',alignItems:'center',gap:10}}>
+                            <div style={{fontFamily:'Bebas Neue',fontSize:18,color:T.text3,width:22}}>#{i+1}</div>
+                            <div style={{width:36,height:36,borderRadius:18,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue'}}>{u.name[0].toUpperCase()}</div>
+                            <div style={{flex:1}}>
+                              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                                <span style={{fontSize:15,fontWeight:700,color:T.text}}>{u.name}</span>
+                                {isMe&&<span style={{background:T.accent,color:'#fff',fontSize:9,fontWeight:700,padding:'1px 6px',borderRadius:10}}>YOU</span>}
+                              </div>
+                              <div style={{fontSize:11,color:T.text3}}>{u.goal?.icon} {u.goal?.label}</div>
                             </div>
-                            <div style={{fontSize:11,color:T.text3}}>{u.goal?.icon} {u.goal?.label}</div>
-                          </div>
-                          <div style={{textAlign:'right'}}>
-                            <div style={{background:u.rank.gradient,borderRadius:8,padding:'4px 10px',boxShadow:`0 0 10px ${u.rank.color}44`}}>
-                              <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:'#fff'}}>{Math.round(u.overall)}</div>
+                            <div style={{background:u.rank.gradient,borderRadius:8,padding:'4px 10px',boxShadow:`0 0 8px ${u.rank.color}33`}}>
+                              <div style={{fontFamily:'Bebas Neue',fontSize:16,letterSpacing:1,color:'#fff'}}>{Math.round(u.overall)}</div>
                             </div>
-                            <div style={{fontSize:10,color:u.rank.color,marginTop:2}}>{u.rank.icon} {u.rank.name}</div>
                           </div>
-                        </div>
-                        {/* Muscle icons row */}
-                        <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:4,marginTop:10}}>
-                          {MUSCLE_GROUPS.map(mg=>{
-                            const s=u.muscleScores[mg.id],r=getRank(s)
-                            return(
+                          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:4,marginTop:10}}>
+                            {MUSCLE_GROUPS.map(mg=>{const s=u.muscleScores[mg.id],r=getRank(s);return(
                               <div key={mg.id} style={{background:T.bg3,borderRadius:6,padding:'4px 2px',textAlign:'center',border:`1px solid ${r.color}22`}}>
-                                <div style={{fontSize:12}}>{mg.icon}</div>
+                                <div style={{fontSize:11}}>{mg.icon}</div>
                                 <div style={{fontSize:9,color:r.color,fontWeight:700}}>{r.icon}</div>
                               </div>
-                            )
-                          })}
+                            )})}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </Section>
+
+                {/* Challenges */}
+                <Section title="Challenges" action={
+                  <button className="btn" onClick={()=>setShowCreateChallenge(v=>!v)} style={{background:T.accent,borderRadius:10,color:'#fff',padding:'6px 14px',fontSize:12,fontWeight:700,letterSpacing:1}}>+ New</button>
+                }>
+                  {showCreateChallenge&&(
+                    <Card style={{marginBottom:12}}>
+                      <div style={{fontFamily:'Bebas Neue',fontSize:18,color:T.text,marginBottom:12}}>New Challenge</div>
+                      <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                        <div><Label>Title</Label><input placeholder="e.g. Bench Press Battle" value={challengeForm.title} onChange={e=>setChallengeForm(f=>({...f,title:e.target.value}))} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'10px 12px',fontSize:14}} /></div>
+                        <div><Label>Description</Label><input placeholder="e.g. Who hits the highest 1RM?" value={challengeForm.description} onChange={e=>setChallengeForm(f=>({...f,description:e.target.value}))} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'10px 12px',fontSize:14}} /></div>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                          <div><Label>Muscle</Label><select value={challengeForm.muscle} onChange={e=>setChallengeForm(f=>({...f,muscle:e.target.value}))} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'9px 10px',fontSize:13}}>{MUSCLE_GROUPS.map(mg=><option key={mg.id} value={mg.id}>{mg.icon} {mg.name}</option>)}</select></div>
+                          <div><Label>Metric</Label><select value={challengeForm.metric} onChange={e=>setChallengeForm(f=>({...f,metric:e.target.value}))} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'9px 10px',fontSize:13}}><option value="1rm">Best 1RM</option><option value="volume">Total Volume</option><option value="sessions">Most Sessions</option></select></div>
+                        </div>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                          <div><Label>Target ({unit})</Label><input type="number" min="0" placeholder="100" value={challengeForm.target} onChange={e=>setChallengeForm(f=>({...f,target:e.target.value}))} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'9px 10px',fontSize:18,fontWeight:700,textAlign:'center'}} /></div>
+                          <div><Label>Duration</Label><select value={challengeForm.days} onChange={e=>setChallengeForm(f=>({...f,days:e.target.value}))} style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:10,color:T.text,padding:'9px 10px',fontSize:13}}>{[7,14,30,60,90].map(d=><option key={d} value={d}>{d} days</option>)}</select></div>
+                        </div>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                          <button className="btn" onClick={()=>setShowCreateChallenge(false)} style={{background:T.bg3,borderRadius:10,color:T.text2,padding:10,fontSize:13,fontWeight:700}}>Cancel</button>
+                          <button className="btn" onClick={createChallenge} disabled={challengeLoading} style={{background:T.accent,borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:700,letterSpacing:1}}>Create</button>
                         </div>
                       </div>
-                    )
-                  })}
-                </div>
-
-                {/* Per muscle leaderboards */}
-                <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:10}}>By Muscle Group</div>
-                <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                  {MUSCLE_GROUPS.map(mg=>{
-                    const sorted=[...leaderboard].sort((a,b)=>b.muscleScores[mg.id]-a.muscleScores[mg.id])
-                    if(!sorted[0]||sorted[0].muscleScores[mg.id]===0) return null
+                    </Card>
+                  )}
+                  {challenges.length===0&&!showCreateChallenge?<Card style={{textAlign:'center',padding:24}}><div style={{fontSize:36,marginBottom:8}}>⚔️</div><div style={{fontSize:15,fontWeight:700,color:T.text2,marginBottom:4}}>No challenges yet</div><div style={{fontSize:13,color:T.text3}}>Create one and challenge your crew.</div></Card>
+                  :challenges.map(ch=>{
+                    const mg=MUSCLE_GROUPS.find(m=>m.id===ch.muscle)
+                    const isJoined=myParts.some(p=>p.challenge_id===ch.id)
+                    const isExpired=new Date(ch.ends_at)<new Date()
+                    const daysLeft=Math.max(0,Math.ceil((new Date(ch.ends_at)-new Date())/(1000*60*60*24)))
+                    const creator=allUsers.find(u=>u.id===ch.created_by)
+                    const challStart=new Date(ch.created_at),challEnd=new Date(ch.ends_at)
+                    const parts=[...new Set([...myParts.filter(p=>p.challenge_id===ch.id).map(p=>p.user_id),ch.created_by])]
+                    const cb=allUsers.filter(u=>parts.includes(u.id)).map(u=>{
+                      const uw=allUsersWorkouts.filter(w=>w.user_id===u.id&&w.muscle===ch.muscle&&new Date(w.created_at)>=challStart&&new Date(w.created_at)<=challEnd)
+                      let score=ch.metric==='1rm'?(uw.length>0?Math.max(...uw.map(w=>cvt(calc1RM(w.weight,w.reps),unit))):0):ch.metric==='volume'?Math.round(cvt(uw.reduce((s,w)=>s+w.weight*w.reps*w.sets,0),unit)):uw.length
+                      return{...u,score}
+                    }).sort((a,b)=>b.score-a.score)
+                    const myScore=cb.find(u=>u.id===currentUser.id)?.score||0
+                    const myPos=cb.findIndex(u=>u.id===currentUser.id)+1
                     return(
-                      <div key={mg.id} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:12,padding:'12px 14px'}}>
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-                          <div style={{fontSize:15,fontWeight:700,color:T.text}}>{mg.icon} {mg.name}</div>
-                          <div style={{fontSize:11,color:T.text3}}>Top 3</div>
+                      <Card key={ch.id} style={{marginBottom:10,border:`1px solid ${isExpired?T.border:T.accent+'33'}`,position:'relative',overflow:'hidden'}}>
+                        {!isExpired&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${T.accent},#F59E0B)`}} />}
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+                          <div style={{flex:1}}>
+                            <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text}}>{ch.title}</div>
+                            <div style={{fontSize:12,color:T.text3}}>{ch.description}</div>
+                          </div>
+                          {isExpired?<span style={{background:T.bg3,borderRadius:6,padding:'2px 8px',fontSize:10,color:T.text3,fontWeight:700}}>ENDED</span>
+                          :<span style={{background:T.accentDim,border:`1px solid ${T.accent}44`,borderRadius:6,padding:'2px 8px',fontSize:10,color:T.accent,fontWeight:700}}>{daysLeft}d left</span>}
                         </div>
-                        {sorted.slice(0,3).filter(u=>u.muscleScores[mg.id]>0).map((u,i)=>{
-                          const isMe=u.id===currentUser.id,rank=getRank(u.muscleScores[mg.id])
+                        <div style={{display:'flex',gap:6,marginBottom:10,flexWrap:'wrap'}}>
+                          <span style={{background:mg?.colorDim,borderRadius:20,padding:'3px 10px',fontSize:11,color:mg?.color,fontWeight:700}}>{mg?.icon} {mg?.name}</span>
+                          <span style={{background:T.bg3,borderRadius:20,padding:'3px 10px',fontSize:11,color:T.text3}}>by {creator?.name||'?'}</span>
+                        </div>
+                        <div style={{marginBottom:10}}>
+                          <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:T.text3,marginBottom:4}}><span>Target: {ch.metric!=='sessions'?`${cvt(ch.target,unit)}${unit}`:ch.target}</span><span>You: {myScore}{ch.metric!=='sessions'?unit:''}</span></div>
+                          <div style={{background:T.bg3,borderRadius:4,height:6,overflow:'hidden'}}>
+                            <div style={{height:'100%',width:`${Math.min((myScore/(ch.metric!=='sessions'?cvt(ch.target,unit):ch.target))*100,100)}%`,background:myScore>=(ch.metric!=='sessions'?cvt(ch.target,unit):ch.target)?'#10B981':T.accent,borderRadius:4,transition:'width 1s ease'}} />
+                          </div>
+                        </div>
+                        {cb.slice(0,3).map((u,i)=>{
+                          const isMe=u.id===currentUser.id
                           return(
-                            <div key={u.id} style={{display:'flex',alignItems:'center',gap:10,padding:'6px 0',borderBottom:i<2?`1px solid ${T.border}`:'none'}}>
-                              <span style={{color:T.text3,fontSize:12,width:18}}>#{i+1}</span>
-                              <div style={{width:28,height:28,borderRadius:14,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,color:'#fff',fontFamily:'Bebas Neue'}}>{u.name[0].toUpperCase()}</div>
-                              <span style={{flex:1,fontSize:14,fontWeight:isMe?700:400,color:isMe?T.accent:T.text}}>{u.name}{isMe?' (you)':''}</span>
-                              <span style={{fontSize:13,color:rank.color,fontWeight:700}}>{rank.icon} {Math.round(u.muscleScores[mg.id])}</span>
+                            <div key={u.id} style={{display:'flex',alignItems:'center',gap:8,padding:'5px 0',borderBottom:i<Math.min(cb.length,3)-1?`1px solid ${T.border}`:'none'}}>
+                              <span style={{fontSize:13}}>{'🥇🥈🥉'[i]}</span>
+                              <div style={{width:22,height:22,borderRadius:11,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:'#fff',fontFamily:'Bebas Neue'}}>{u.name[0].toUpperCase()}</div>
+                              <span style={{flex:1,fontSize:13,color:isMe?T.accent:T.text,fontWeight:isMe?700:400}}>{u.name}</span>
+                              <span style={{fontFamily:'Bebas Neue',fontSize:14,color:T.text}}>{u.score}{ch.metric!=='sessions'?unit:''}</span>
                             </div>
                           )
                         })}
-                      </div>
+                        {!isJoined&&!isExpired&&ch.created_by!==currentUser.id&&(
+                          <button className="btn" onClick={()=>handleJoinChallenge(ch.id)} style={{width:'100%',marginTop:10,background:T.accent,borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:800,letterSpacing:1}}>Join Challenge</button>
+                        )}
+                        {(isJoined||ch.created_by===currentUser.id)&&<div style={{textAlign:'center',fontSize:12,color:'#10B981',fontWeight:700,marginTop:8}}>✓ {ch.created_by===currentUser.id?'Your challenge':'Joined'}</div>}
+                      </Card>
                     )
                   })}
-                </div>
+                </Section>
               </>
             )}
           </div>
         )}
 
-        {/* SETTINGS */}
-        {tab==='settings'&&(
-          <div className="slide-up">
-            <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:2}}>SETTINGS</div>
-            <div style={{fontSize:13,color:T.text2,marginBottom:20,fontFamily:'Inter'}}>Manage your account.</div>
+      </div>
 
-            {/* Account card */}
-            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:12,position:'relative',overflow:'hidden'}}>
-              <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${avatarColor(currentUser.name)},transparent)`}} />
-              <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:12}}>Account</div>
-              <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:14}}>
-                <div style={{width:56,height:56,borderRadius:28,background:avatarColor(currentUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,fontWeight:700,color:'#fff',fontFamily:'Bebas Neue',letterSpacing:1,boxShadow:`0 0 20px ${avatarColor(currentUser.name)}55`}}>{currentUser.name[0].toUpperCase()}</div>
-                <div>
-                  <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:1,color:T.text}}>{currentUser.name}</div>
-                  <div style={{fontSize:13,color:T.text3}}>{GOALS.find(g=>g.id===(currentUser.goal||'general'))?.icon} {GOALS.find(g=>g.id===(currentUser.goal||'general'))?.label}</div>
-                </div>
+      {/* ── LOG MODAL ── */}
+      {logOpen&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.75)',zIndex:500,display:'flex',alignItems:'flex-end',justifyContent:'center',padding:'0 16px 24px'}} onClick={()=>setLogOpen(false)}>
+          <div className="fade-up" onClick={e=>e.stopPropagation()} style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:24,padding:20,width:'100%',maxWidth:440}}>
+            <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:2,color:T.text,marginBottom:2}}>Log a Set</div>
+            <div style={{fontSize:13,color:T.text2,marginBottom:16}}>Weight in <span style={{color:T.accent,fontWeight:800}}>{unit.toUpperCase()}</span></div>
+            <div style={{display:'flex',flexDirection:'column',gap:14}}>
+              {/* Muscle grid */}
+              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+                {MUSCLE_GROUPS.map(mg=>(
+                  <button key={mg.id} className="btn press" onClick={()=>{setLogForm(f=>({...f,muscle:mg.id,exercise:''}));setCustomEx('')}}
+                    style={{background:logForm.muscle===mg.id?mg.colorDim:T.bg3,border:`2px solid ${logForm.muscle===mg.id?mg.color:T.border}`,borderRadius:14,padding:'10px 6px',display:'flex',flexDirection:'column',alignItems:'center',gap:4,transition:'all .15s'}}>
+                    <span style={{fontSize:22}}>{mg.icon}</span>
+                    <span style={{fontSize:11,fontWeight:700,color:logForm.muscle===mg.id?mg.color:T.text3}}>{mg.name}</span>
+                  </button>
+                ))}
               </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                {[['Workouts',workouts.length],['Overall Score',Math.round(totalScore)]].map(([l,v])=>(
-                  <div key={l} style={{background:T.bg3,borderRadius:10,padding:'10px',textAlign:'center'}}>
-                    <div style={{fontSize:10,color:T.text3,letterSpacing:1}}>{l}</div>
-                    <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:1,color:T.text}}>{v}</div>
+              {/* Exercise */}
+              <div>
+                <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:6}}>EXERCISE</div>
+                <select value={customEx?'__c__':logForm.exercise} onChange={e=>{if(e.target.value==='__c__'){setCustomEx(' ');setLogForm(f=>({...f,exercise:''}))}else{setCustomEx('');setLogForm(f=>({...f,exercise:e.target.value}))}}}
+                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:15,marginBottom:customEx?8:0}}>
+                  <option value="">Select exercise...</option>
+                  {MUSCLE_GROUPS.find(m=>m.id===logForm.muscle)?.exercises.map(ex=><option key={ex} value={ex}>{ex}</option>)}
+                  <option value="__c__">✏️ Type my own...</option>
+                </select>
+                {customEx!==''&&<input autoFocus placeholder="Exercise name..." value={customEx.trim()?customEx:''} onChange={e=>{setCustomEx(e.target.value);setLogForm(f=>({...f,exercise:e.target.value}))}} style={{width:'100%',background:T.input,border:`1px solid ${T.accent}`,borderRadius:12,color:T.text,padding:'11px 14px',fontSize:15}} />}
+              </div>
+              {/* Numbers */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
+                {[[`WT (${unit})`,'weight'],[`REPS`,'reps'],['SETS','sets']].map(([label,field])=>(
+                  <div key={field}>
+                    <div style={{fontSize:11,fontWeight:700,color:T.text3,marginBottom:6,textAlign:'center'}}>{label}</div>
+                    <input type="number" min="0" value={logForm[field]} onChange={e=>setLogForm(f=>({...f,[field]:e.target.value}))} placeholder="0"
+                      style={{width:'100%',background:T.bg3,border:`2px solid ${T.border}`,borderRadius:14,color:T.text,padding:'14px 6px',fontSize:26,fontWeight:900,textAlign:'center'}} />
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Recalibrate */}
-            <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:16,marginBottom:12}}>
-              <div style={{fontSize:11,color:T.text3,letterSpacing:3,textTransform:'uppercase',marginBottom:8}}>Starting Rank</div>
-              <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',marginBottom:14,lineHeight:1.5}}>Already been training? Set your starting rank based on your current lifts.</div>
-              <button className="btn-press" onClick={onRecalibrate}
-                style={{width:'100%',background:'transparent',border:`1px solid #3B82F6`,borderRadius:10,color:'#3B82F6',padding:12,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                ◉ RECALIBRATE MY RANK
+              {/* Per-hand toggle */}
+              <div style={{background:T.bg3,borderRadius:12,padding:'10px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div>
+                  <div style={{fontSize:13,fontWeight:700,color:T.text}}>Dumbbell / Per Hand</div>
+                  <div style={{fontSize:11,color:T.text3,marginTop:1}}>{perHand?`${logForm.weight||0}${unit} × 2 = ${Math.round(parseFloat(logForm.weight||0)*2*10)/10}${unit} total`:'Logging total weight'}</div>
+                </div>
+                <button onClick={()=>setPerHand(p=>!p)} style={{width:48,height:26,borderRadius:13,border:'none',cursor:'pointer',position:'relative',background:perHand?T.accent:T.bg2,transition:'background .2s',flexShrink:0}}>
+                  <div style={{position:'absolute',top:3,left:perHand?25:3,width:20,height:20,borderRadius:10,background:'#fff',transition:'left .2s',boxShadow:'0 1px 4px rgba(0,0,0,.25)'}} />
+                </button>
+              </div>
+              {/* 1RM preview */}
+              {logForm.weight&&logForm.reps&&(
+                <div style={{background:T.bg3,borderRadius:14,padding:12,textAlign:'center'}}>
+                  <div style={{fontSize:11,color:T.text3,letterSpacing:1,marginBottom:2}}>EST. 1RM</div>
+                  <div style={{fontFamily:'Bebas Neue',fontSize:36,letterSpacing:2,color:T.accent}}>{Math.round(calc1RM(parseFloat(logForm.weight)*(perHand?2:1),parseInt(logForm.reps)))} {unit}</div>
+                </div>
+              )}
+              {logMsg&&<div style={{background:T.accent+'22',border:`1px solid ${T.accent}`,borderRadius:10,padding:10,color:T.accent,fontSize:13,textAlign:'center'}}>{logMsg}</div>}
+              <button className="btn" onClick={handleLog} disabled={logLoading}
+                style={{background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,borderRadius:14,color:'#fff',padding:16,fontSize:18,fontWeight:900,letterSpacing:3,boxShadow:`0 6px 20px ${T.accent}44`}}>
+                {logLoading?<span className="spin">◈</span>:'💪 LOG SET'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
 
-            {/* Danger zone */}
-            <div style={{background:T.bg2,border:`1px solid ${T.accent}44`,borderRadius:14,padding:16}}>
-              <div style={{fontSize:11,color:T.accent,letterSpacing:3,textTransform:'uppercase',marginBottom:8}}>Danger Zone</div>
-              <div style={{fontSize:13,color:T.text2,fontFamily:'Inter',marginBottom:16,lineHeight:1.5}}>
-                Deleting your account will permanently remove your profile and <strong style={{color:T.text}}>all {workouts.length} workout sessions</strong>. This cannot be undone.
+      {/* ── PROFILE MODAL ── */}
+      {viewingProfile&&(
+        <div style={{position:'fixed',inset:0,zIndex:400,background:'rgba(0,0,0,.75)',display:'flex',flexDirection:'column',justifyContent:'flex-end'}} onClick={()=>setViewingProfile(null)}>
+          <div className="fade-up" onClick={e=>e.stopPropagation()} style={{background:T.bg2,borderRadius:'24px 24px 0 0',padding:0,maxHeight:'88vh',overflowY:'auto'}}>
+            <div style={{display:'flex',justifyContent:'center',padding:'12px 0 0'}}><div style={{width:36,height:4,borderRadius:2,background:T.border}} /></div>
+            {(()=>{
+              const u=viewingProfile,isMe=u.id===currentUser.id
+              const uw=allWorkouts.filter(w=>w.user_id===u.id)
+              const us=MUSCLE_GROUPS.reduce((a,mg)=>({...a,[mg.id]:calcScore(uw.filter(w=>w.muscle===mg.id))}),{})
+              const uo=MUSCLE_GROUPS.reduce((s,mg)=>s+us[mg.id],0)/MUSCLE_GROUPS.length
+              const ur=getRank(uo),ug=GOALS.find(g=>g.id===(u.goal||'general'))
+              const uv=uw.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
+              const uprs=uw.reduce((a,w)=>{const rm=calc1RM(w.weight,w.reps);if(!a[w.exercise]||rm>a[w.exercise])a[w.exercise]=rm;return a},{})
+              return(
+                <div style={{padding:'16px 20px 32px'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:20}}>
+                    <div style={{width:68,height:68,borderRadius:34,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:30,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue',boxShadow:`0 0 20px ${avatarColor(u.name)}55`,flexShrink:0}}>{u.name[0].toUpperCase()}</div>
+                    <div style={{flex:1}}>
+                      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:2}}>
+                        <div style={{fontFamily:'Bebas Neue',fontSize:26,letterSpacing:2,color:T.text,lineHeight:1}}>{u.name}</div>
+                        {isMe&&<span style={{background:T.accent,color:'#fff',fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:20}}>YOU</span>}
+                      </div>
+                      <div style={{fontSize:12,color:T.text3,marginBottom:6}}>{ug?.icon} {ug?.label}</div>
+                      <div style={{display:'inline-flex',alignItems:'center',gap:4,background:ur.gradient,borderRadius:8,padding:'3px 10px'}}>
+                        <span style={{fontSize:13}}>{ur.icon}</span>
+                        <span style={{fontSize:13,fontWeight:700,color:'#fff'}}>{ur.name}</span>
+                      </div>
+                    </div>
+                    <button onClick={()=>setViewingProfile(null)} style={{background:T.bg3,border:'none',borderRadius:12,width:36,height:36,fontSize:18,color:T.text3,cursor:'pointer'}}>✕</button>
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:20}}>
+                    {[['Sessions',uw.length,'📝'],['PRs',Object.keys(uprs).length,'⭐'],['Vol.',`${Math.round(cvt(uv,unit)/1000)}k`,'📦'],['Score',Math.round(uo),'🏅']].map(([l,v,i])=>(
+                      <div key={l} style={{background:T.bg3,borderRadius:14,padding:'10px 6px',textAlign:'center'}}>
+                        <div style={{fontSize:18,marginBottom:2}}>{i}</div>
+                        <div style={{fontFamily:'Bebas Neue',fontSize:18,letterSpacing:1,color:T.text,lineHeight:1}}>{v}</div>
+                        <div style={{fontSize:10,color:T.text3,fontWeight:600,marginTop:2}}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:12}}>{isMe?'Your Muscle Ranks':'vs You'}</div>
+                  {MUSCLE_GROUPS.map(mg=>{
+                    const ts=us[mg.id],ms=scores[mg.id],tr=getRank(ts),diff=ts-ms
+                    const pct=Math.min((ts/100)*100,100)
+                    const theyWin=diff>2,iWin=diff<-2
+                    return(
+                      <div key={mg.id} style={{background:T.bg3,borderRadius:14,padding:'12px 14px',marginBottom:8,border:`1.5px solid ${isMe||Math.abs(diff)<=2?T.border:theyWin?tr.color+'44':'#10B98133'}`}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                          <div style={{display:'flex',alignItems:'center',gap:8}}>
+                            <div style={{width:28,height:28,borderRadius:9,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:15}}>{mg.icon}</div>
+                            <div style={{fontSize:14,fontWeight:700,color:T.text}}>{mg.name}</div>
+                          </div>
+                          <div style={{display:'flex',alignItems:'center',gap:8}}>
+                            <div style={{fontSize:13,fontWeight:700,color:tr.color}}>{tr.icon} {tr.name}</div>
+                            {!isMe&&<div style={{width:26,height:26,borderRadius:13,background:Math.abs(diff)<=2?T.bg2:theyWin?tr.color+'22':'#10B98122',border:`1.5px solid ${Math.abs(diff)<=2?T.border:theyWin?tr.color:'#10B981'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13}}>
+                              {Math.abs(diff)<=2?'≈':theyWin?'↑':'↓'}
+                            </div>}
+                          </div>
+                        </div>
+                        <div style={{background:T.bg2,borderRadius:6,height:6,overflow:'hidden',position:'relative'}}>
+                          <div className="bar" style={{'--w':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}88)`,borderRadius:6}} />
+                          {!isMe&&ms>0&&<div style={{position:'absolute',top:0,bottom:0,left:`${Math.min((ms/100)*100,100)}%`,width:2,background:'#fff',opacity:.6,transform:'translateX(-50%)'}} />}
+                        </div>
+                        {!isMe&&Math.abs(diff)>2&&<div style={{fontSize:11,color:theyWin?tr.color:'#10B981',fontWeight:600,marginTop:4}}>{theyWin?`${u.name.split(' ')[0]} leads by ${Math.round(Math.abs(diff))} pts`:`You lead by ${Math.round(Math.abs(diff))} pts`}</div>}
+                      </div>
+                    )
+                  })}
+                  {!isMe&&(
+                    <div style={{background:T.bg3,borderRadius:14,padding:14,marginTop:8}}>
+                      <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Overall</div>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                        <div style={{textAlign:'center'}}><div style={{fontFamily:'Bebas Neue',fontSize:26,letterSpacing:1,color:T.accent}}>{Math.round(totalScore)}</div><div style={{fontSize:11,color:T.text3}}>You</div></div>
+                        <div style={{flex:1,margin:'0 12px'}}>
+                          <div style={{background:T.bg2,borderRadius:8,height:10,overflow:'hidden',position:'relative'}}>
+                            <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${Math.min((totalScore/Math.max(totalScore,uo))*100,100)}%`,background:`linear-gradient(90deg,${T.accent},${T.accent}99)`,borderRadius:8}} />
+                            <div style={{position:'absolute',right:0,top:0,bottom:0,width:`${Math.min((uo/Math.max(totalScore,uo))*100,100)}%`,background:`linear-gradient(90deg,${ur.color}99,${ur.color})`,borderRadius:8}} />
+                          </div>
+                          <div style={{textAlign:'center',fontSize:11,color:T.text3,marginTop:4}}>{Math.abs(Math.round(uo-totalScore))===0?'Tied!':uo>totalScore?`${u.name.split(' ')[0]} leads by ${Math.round(uo-totalScore)} pts`:`You lead by ${Math.round(totalScore-uo)} pts`}</div>
+                        </div>
+                        <div style={{textAlign:'center'}}><div style={{fontFamily:'Bebas Neue',fontSize:26,letterSpacing:1,color:ur.color}}>{Math.round(uo)}</div><div style={{fontSize:11,color:T.text3}}>{u.name.split(' ')[0]}</div></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* ── SETTINGS PANEL ── */}
+      {showSettings&&(
+        <div style={{position:'fixed',inset:0,zIndex:400,background:'rgba(0,0,0,.75)',display:'flex',flexDirection:'column',justifyContent:'flex-end'}} onClick={()=>setShowSettings(false)}>
+          <div className="fade-up" onClick={e=>e.stopPropagation()} style={{background:T.bg2,borderRadius:'24px 24px 0 0',padding:'16px 20px 40px',maxHeight:'80vh',overflowY:'auto'}}>
+            <div style={{display:'flex',justifyContent:'center',marginBottom:16}}><div style={{width:36,height:4,borderRadius:2,background:T.border}} /></div>
+            <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:20}}>
+              <div style={{width:56,height:56,borderRadius:28,background:avatarColor(currentUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue',boxShadow:`0 0 18px ${avatarColor(currentUser.name)}55`}}>{currentUser.name[0].toUpperCase()}</div>
+              <div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:T.text}}>{currentUser.name}</div>
+                <div style={{fontSize:12,color:T.text3}}>{GOALS.find(g=>g.id===(currentUser.goal||'general'))?.icon} {GOALS.find(g=>g.id===(currentUser.goal||'general'))?.label}</div>
               </div>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
+              {[['Workouts',workouts.length],['Score',Math.round(totalScore)]].map(([l,v])=>(
+                <div key={l} style={{background:T.bg3,borderRadius:12,padding:'12px',textAlign:'center'}}>
+                  <div style={{fontFamily:'Bebas Neue',fontSize:24,letterSpacing:1,color:T.text}}>{v}</div>
+                  <div style={{fontSize:11,color:T.text3,fontWeight:600}}>{l}</div>
+                </div>
+              ))}
+            </div>
+            <button className="btn" onClick={onRecalibrate} style={{width:'100%',background:'transparent',border:`1px solid #3B82F6`,borderRadius:12,color:'#3B82F6',padding:12,fontSize:14,fontWeight:700,letterSpacing:1,marginBottom:10}}>◉ Recalibrate My Rank</button>
+            <button className="btn" onClick={onLogout} style={{width:'100%',background:T.bg3,border:`1px solid ${T.border}`,borderRadius:12,color:T.text2,padding:12,fontSize:14,fontWeight:700,marginBottom:16}}>Sign Out</button>
+            <div style={{background:T.bg2,border:`1px solid ${T.accent}33`,borderRadius:14,padding:14}}>
+              <div style={{fontSize:11,color:T.accent,letterSpacing:2,textTransform:'uppercase',fontWeight:700,marginBottom:8}}>Danger Zone</div>
+              <div style={{fontSize:13,color:T.text2,marginBottom:14,lineHeight:1.5}}>Permanently deletes your account and all {workouts.length} workout sessions.</div>
               {!showDeleteConfirm?(
-                <button className="btn-press" onClick={()=>setShowDeleteConfirm(true)}
-                  style={{width:'100%',background:'transparent',border:`1px solid ${T.accent}`,borderRadius:10,color:T.accent,padding:12,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                  DELETE MY ACCOUNT
-                </button>
+                <button className="btn" onClick={()=>setShowDeleteConfirm(true)} style={{width:'100%',background:'transparent',border:`1px solid ${T.accent}`,borderRadius:10,color:T.accent,padding:11,fontSize:13,fontWeight:700,letterSpacing:1}}>Delete My Account</button>
               ):(
                 <div>
-                  <div style={{background:T.darkMode?'#2A0505':'#FFF5F5',borderRadius:10,padding:12,marginBottom:12,fontSize:13,color:T.darkMode?'#FCA5A5':'#991B1B',fontFamily:'Inter',lineHeight:1.5}}>
-                    ⚠️ This will permanently delete your account and all workout data.
-                  </div>
-                  <div style={{fontSize:11,letterSpacing:3,color:T.text3,textTransform:'uppercase',marginBottom:6}}>Confirm with your PIN</div>
-                  <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
-                    value={deletePin} onChange={e=>setDeletePin(e.target.value)}
-                    style={{width:'100%',background:T.input,border:`1px solid ${T.accent}55`,borderRadius:10,color:T.text,padding:'12px 14px',fontSize:24,letterSpacing:8,textAlign:'center',marginBottom:10,fontFamily:'Bebas Neue'}} />
-                  {deleteMsg&&<div style={{color:T.accent,fontSize:13,textAlign:'center',marginBottom:10}}>{deleteMsg}</div>}
+                  <div style={{background:T.darkMode?'#2A0505':'#FFF5F5',borderRadius:10,padding:10,marginBottom:10,fontSize:12,color:T.darkMode?'#FCA5A5':'#991B1B'}}>⚠️ This cannot be undone.</div>
+                  <input type="password" inputMode="numeric" maxLength={8} placeholder="••••" value={deletePin} onChange={e=>setDeletePin(e.target.value)}
+                    style={{width:'100%',background:T.input,border:`1px solid ${T.accent}55`,borderRadius:10,color:T.text,padding:'11px 14px',fontSize:22,letterSpacing:8,textAlign:'center',marginBottom:10}} />
+                  {deleteMsg&&<div style={{color:T.accent,fontSize:12,textAlign:'center',marginBottom:10}}>{deleteMsg}</div>}
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                    <button className="btn-press" onClick={()=>{setShowDeleteConfirm(false);setDeletePin('');setDeleteMsg('')}}
-                      style={{background:'transparent',border:`1px solid ${T.border}`,borderRadius:10,color:T.text3,padding:12,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                      CANCEL
-                    </button>
-                    <button className="btn-press" onClick={handleDeleteAccount} disabled={deleteLoading}
-                      style={{background:T.accent,border:'none',borderRadius:10,color:'#fff',padding:12,fontSize:13,fontWeight:700,letterSpacing:1,cursor:'pointer',fontFamily:'Rajdhani'}}>
-                      {deleteLoading?'...':'CONFIRM DELETE'}
-                    </button>
+                    <button className="btn" onClick={()=>{setShowDeleteConfirm(false);setDeletePin('');setDeleteMsg('')}} style={{background:T.bg3,borderRadius:10,color:T.text2,padding:11,fontSize:13,fontWeight:700}}>Cancel</button>
+                    <button className="btn" onClick={handleDeleteAccount} disabled={deleteLoading} style={{background:T.accent,borderRadius:10,color:'#fff',padding:11,fontSize:13,fontWeight:700,letterSpacing:1}}>{deleteLoading?'...':'Confirm'}</button>
                   </div>
                 </div>
               )}
             </div>
           </div>
-        )}
-      </div>
-
-      {/* Bottom accent line */}
-
-
-      {/* ── ONBOARDING OVERLAY ── */}
-      {showOnboarding&&(
-        <div style={{position:'fixed',inset:0,zIndex:600,background:'rgba(0,0,0,0.85)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24}}>
-          <div className="slide-up" style={{width:'100%',maxWidth:400,background:T.bg2,borderRadius:24,overflow:'hidden',boxShadow:`0 24px 80px rgba(0,0,0,0.5)`}}>
-
-            {/* Progress dots */}
-            <div style={{display:'flex',justifyContent:'center',gap:8,padding:'20px 0 0'}}>
-              {[0,1,2,3].map(i=>(
-                <div key={i} style={{width:i===onboardStep?24:8,height:8,borderRadius:4,background:i===onboardStep?T.accent:T.bg3,transition:'all 0.3s'}} />
-              ))}
-            </div>
-
-            {/* Step content */}
-            {onboardStep===0&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:64,marginBottom:16}}>👋</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>Welcome to ARISE</div>
-                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
-                  Your personal gym tracker that turns your workouts into a <strong style={{color:T.accent}}>ranking system</strong>. The more you lift, the higher you rank.
-                </div>
-                <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                  {[
-                    {icon:'📈', text:'Track every lift and see your progress'},
-                    {icon:'🏆', text:'Rank up from Beginner to Legend'},
-                    {icon:'⚔️', text:'Compete with your gym crew'},
-                  ].map(({icon,text})=>(
-                    <div key={text} style={{display:'flex',alignItems:'center',gap:12,background:T.bg3,borderRadius:12,padding:'10px 14px',textAlign:'left'}}>
-                      <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
-                      <span style={{fontSize:14,color:T.text2}}>{text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {onboardStep===1&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:56,marginBottom:16}}>🏅</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How Ranks Work</div>
-                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Each muscle group has its own rank. The heavier you lift and the more volume you do, the higher your score.</div>
-                <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:4}}>
-                  {RANKS.map((r,i)=>(
-                    <div key={r.name} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'8px 12px'}}>
-                      <div style={{width:28,height:28,borderRadius:8,background:r.gradient,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0}}>{r.icon}</div>
-                      <div style={{flex:1,textAlign:'left'}}>
-                        <span style={{fontWeight:700,color:r.color,fontSize:14}}>{r.name}</span>
-                        <span style={{fontSize:12,color:T.text3,marginLeft:8}}>Score ≥ {r.min}</span>
-                      </div>
-                      {i===0&&<span style={{fontSize:11,color:T.text3}}>Start here</span>}
-                      {i===RANKS.length-1&&<span style={{fontSize:11,color:r.color}}>⬡ Top</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {onboardStep===2&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:56,marginBottom:16}}>💪</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How to Use ARISE</div>
-                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Three simple steps every gym session:</div>
-                <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                  {[
-                    {num:'1', icon:'📋', title:'Load a Template', desc:'Go to Workouts, open your template, and follow the checklist.'},
-                    {num:'2', icon:'✅', title:'Check off exercises', desc:'After each set, tap "Mark Done" — enter your weight and reps, it logs automatically.'},
-                    {num:'3', icon:'📈', title:'Watch yourself rank up', desc:'Your scores update in real time. Keep pushing to hit the next tier.'},
-                  ].map(({num,icon,title,desc})=>(
-                    <div key={num} style={{display:'flex',alignItems:'flex-start',gap:12,background:T.bg3,borderRadius:12,padding:'12px 14px',textAlign:'left'}}>
-                      <div style={{width:28,height:28,borderRadius:14,background:T.accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color:'#fff',flexShrink:0}}>{num}</div>
-                      <div>
-                        <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:2}}>{icon} {title}</div>
-                        <div style={{fontSize:12,color:T.text3,lineHeight:1.5}}>{desc}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {onboardStep===3&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:64,marginBottom:16}}>🚀</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>You're All Set!</div>
-                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
-                  Start by creating your first workout template, or just tap <strong style={{color:T.accent}}>Log</strong> to track your first set right now.
-                </div>
-                <div style={{background:T.bg3,borderRadius:14,padding:14,marginBottom:4,textAlign:'left'}}>
-                  <div style={{fontSize:12,fontWeight:700,color:T.text3,marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>Quick tip</div>
-                  <div style={{fontSize:13,color:T.text2,lineHeight:1.6}}>
-                    💡 You can access everything from the bottom bar. Tap <strong style={{color:T.text}}>More</strong> to find History, Stats, Charts, Achievements and more.
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation */}
-            <div style={{display:'grid',gridTemplateColumns:onboardStep===0?'1fr':'1fr 1fr',gap:10,padding:'0 24px 24px'}}>
-              {onboardStep>0&&(
-                <button className="btn-press" onClick={()=>setOnboardStep(s=>s-1)}
-                  style={{background:T.bg3,border:'none',borderRadius:12,color:T.text2,padding:14,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Nunito'}}>
-                  ← Back
-                </button>
-              )}
-              <button className="btn-press" onClick={()=>{
-                if(onboardStep<3){setOnboardStep(s=>s+1)}
-                else{onOnboardingDone();setOnboardStep(0)}
-              }}
-                style={{background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,border:'none',borderRadius:12,color:'#fff',padding:14,fontSize:14,fontWeight:800,letterSpacing:1,cursor:'pointer',fontFamily:'Nunito',boxShadow:`0 4px 16px ${T.accent}44`}}>
-                {onboardStep===3?'Start Training 💪':'Next →'}
-              </button>
-            </div>
-
-            {/* Skip */}
-            {onboardStep<3&&(
-              <button onClick={()=>{onOnboardingDone();setOnboardStep(0)}}
-                style={{display:'block',width:'100%',background:'none',border:'none',color:T.text3,fontSize:12,padding:'0 0 16px',cursor:'pointer',fontFamily:'Nunito'}}>
-                Skip intro
-              </button>
-            )}
-          </div>
         </div>
       )}
 
-      {/* ── PROFILE MODAL ── */}
-      {viewingProfile&&(
-        <div style={{position:'fixed',inset:0,zIndex:400,background:'rgba(0,0,0,0.75)',display:'flex',flexDirection:'column',justifyContent:'flex-end'}} onClick={()=>setViewingProfile(null)}>
-          <div className="slide-up" onClick={e=>e.stopPropagation()}
-            style={{background:T.bg2,borderRadius:'24px 24px 0 0',padding:'0 0 32px',maxHeight:'90vh',overflowY:'auto'}}>
-
-            {/* Handle bar */}
-            <div style={{display:'flex',justifyContent:'center',padding:'12px 0 0'}}>
-              <div style={{width:36,height:4,borderRadius:2,background:T.border}} />
-            </div>
-
-            {(()=>{
-              const u = viewingProfile
-              const isMe = u.id === currentUser.id
-              const uWorkouts = allWorkouts.filter(w=>w.user_id===u.id)
-              const uScores = MUSCLE_GROUPS.reduce((acc,mg)=>({...acc,[mg.id]:calcScore(uWorkouts.filter(w=>w.muscle===mg.id))}),{})
-              const uOverall = MUSCLE_GROUPS.reduce((s,mg)=>s+uScores[mg.id],0)/MUSCLE_GROUPS.length
-              const uRank = getRank(uOverall)
-              const uGoal = GOALS.find(g=>g.id===(u.goal||'general'))
-              const uTotalVol = uWorkouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
-              const uSessions = uWorkouts.length
-              // PRs
-              const uPRs = uWorkouts.reduce((acc,w)=>{
-                const rm=calc1RM(w.weight,w.reps)
-                if(!acc[w.exercise]||rm>acc[w.exercise]) acc[w.exercise]=rm
-                return acc
-              },{})
-              const uPRCount = Object.keys(uPRs).length
-              // Streak
-              const getWeek=d=>{const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toDateString()}
-              const uWeeks=[...new Set(uWorkouts.map(w=>getWeek(w.created_at)))].sort((a,b)=>new Date(b)-new Date(a))
-              let uStreak=0,cur=new Date()
-              cur.setDate(cur.getDate()-cur.getDay()+(cur.getDay()===0?-6:1))
-              for(let i=0;i<uWeeks.length;i++){const wk=new Date(uWeeks[i]);const diff=Math.round((cur-wk)/(7*24*60*60*1000));if(diff===i)uStreak++;else break}
-
-              // vs me comparison
-              const myScores = scores // already computed
-              const myOverall = totalScore
-
-              return (
-                <div style={{padding:'16px 20px'}}>
-                  {/* Header */}
-                  <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:20}}>
-                    <div style={{width:72,height:72,borderRadius:36,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue',letterSpacing:2,boxShadow:`0 0 24px ${avatarColor(u.name)}55`,flexShrink:0}}>
-                      {u.name[0].toUpperCase()}
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{display:'flex',alignItems:'center',gap:8}}>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,lineHeight:1}}>{u.name}</div>
-                        {isMe&&<span style={{background:T.accent,color:'#fff',fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:20,letterSpacing:1}}>YOU</span>}
-                      </div>
-                      <div style={{fontSize:13,color:T.text3,marginTop:3}}>{uGoal?.icon} {uGoal?.label}</div>
-                      <div style={{display:'flex',alignItems:'center',gap:6,marginTop:6}}>
-                        <div style={{background:uRank.gradient,borderRadius:8,padding:'3px 10px',display:'flex',alignItems:'center',gap:4}}>
-                          <span style={{fontSize:13}}>{uRank.icon}</span>
-                          <span style={{fontSize:13,fontWeight:700,color:'#fff'}}>{uRank.name}</span>
-                        </div>
-                        <span style={{fontSize:12,color:T.text3}}>{Math.round(uOverall)} pts</span>
-                      </div>
-                    </div>
-                    <button onClick={()=>setViewingProfile(null)}
-                      style={{background:T.bg3,border:'none',borderRadius:12,width:36,height:36,fontSize:18,color:T.text3,cursor:'pointer',flexShrink:0}}>✕</button>
-                  </div>
-
-                  {/* Stats row */}
-                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:20}}>
-                    {[
-                      ['Sessions', uSessions, '📝'],
-                      ['PRs', uPRCount, '⭐'],
-                      ['Streak', `${uStreak}w`, '🔥'],
-                      ['Volume', `${Math.round(cvt(uTotalVol,unit)/1000)}k`, '📦'],
-                    ].map(([label,val,icon])=>(
-                      <div key={label} style={{background:T.bg3,borderRadius:14,padding:'10px 6px',textAlign:'center'}}>
-                        <div style={{fontSize:18,marginBottom:2}}>{icon}</div>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text,lineHeight:1}}>{val}</div>
-                        <div style={{fontSize:10,color:T.text3,fontWeight:600,marginTop:2}}>{label}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Muscle breakdown + vs Me */}
-                  <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:12}}>
-                    {isMe ? 'Your Muscle Ranks' : `${u.name.split(' ')[0]} vs You`}
-                  </div>
-                  <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
-                    {MUSCLE_GROUPS.map(mg=>{
-                      const theirScore = uScores[mg.id]
-                      const myScore = myScores[mg.id]
-                      const theirRank = getRank(theirScore)
-                      const myRank = getRank(myScore)
-                      const diff = theirScore - myScore
-                      const pct = Math.min((theirScore/100)*100, 100)
-                      const theyWin = diff > 2
-                      const iWin = diff < -2
-                      const tied = Math.abs(diff) <= 2
-                      return(
-                        <div key={mg.id} style={{background:T.bg3,borderRadius:14,padding:'12px 14px',border:`1.5px solid ${isMe||tied?T.border:theyWin?theirRank.color+'44':'#10B98133'}`}}>
-                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                            <div style={{display:'flex',alignItems:'center',gap:8}}>
-                              <div style={{width:30,height:30,borderRadius:10,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>{mg.icon}</div>
-                              <div style={{fontSize:14,fontWeight:700,color:T.text}}>{mg.name}</div>
-                            </div>
-                            <div style={{display:'flex',alignItems:'center',gap:8}}>
-                              <div style={{textAlign:'right'}}>
-                                <div style={{fontSize:13,fontWeight:700,color:theirRank.color}}>{theirRank.icon} {theirRank.name}</div>
-                                <div style={{fontSize:11,color:T.text3}}>{Math.round(theirScore)} pts</div>
-                              </div>
-                              {!isMe&&(
-                                <div style={{width:28,height:28,borderRadius:14,background:tied?T.bg2:theyWin?theirRank.color+'22':'#10B98122',border:`1.5px solid ${tied?T.border:theyWin?theirRank.color:'#10B981'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13}}>
-                                  {tied?'≈':theyWin?'↑':'↓'}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div style={{background:T.bg2,borderRadius:6,height:6,overflow:'hidden',position:'relative'}}>
-                            <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}88)`,borderRadius:6}} />
-                            {!isMe&&myScore>0&&(
-                              <div style={{position:'absolute',top:0,bottom:0,left:`${Math.min((myScore/100)*100,100)}%`,width:2,background:'#fff',opacity:0.6,transform:'translateX(-50%)'}} />
-                            )}
-                          </div>
-                          {!isMe&&!tied&&(
-                            <div style={{fontSize:11,color:theyWin?theirRank.color:'#10B981',fontWeight:600,marginTop:4}}>
-                              {theyWin
-                                ? `${u.name.split(' ')[0]} leads by ${Math.round(Math.abs(diff))} pts`
-                                : `You lead by ${Math.round(Math.abs(diff))} pts`
-                              }
-                            </div>
-                          )}
-                          {!isMe&&tied&&<div style={{fontSize:11,color:T.text3,marginTop:4}}>Neck and neck</div>}
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Overall comparison bar */}
-                  {!isMe&&(
-                    <div style={{background:T.bg3,borderRadius:14,padding:14}}>
-                      <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Overall Score</div>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                        <div style={{textAlign:'center'}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:T.accent}}>{Math.round(myOverall)}</div>
-                          <div style={{fontSize:11,color:T.text3}}>You</div>
-                        </div>
-                        <div style={{flex:1,margin:'0 12px'}}>
-                          <div style={{background:T.bg2,borderRadius:8,height:10,overflow:'hidden',position:'relative'}}>
-                            <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${Math.min((myOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${T.accent},${T.accent}99)`,borderRadius:8}} />
-                            <div style={{position:'absolute',right:0,top:0,bottom:0,width:`${Math.min((uOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${uRank.color}99,${uRank.color})`,borderRadius:8}} />
-                          </div>
-                          <div style={{textAlign:'center',fontSize:11,color:T.text3,marginTop:4}}>
-                            {Math.abs(Math.round(uOverall-myOverall))===0?'Tied!'
-                              :uOverall>myOverall?`${u.name.split(' ')[0]} leads by ${Math.round(uOverall-myOverall)} pts`
-                              :`You lead by ${Math.round(myOverall-uOverall)} pts`}
-                          </div>
-                        </div>
-                        <div style={{textAlign:'center'}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:uRank.color}}>{Math.round(uOverall)}</div>
-                          <div style={{fontSize:11,color:T.text3}}>{u.name.split(' ')[0]}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })()}
-          </div>
-        </div>
-      )}
-
-      {/* ── BOTTOM NAV BAR ── */}
-
-
-      {/* ── ONBOARDING OVERLAY ── */}
-      {showOnboarding&&(
-        <div style={{position:'fixed',inset:0,zIndex:600,background:'rgba(0,0,0,0.85)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24}}>
-          <div className="slide-up" style={{width:'100%',maxWidth:400,background:T.bg2,borderRadius:24,overflow:'hidden',boxShadow:`0 24px 80px rgba(0,0,0,0.5)`}}>
-
-            {/* Progress dots */}
-            <div style={{display:'flex',justifyContent:'center',gap:8,padding:'20px 0 0'}}>
-              {[0,1,2,3].map(i=>(
-                <div key={i} style={{width:i===onboardStep?24:8,height:8,borderRadius:4,background:i===onboardStep?T.accent:T.bg3,transition:'all 0.3s'}} />
-              ))}
-            </div>
-
-            {/* Step content */}
-            {onboardStep===0&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:64,marginBottom:16}}>👋</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>Welcome to ARISE</div>
-                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
-                  Your personal gym tracker that turns your workouts into a <strong style={{color:T.accent}}>ranking system</strong>. The more you lift, the higher you rank.
-                </div>
-                <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                  {[
-                    {icon:'📈', text:'Track every lift and see your progress'},
-                    {icon:'🏆', text:'Rank up from Beginner to Legend'},
-                    {icon:'⚔️', text:'Compete with your gym crew'},
-                  ].map(({icon,text})=>(
-                    <div key={text} style={{display:'flex',alignItems:'center',gap:12,background:T.bg3,borderRadius:12,padding:'10px 14px',textAlign:'left'}}>
-                      <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
-                      <span style={{fontSize:14,color:T.text2}}>{text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {onboardStep===1&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:56,marginBottom:16}}>🏅</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How Ranks Work</div>
-                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Each muscle group has its own rank. The heavier you lift and the more volume you do, the higher your score.</div>
-                <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:4}}>
-                  {RANKS.map((r,i)=>(
-                    <div key={r.name} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'8px 12px'}}>
-                      <div style={{width:28,height:28,borderRadius:8,background:r.gradient,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0}}>{r.icon}</div>
-                      <div style={{flex:1,textAlign:'left'}}>
-                        <span style={{fontWeight:700,color:r.color,fontSize:14}}>{r.name}</span>
-                        <span style={{fontSize:12,color:T.text3,marginLeft:8}}>Score ≥ {r.min}</span>
-                      </div>
-                      {i===0&&<span style={{fontSize:11,color:T.text3}}>Start here</span>}
-                      {i===RANKS.length-1&&<span style={{fontSize:11,color:r.color}}>⬡ Top</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {onboardStep===2&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:56,marginBottom:16}}>💪</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How to Use ARISE</div>
-                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Three simple steps every gym session:</div>
-                <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                  {[
-                    {num:'1', icon:'📋', title:'Load a Template', desc:'Go to Workouts, open your template, and follow the checklist.'},
-                    {num:'2', icon:'✅', title:'Check off exercises', desc:'After each set, tap "Mark Done" — enter your weight and reps, it logs automatically.'},
-                    {num:'3', icon:'📈', title:'Watch yourself rank up', desc:'Your scores update in real time. Keep pushing to hit the next tier.'},
-                  ].map(({num,icon,title,desc})=>(
-                    <div key={num} style={{display:'flex',alignItems:'flex-start',gap:12,background:T.bg3,borderRadius:12,padding:'12px 14px',textAlign:'left'}}>
-                      <div style={{width:28,height:28,borderRadius:14,background:T.accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color:'#fff',flexShrink:0}}>{num}</div>
-                      <div>
-                        <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:2}}>{icon} {title}</div>
-                        <div style={{fontSize:12,color:T.text3,lineHeight:1.5}}>{desc}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {onboardStep===3&&(
-              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
-                <div style={{fontSize:64,marginBottom:16}}>🚀</div>
-                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>You're All Set!</div>
-                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
-                  Start by creating your first workout template, or just tap <strong style={{color:T.accent}}>Log</strong> to track your first set right now.
-                </div>
-                <div style={{background:T.bg3,borderRadius:14,padding:14,marginBottom:4,textAlign:'left'}}>
-                  <div style={{fontSize:12,fontWeight:700,color:T.text3,marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>Quick tip</div>
-                  <div style={{fontSize:13,color:T.text2,lineHeight:1.6}}>
-                    💡 You can access everything from the bottom bar. Tap <strong style={{color:T.text}}>More</strong> to find History, Stats, Charts, Achievements and more.
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation */}
-            <div style={{display:'grid',gridTemplateColumns:onboardStep===0?'1fr':'1fr 1fr',gap:10,padding:'0 24px 24px'}}>
-              {onboardStep>0&&(
-                <button className="btn-press" onClick={()=>setOnboardStep(s=>s-1)}
-                  style={{background:T.bg3,border:'none',borderRadius:12,color:T.text2,padding:14,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Nunito'}}>
-                  ← Back
-                </button>
-              )}
-              <button className="btn-press" onClick={()=>{
-                if(onboardStep<3){setOnboardStep(s=>s+1)}
-                else{onOnboardingDone();setOnboardStep(0)}
-              }}
-                style={{background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,border:'none',borderRadius:12,color:'#fff',padding:14,fontSize:14,fontWeight:800,letterSpacing:1,cursor:'pointer',fontFamily:'Nunito',boxShadow:`0 4px 16px ${T.accent}44`}}>
-                {onboardStep===3?'Start Training 💪':'Next →'}
-              </button>
-            </div>
-
-            {/* Skip */}
-            {onboardStep<3&&(
-              <button onClick={()=>{onOnboardingDone();setOnboardStep(0)}}
-                style={{display:'block',width:'100%',background:'none',border:'none',color:T.text3,fontSize:12,padding:'0 0 16px',cursor:'pointer',fontFamily:'Nunito'}}>
-                Skip intro
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── PROFILE MODAL ── */}
-      {viewingProfile&&(
-        <div style={{position:'fixed',inset:0,zIndex:400,background:'rgba(0,0,0,0.75)',display:'flex',flexDirection:'column',justifyContent:'flex-end'}} onClick={()=>setViewingProfile(null)}>
-          <div className="slide-up" onClick={e=>e.stopPropagation()}
-            style={{background:T.bg2,borderRadius:'24px 24px 0 0',padding:'0 0 32px',maxHeight:'90vh',overflowY:'auto'}}>
-
-            {/* Handle bar */}
-            <div style={{display:'flex',justifyContent:'center',padding:'12px 0 0'}}>
-              <div style={{width:36,height:4,borderRadius:2,background:T.border}} />
-            </div>
-
-            {(()=>{
-              const u = viewingProfile
-              const isMe = u.id === currentUser.id
-              const uWorkouts = allWorkouts.filter(w=>w.user_id===u.id)
-              const uScores = MUSCLE_GROUPS.reduce((acc,mg)=>({...acc,[mg.id]:calcScore(uWorkouts.filter(w=>w.muscle===mg.id))}),{})
-              const uOverall = MUSCLE_GROUPS.reduce((s,mg)=>s+uScores[mg.id],0)/MUSCLE_GROUPS.length
-              const uRank = getRank(uOverall)
-              const uGoal = GOALS.find(g=>g.id===(u.goal||'general'))
-              const uTotalVol = uWorkouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
-              const uSessions = uWorkouts.length
-              // PRs
-              const uPRs = uWorkouts.reduce((acc,w)=>{
-                const rm=calc1RM(w.weight,w.reps)
-                if(!acc[w.exercise]||rm>acc[w.exercise]) acc[w.exercise]=rm
-                return acc
-              },{})
-              const uPRCount = Object.keys(uPRs).length
-              // Streak
-              const getWeek=d=>{const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toDateString()}
-              const uWeeks=[...new Set(uWorkouts.map(w=>getWeek(w.created_at)))].sort((a,b)=>new Date(b)-new Date(a))
-              let uStreak=0,cur=new Date()
-              cur.setDate(cur.getDate()-cur.getDay()+(cur.getDay()===0?-6:1))
-              for(let i=0;i<uWeeks.length;i++){const wk=new Date(uWeeks[i]);const diff=Math.round((cur-wk)/(7*24*60*60*1000));if(diff===i)uStreak++;else break}
-
-              // vs me comparison
-              const myScores = scores // already computed
-              const myOverall = totalScore
-
-              return (
-                <div style={{padding:'16px 20px'}}>
-                  {/* Header */}
-                  <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:20}}>
-                    <div style={{width:72,height:72,borderRadius:36,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue',letterSpacing:2,boxShadow:`0 0 24px ${avatarColor(u.name)}55`,flexShrink:0}}>
-                      {u.name[0].toUpperCase()}
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{display:'flex',alignItems:'center',gap:8}}>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,lineHeight:1}}>{u.name}</div>
-                        {isMe&&<span style={{background:T.accent,color:'#fff',fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:20,letterSpacing:1}}>YOU</span>}
-                      </div>
-                      <div style={{fontSize:13,color:T.text3,marginTop:3}}>{uGoal?.icon} {uGoal?.label}</div>
-                      <div style={{display:'flex',alignItems:'center',gap:6,marginTop:6}}>
-                        <div style={{background:uRank.gradient,borderRadius:8,padding:'3px 10px',display:'flex',alignItems:'center',gap:4}}>
-                          <span style={{fontSize:13}}>{uRank.icon}</span>
-                          <span style={{fontSize:13,fontWeight:700,color:'#fff'}}>{uRank.name}</span>
-                        </div>
-                        <span style={{fontSize:12,color:T.text3}}>{Math.round(uOverall)} pts</span>
-                      </div>
-                    </div>
-                    <button onClick={()=>setViewingProfile(null)}
-                      style={{background:T.bg3,border:'none',borderRadius:12,width:36,height:36,fontSize:18,color:T.text3,cursor:'pointer',flexShrink:0}}>✕</button>
-                  </div>
-
-                  {/* Stats row */}
-                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:20}}>
-                    {[
-                      ['Sessions', uSessions, '📝'],
-                      ['PRs', uPRCount, '⭐'],
-                      ['Streak', `${uStreak}w`, '🔥'],
-                      ['Volume', `${Math.round(cvt(uTotalVol,unit)/1000)}k`, '📦'],
-                    ].map(([label,val,icon])=>(
-                      <div key={label} style={{background:T.bg3,borderRadius:14,padding:'10px 6px',textAlign:'center'}}>
-                        <div style={{fontSize:18,marginBottom:2}}>{icon}</div>
-                        <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text,lineHeight:1}}>{val}</div>
-                        <div style={{fontSize:10,color:T.text3,fontWeight:600,marginTop:2}}>{label}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Muscle breakdown + vs Me */}
-                  <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:12}}>
-                    {isMe ? 'Your Muscle Ranks' : `${u.name.split(' ')[0]} vs You`}
-                  </div>
-                  <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
-                    {MUSCLE_GROUPS.map(mg=>{
-                      const theirScore = uScores[mg.id]
-                      const myScore = myScores[mg.id]
-                      const theirRank = getRank(theirScore)
-                      const myRank = getRank(myScore)
-                      const diff = theirScore - myScore
-                      const pct = Math.min((theirScore/100)*100, 100)
-                      const theyWin = diff > 2
-                      const iWin = diff < -2
-                      const tied = Math.abs(diff) <= 2
-                      return(
-                        <div key={mg.id} style={{background:T.bg3,borderRadius:14,padding:'12px 14px',border:`1.5px solid ${isMe||tied?T.border:theyWin?theirRank.color+'44':'#10B98133'}`}}>
-                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                            <div style={{display:'flex',alignItems:'center',gap:8}}>
-                              <div style={{width:30,height:30,borderRadius:10,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>{mg.icon}</div>
-                              <div style={{fontSize:14,fontWeight:700,color:T.text}}>{mg.name}</div>
-                            </div>
-                            <div style={{display:'flex',alignItems:'center',gap:8}}>
-                              <div style={{textAlign:'right'}}>
-                                <div style={{fontSize:13,fontWeight:700,color:theirRank.color}}>{theirRank.icon} {theirRank.name}</div>
-                                <div style={{fontSize:11,color:T.text3}}>{Math.round(theirScore)} pts</div>
-                              </div>
-                              {!isMe&&(
-                                <div style={{width:28,height:28,borderRadius:14,background:tied?T.bg2:theyWin?theirRank.color+'22':'#10B98122',border:`1.5px solid ${tied?T.border:theyWin?theirRank.color:'#10B981'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13}}>
-                                  {tied?'≈':theyWin?'↑':'↓'}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div style={{background:T.bg2,borderRadius:6,height:6,overflow:'hidden',position:'relative'}}>
-                            <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}88)`,borderRadius:6}} />
-                            {!isMe&&myScore>0&&(
-                              <div style={{position:'absolute',top:0,bottom:0,left:`${Math.min((myScore/100)*100,100)}%`,width:2,background:'#fff',opacity:0.6,transform:'translateX(-50%)'}} />
-                            )}
-                          </div>
-                          {!isMe&&!tied&&(
-                            <div style={{fontSize:11,color:theyWin?theirRank.color:'#10B981',fontWeight:600,marginTop:4}}>
-                              {theyWin
-                                ? `${u.name.split(' ')[0]} leads by ${Math.round(Math.abs(diff))} pts`
-                                : `You lead by ${Math.round(Math.abs(diff))} pts`
-                              }
-                            </div>
-                          )}
-                          {!isMe&&tied&&<div style={{fontSize:11,color:T.text3,marginTop:4}}>Neck and neck</div>}
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Overall comparison bar */}
-                  {!isMe&&(
-                    <div style={{background:T.bg3,borderRadius:14,padding:14}}>
-                      <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Overall Score</div>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                        <div style={{textAlign:'center'}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:T.accent}}>{Math.round(myOverall)}</div>
-                          <div style={{fontSize:11,color:T.text3}}>You</div>
-                        </div>
-                        <div style={{flex:1,margin:'0 12px'}}>
-                          <div style={{background:T.bg2,borderRadius:8,height:10,overflow:'hidden',position:'relative'}}>
-                            <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${Math.min((myOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${T.accent},${T.accent}99)`,borderRadius:8}} />
-                            <div style={{position:'absolute',right:0,top:0,bottom:0,width:`${Math.min((uOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${uRank.color}99,${uRank.color})`,borderRadius:8}} />
-                          </div>
-                          <div style={{textAlign:'center',fontSize:11,color:T.text3,marginTop:4}}>
-                            {Math.abs(Math.round(uOverall-myOverall))===0?'Tied!'
-                              :uOverall>myOverall?`${u.name.split(' ')[0]} leads by ${Math.round(uOverall-myOverall)} pts`
-                              :`You lead by ${Math.round(myOverall-uOverall)} pts`}
-                          </div>
-                        </div>
-                        <div style={{textAlign:'center'}}>
-                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:uRank.color}}>{Math.round(uOverall)}</div>
-                          <div style={{fontSize:11,color:T.text3}}>{u.name.split(' ')[0]}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })()}
-          </div>
-        </div>
-      )}
-
-      {/* ── BOTTOM NAV BAR ── */}
-      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:200,background:T.navBg||T.bg2,borderTop:`1.5px solid ${T.border}`,paddingBottom:'env(safe-area-inset-bottom)',backdropFilter:'blur(12px)'}}>
-        {/* Primary row */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',padding:'8px 0 6px'}}>
+      {/* ── BOTTOM NAV ── */}
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:200,background:T.bg2,borderTop:`1px solid ${T.border}`,paddingBottom:'env(safe-area-inset-bottom)'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',padding:'6px 0 4px'}}>
           {[
-            {id:'dashboard', icon:'🏅', label:'Ranks'},
-            {id:'templates', icon:'📋', label:'Workouts'},
-            {id:'log',       icon:'＋', label:'Log'},
-            {id:'plan',      icon:'📅', label:'Plan'},
-            {id:'more',      icon:'☰',  label:'More'},
+            {id:'today',     icon:'🏠', label:'Today'},
+            {id:'workouts',  icon:'📋', label:'Workouts'},
+            {id:'progress',  icon:'📈', label:'Progress'},
+            {id:'community', icon:'🏆', label:'Community'},
           ].map(({id,icon,label})=>(
-            <button key={id} onClick={()=>{
-              if(id==='more'){setShowMore(m=>!m)}
-              else{setTab(id);setShowMore(false)}
-            }}
-              style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'4px 2px',border:'none',background:'transparent',cursor:'pointer',position:'relative'}}>
-              {id==='log'?(
-                <div style={{width:50,height:50,borderRadius:25,background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,fontWeight:900,color:'#fff',marginTop:-18,boxShadow:`0 6px 20px ${T.accent}55`}}>＋</div>
-              ):(
-                <div style={{width:36,height:36,borderRadius:12,background:(id==='more'?showMore:tab===id)?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,transition:'all 0.2s'}}>{id==='more'&&showMore?'✕':icon}</div>
-              )}
-              <div style={{fontSize:10,fontWeight:700,color:(id==='more'?showMore:tab===id)||id==='log'?T.accent:T.text3,marginTop:id==='log'?4:0,transition:'color 0.2s'}}>{label}</div>
+            <button key={id} onClick={()=>setTab(id)} className="btn"
+              style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'6px 4px',background:'transparent'}}>
+              <div style={{width:38,height:38,borderRadius:12,background:tab===id?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,transition:'all .2s'}}>{icon}</div>
+              <div style={{fontSize:10,fontWeight:700,color:tab===id?T.accent:T.text3,transition:'color .2s'}}>{label}</div>
             </button>
           ))}
         </div>
-
-        {/* More drawer — only shows when showMore is true */}
-        {showMore&&(
-          <div style={{borderTop:`1px solid ${T.border}`,display:'grid',gridTemplateColumns:'repeat(4,1fr)',padding:'10px 4px 8px',background:T.bg3}}>
-            {[
-              {id:'body',         icon:'⚖️',  label:'Body'},
-              {id:'history',      icon:'📝',  label:'History'},
-              {id:'stats',        icon:'📊',  label:'Stats'},
-              {id:'charts',       icon:'📈',  label:'Charts'},
-              {id:'achievements', icon:'🎖️', label:'Awards'},
-              {id:'challenges',   icon:'⚔️',  label:'Challenges'},
-              {id:'leaderboard',  icon:'🏆',  label:'Leaders'},
-              {id:'settings',     icon:'⚙️',  label:'Settings'},
-            ].map(({id,icon,label})=>(
-              <button key={id} onClick={()=>{setTab(id);setShowMore(false)}}
-                style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'6px 4px',border:'none',background:'transparent',cursor:'pointer'}}>
-                <div style={{width:34,height:34,borderRadius:10,background:tab===id?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,transition:'all 0.2s'}}>{icon}</div>
-                <div style={{fontSize:10,fontWeight:700,color:tab===id?T.accent:T.text3,transition:'color 0.2s'}}>{label}</div>
-              </button>
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* Floating log button */}
+      <button className="btn" onClick={()=>setLogOpen(true)}
+        style={{position:'fixed',bottom:72,right:20,zIndex:300,width:54,height:54,borderRadius:27,background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,color:'#fff',fontSize:26,fontWeight:900,boxShadow:`0 6px 20px ${T.accent}55`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+        +
+      </button>
     </div>
   )
 }
