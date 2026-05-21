@@ -306,8 +306,8 @@ const SESSION_KEY='arise_session_v1'
 function loadSettings(){
   try{
     const s=JSON.parse(localStorage.getItem(SETTINGS_KEY))
-    return s?{unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false,darkMode:true,...s}:{unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false,darkMode:true}
-  }catch{return{unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false,darkMode:true}}
+    return s?{unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false,darkMode:true,onboardingDone:false,...s}:{unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false,darkMode:true,onboardingDone:false}
+  }catch{return{unit:'kg',trainingDays:['Mon','Tue','Thu','Fri'],ownSplit:false,darkMode:true,onboardingDone:false}}
 }
 function loadSession(){
   try{return JSON.parse(localStorage.getItem(SESSION_KEY))||null}catch{return null}
@@ -430,6 +430,7 @@ export default function App() {
   const [authLoading,setAuthLoading] = useState(false)
   const [selectedUser,setSelectedUser] = useState(null)
   const [pendingUser,setPendingUser]   = useState(null)
+  const [showOnboarding,setShowOnboarding] = useState(false)
   const [settings,setSettings]        = useState(loadSettings)
 
   const T = settings.darkMode ? DARK : LIGHT
@@ -488,12 +489,13 @@ export default function App() {
   if(screen==='app'&&currentUser) return (
     <MainApp currentUser={currentUser} onLogout={handleLogout} allUsers={users}
       settings={settings} setSettings={setSettings} T={T} cssVars={cssVars}
+      showOnboarding={showOnboarding} onOnboardingDone={()=>setShowOnboarding(false)}
       onRecalibrate={()=>{setPendingUser(currentUser);setScreen('calibrate')}} />
   )
   if(screen==='calibrate'&&pendingUser) return (
     <CalibrationScreen user={pendingUser} T={T} cssVars={cssVars}
-      onDone={u=>{setCurrentUser(u);setPendingUser(null)}}
-      onSkip={u=>{setCurrentUser(u);setPendingUser(null)}} />
+      onDone={u=>{setCurrentUser(u);setPendingUser(null);setShowOnboarding(true)}}
+      onSkip={u=>{setCurrentUser(u);setPendingUser(null);setShowOnboarding(true)}} />
   )
 
   return (
@@ -743,11 +745,12 @@ function CalibrationScreen({user,T,cssVars,onDone,onSkip}){
 }
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
-function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,onRecalibrate}){
+function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,onRecalibrate,showOnboarding,onOnboardingDone}){
   const [tab,setTab]                 = useState('dashboard')
   const [showMore,setShowMore]           = useState(false)
   const [perHand,setPerHand]             = useState(false)
-  const [viewingProfile,setViewingProfile] = useState(null) // user object to view profile of
+  const [viewingProfile,setViewingProfile] = useState(null)
+  const [onboardStep,setOnboardStep]       = useState(0)
   const [workouts,setWorkouts]       = useState([])
   const [allWorkouts,setAllWorkouts] = useState([])
   const [loading,setLoading]         = useState(true)
@@ -2707,6 +2710,130 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
 
       {/* Bottom accent line */}
 
+
+      {/* ── ONBOARDING OVERLAY ── */}
+      {showOnboarding&&(
+        <div style={{position:'fixed',inset:0,zIndex:600,background:'rgba(0,0,0,0.85)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24}}>
+          <div className="slide-up" style={{width:'100%',maxWidth:400,background:T.bg2,borderRadius:24,overflow:'hidden',boxShadow:`0 24px 80px rgba(0,0,0,0.5)`}}>
+
+            {/* Progress dots */}
+            <div style={{display:'flex',justifyContent:'center',gap:8,padding:'20px 0 0'}}>
+              {[0,1,2,3].map(i=>(
+                <div key={i} style={{width:i===onboardStep?24:8,height:8,borderRadius:4,background:i===onboardStep?T.accent:T.bg3,transition:'all 0.3s'}} />
+              ))}
+            </div>
+
+            {/* Step content */}
+            {onboardStep===0&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:64,marginBottom:16}}>👋</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>Welcome to ARISE</div>
+                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
+                  Your personal gym tracker that turns your workouts into a <strong style={{color:T.accent}}>ranking system</strong>. The more you lift, the higher you rank.
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {[
+                    {icon:'📈', text:'Track every lift and see your progress'},
+                    {icon:'🏆', text:'Rank up from Beginner to Legend'},
+                    {icon:'⚔️', text:'Compete with your gym crew'},
+                  ].map(({icon,text})=>(
+                    <div key={text} style={{display:'flex',alignItems:'center',gap:12,background:T.bg3,borderRadius:12,padding:'10px 14px',textAlign:'left'}}>
+                      <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+                      <span style={{fontSize:14,color:T.text2}}>{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onboardStep===1&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:56,marginBottom:16}}>🏅</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How Ranks Work</div>
+                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Each muscle group has its own rank. The heavier you lift and the more volume you do, the higher your score.</div>
+                <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:4}}>
+                  {RANKS.map((r,i)=>(
+                    <div key={r.name} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'8px 12px'}}>
+                      <div style={{width:28,height:28,borderRadius:8,background:r.gradient,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0}}>{r.icon}</div>
+                      <div style={{flex:1,textAlign:'left'}}>
+                        <span style={{fontWeight:700,color:r.color,fontSize:14}}>{r.name}</span>
+                        <span style={{fontSize:12,color:T.text3,marginLeft:8}}>Score ≥ {r.min}</span>
+                      </div>
+                      {i===0&&<span style={{fontSize:11,color:T.text3}}>Start here</span>}
+                      {i===RANKS.length-1&&<span style={{fontSize:11,color:r.color}}>⬡ Top</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onboardStep===2&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:56,marginBottom:16}}>💪</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How to Use ARISE</div>
+                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Three simple steps every gym session:</div>
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {[
+                    {num:'1', icon:'📋', title:'Load a Template', desc:'Go to Workouts, open your template, and follow the checklist.'},
+                    {num:'2', icon:'✅', title:'Check off exercises', desc:'After each set, tap "Mark Done" — enter your weight and reps, it logs automatically.'},
+                    {num:'3', icon:'📈', title:'Watch yourself rank up', desc:'Your scores update in real time. Keep pushing to hit the next tier.'},
+                  ].map(({num,icon,title,desc})=>(
+                    <div key={num} style={{display:'flex',alignItems:'flex-start',gap:12,background:T.bg3,borderRadius:12,padding:'12px 14px',textAlign:'left'}}>
+                      <div style={{width:28,height:28,borderRadius:14,background:T.accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color:'#fff',flexShrink:0}}>{num}</div>
+                      <div>
+                        <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:2}}>{icon} {title}</div>
+                        <div style={{fontSize:12,color:T.text3,lineHeight:1.5}}>{desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onboardStep===3&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:64,marginBottom:16}}>🚀</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>You're All Set!</div>
+                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
+                  Start by creating your first workout template, or just tap <strong style={{color:T.accent}}>Log</strong> to track your first set right now.
+                </div>
+                <div style={{background:T.bg3,borderRadius:14,padding:14,marginBottom:4,textAlign:'left'}}>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text3,marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>Quick tip</div>
+                  <div style={{fontSize:13,color:T.text2,lineHeight:1.6}}>
+                    💡 You can access everything from the bottom bar. Tap <strong style={{color:T.text}}>More</strong> to find History, Stats, Charts, Achievements and more.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div style={{display:'grid',gridTemplateColumns:onboardStep===0?'1fr':'1fr 1fr',gap:10,padding:'0 24px 24px'}}>
+              {onboardStep>0&&(
+                <button className="btn-press" onClick={()=>setOnboardStep(s=>s-1)}
+                  style={{background:T.bg3,border:'none',borderRadius:12,color:T.text2,padding:14,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Nunito'}}>
+                  ← Back
+                </button>
+              )}
+              <button className="btn-press" onClick={()=>{
+                if(onboardStep<3){setOnboardStep(s=>s+1)}
+                else{onOnboardingDone();setOnboardStep(0)}
+              }}
+                style={{background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,border:'none',borderRadius:12,color:'#fff',padding:14,fontSize:14,fontWeight:800,letterSpacing:1,cursor:'pointer',fontFamily:'Nunito',boxShadow:`0 4px 16px ${T.accent}44`}}>
+                {onboardStep===3?'Start Training 💪':'Next →'}
+              </button>
+            </div>
+
+            {/* Skip */}
+            {onboardStep<3&&(
+              <button onClick={()=>{onOnboardingDone();setOnboardStep(0)}}
+                style={{display:'block',width:'100%',background:'none',border:'none',color:T.text3,fontSize:12,padding:'0 0 16px',cursor:'pointer',fontFamily:'Nunito'}}>
+                Skip intro
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── PROFILE MODAL ── */}
       {viewingProfile&&(
         <div style={{position:'fixed',inset:0,zIndex:400,background:'rgba(0,0,0,0.75)',display:'flex',flexDirection:'column',justifyContent:'flex-end'}} onClick={()=>setViewingProfile(null)}>
@@ -2876,6 +3003,130 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
       )}
 
       {/* ── BOTTOM NAV BAR ── */}
+
+
+      {/* ── ONBOARDING OVERLAY ── */}
+      {showOnboarding&&(
+        <div style={{position:'fixed',inset:0,zIndex:600,background:'rgba(0,0,0,0.85)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24}}>
+          <div className="slide-up" style={{width:'100%',maxWidth:400,background:T.bg2,borderRadius:24,overflow:'hidden',boxShadow:`0 24px 80px rgba(0,0,0,0.5)`}}>
+
+            {/* Progress dots */}
+            <div style={{display:'flex',justifyContent:'center',gap:8,padding:'20px 0 0'}}>
+              {[0,1,2,3].map(i=>(
+                <div key={i} style={{width:i===onboardStep?24:8,height:8,borderRadius:4,background:i===onboardStep?T.accent:T.bg3,transition:'all 0.3s'}} />
+              ))}
+            </div>
+
+            {/* Step content */}
+            {onboardStep===0&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:64,marginBottom:16}}>👋</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>Welcome to ARISE</div>
+                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
+                  Your personal gym tracker that turns your workouts into a <strong style={{color:T.accent}}>ranking system</strong>. The more you lift, the higher you rank.
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {[
+                    {icon:'📈', text:'Track every lift and see your progress'},
+                    {icon:'🏆', text:'Rank up from Beginner to Legend'},
+                    {icon:'⚔️', text:'Compete with your gym crew'},
+                  ].map(({icon,text})=>(
+                    <div key={text} style={{display:'flex',alignItems:'center',gap:12,background:T.bg3,borderRadius:12,padding:'10px 14px',textAlign:'left'}}>
+                      <span style={{fontSize:20,flexShrink:0}}>{icon}</span>
+                      <span style={{fontSize:14,color:T.text2}}>{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onboardStep===1&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:56,marginBottom:16}}>🏅</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How Ranks Work</div>
+                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Each muscle group has its own rank. The heavier you lift and the more volume you do, the higher your score.</div>
+                <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:4}}>
+                  {RANKS.map((r,i)=>(
+                    <div key={r.name} style={{display:'flex',alignItems:'center',gap:10,background:T.bg3,borderRadius:10,padding:'8px 12px'}}>
+                      <div style={{width:28,height:28,borderRadius:8,background:r.gradient,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0}}>{r.icon}</div>
+                      <div style={{flex:1,textAlign:'left'}}>
+                        <span style={{fontWeight:700,color:r.color,fontSize:14}}>{r.name}</span>
+                        <span style={{fontSize:12,color:T.text3,marginLeft:8}}>Score ≥ {r.min}</span>
+                      </div>
+                      {i===0&&<span style={{fontSize:11,color:T.text3}}>Start here</span>}
+                      {i===RANKS.length-1&&<span style={{fontSize:11,color:r.color}}>⬡ Top</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onboardStep===2&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:56,marginBottom:16}}>💪</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,marginBottom:8}}>How to Use ARISE</div>
+                <div style={{fontSize:14,color:T.text2,lineHeight:1.6,marginBottom:20}}>Three simple steps every gym session:</div>
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {[
+                    {num:'1', icon:'📋', title:'Load a Template', desc:'Go to Workouts, open your template, and follow the checklist.'},
+                    {num:'2', icon:'✅', title:'Check off exercises', desc:'After each set, tap "Mark Done" — enter your weight and reps, it logs automatically.'},
+                    {num:'3', icon:'📈', title:'Watch yourself rank up', desc:'Your scores update in real time. Keep pushing to hit the next tier.'},
+                  ].map(({num,icon,title,desc})=>(
+                    <div key={num} style={{display:'flex',alignItems:'flex-start',gap:12,background:T.bg3,borderRadius:12,padding:'12px 14px',textAlign:'left'}}>
+                      <div style={{width:28,height:28,borderRadius:14,background:T.accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color:'#fff',flexShrink:0}}>{num}</div>
+                      <div>
+                        <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:2}}>{icon} {title}</div>
+                        <div style={{fontSize:12,color:T.text3,lineHeight:1.5}}>{desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onboardStep===3&&(
+              <div className="slide-up" style={{padding:'24px 24px 28px',textAlign:'center'}}>
+                <div style={{fontSize:64,marginBottom:16}}>🚀</div>
+                <div style={{fontFamily:'Bebas Neue',fontSize:32,letterSpacing:3,color:T.text,marginBottom:8}}>You're All Set!</div>
+                <div style={{fontSize:15,color:T.text2,lineHeight:1.7,marginBottom:24}}>
+                  Start by creating your first workout template, or just tap <strong style={{color:T.accent}}>Log</strong> to track your first set right now.
+                </div>
+                <div style={{background:T.bg3,borderRadius:14,padding:14,marginBottom:4,textAlign:'left'}}>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text3,marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>Quick tip</div>
+                  <div style={{fontSize:13,color:T.text2,lineHeight:1.6}}>
+                    💡 You can access everything from the bottom bar. Tap <strong style={{color:T.text}}>More</strong> to find History, Stats, Charts, Achievements and more.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div style={{display:'grid',gridTemplateColumns:onboardStep===0?'1fr':'1fr 1fr',gap:10,padding:'0 24px 24px'}}>
+              {onboardStep>0&&(
+                <button className="btn-press" onClick={()=>setOnboardStep(s=>s-1)}
+                  style={{background:T.bg3,border:'none',borderRadius:12,color:T.text2,padding:14,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Nunito'}}>
+                  ← Back
+                </button>
+              )}
+              <button className="btn-press" onClick={()=>{
+                if(onboardStep<3){setOnboardStep(s=>s+1)}
+                else{onOnboardingDone();setOnboardStep(0)}
+              }}
+                style={{background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,border:'none',borderRadius:12,color:'#fff',padding:14,fontSize:14,fontWeight:800,letterSpacing:1,cursor:'pointer',fontFamily:'Nunito',boxShadow:`0 4px 16px ${T.accent}44`}}>
+                {onboardStep===3?'Start Training 💪':'Next →'}
+              </button>
+            </div>
+
+            {/* Skip */}
+            {onboardStep<3&&(
+              <button onClick={()=>{onOnboardingDone();setOnboardStep(0)}}
+                style={{display:'block',width:'100%',background:'none',border:'none',color:T.text3,fontSize:12,padding:'0 0 16px',cursor:'pointer',fontFamily:'Nunito'}}>
+                Skip intro
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── PROFILE MODAL ── */}
       {viewingProfile&&(
