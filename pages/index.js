@@ -276,6 +276,208 @@ const PLANS = {
   ]},
 }
 
+
+// ─── Default templates per goal ──────────────────────────────────────────────
+const DEFAULT_TEMPLATES = {
+  david_laid: [
+    { name:'Push Day', exercises:[
+      {muscle:'chest',    exercise:'Incline Bench Press', sets:4,reps:8, weight:60},
+      {muscle:'chest',    exercise:'Bench Press',          sets:3,reps:10,weight:70},
+      {muscle:'chest',    exercise:'Cable Fly',            sets:3,reps:15,weight:20},
+      {muscle:'shoulders',exercise:'Overhead Press',       sets:4,reps:8, weight:40},
+      {muscle:'shoulders',exercise:'Lateral Raise',        sets:4,reps:15,weight:10},
+      {muscle:'arms',     exercise:'Tricep Pushdown',      sets:3,reps:12,weight:25},
+      {muscle:'arms',     exercise:'Skull Crusher',        sets:3,reps:10,weight:20},
+    ]},
+    { name:'Pull Day', exercises:[
+      {muscle:'back',exercise:'Deadlift',        sets:4,reps:5, weight:80},
+      {muscle:'back',exercise:'Pull-ups',         sets:4,reps:8, weight:0},
+      {muscle:'back',exercise:'Barbell Row',      sets:3,reps:10,weight:60},
+      {muscle:'back',exercise:'Lat Pulldown',     sets:3,reps:12,weight:50},
+      {muscle:'back',exercise:'Seated Cable Row', sets:3,reps:12,weight:45},
+      {muscle:'arms',exercise:'Barbell Curl',     sets:3,reps:10,weight:30},
+      {muscle:'arms',exercise:'Hammer Curl',      sets:3,reps:12,weight:15},
+    ]},
+    { name:'Legs Day', exercises:[
+      {muscle:'legs',exercise:'Squat',                 sets:4,reps:8, weight:80},
+      {muscle:'legs',exercise:'Romanian Deadlift',     sets:4,reps:10,weight:60},
+      {muscle:'legs',exercise:'Leg Press',             sets:3,reps:12,weight:100},
+      {muscle:'legs',exercise:'Bulgarian Split Squat', sets:3,reps:10,weight:20},
+      {muscle:'legs',exercise:'Leg Extension',         sets:3,reps:15,weight:40},
+      {muscle:'legs',exercise:'Leg Curl',              sets:3,reps:12,weight:35},
+      {muscle:'legs',exercise:'Calf Raise',            sets:4,reps:20,weight:50},
+    ]},
+    { name:'Upper Day', exercises:[
+      {muscle:'chest',    exercise:'Decline Bench Press',      sets:3,reps:10,weight:60},
+      {muscle:'back',     exercise:'Single Arm Dumbbell Row',  sets:3,reps:12,weight:25},
+      {muscle:'shoulders',exercise:'Arnold Press',             sets:3,reps:12,weight:15},
+      {muscle:'shoulders',exercise:'Cable Lateral Raise',      sets:3,reps:15,weight:8},
+      {muscle:'arms',     exercise:'Incline Dumbbell Curl',    sets:3,reps:12,weight:12},
+      {muscle:'arms',     exercise:'Overhead Tricep Extension',sets:3,reps:15,weight:20},
+      {muscle:'core',     exercise:'Ab Wheel',                 sets:3,reps:12,weight:0},
+      {muscle:'core',     exercise:'Hanging Leg Raise',        sets:3,reps:12,weight:0},
+    ]},
+  ],
+  strength: [
+    { name:'Upper A — Heavy', exercises:[
+      {muscle:'chest',    exercise:'Bench Press',    sets:4,reps:5, weight:80},
+      {muscle:'back',     exercise:'Barbell Row',    sets:4,reps:5, weight:70},
+      {muscle:'shoulders',exercise:'Overhead Press', sets:3,reps:5, weight:50},
+      {muscle:'back',     exercise:'Pull-ups',        sets:3,reps:8, weight:0},
+      {muscle:'arms',     exercise:'Barbell Curl',   sets:3,reps:10,weight:30},
+      {muscle:'arms',     exercise:'Tricep Pushdown',sets:3,reps:10,weight:25},
+    ]},
+    { name:'Lower A — Squat', exercises:[
+      {muscle:'legs',exercise:'Squat',             sets:4,reps:5, weight:100},
+      {muscle:'legs',exercise:'Romanian Deadlift', sets:3,reps:8, weight:70},
+      {muscle:'legs',exercise:'Leg Press',         sets:3,reps:10,weight:120},
+      {muscle:'legs',exercise:'Leg Curl',          sets:3,reps:12,weight:40},
+      {muscle:'legs',exercise:'Calf Raise',        sets:4,reps:15,weight:60},
+      {muscle:'core', exercise:'Plank',            sets:3,reps:60,weight:0},
+    ]},
+    { name:'Upper B — Volume', exercises:[
+      {muscle:'chest',exercise:'Incline Bench Press',sets:4,reps:10,weight:70},
+      {muscle:'back', exercise:'Lat Pulldown',       sets:4,reps:10,weight:55},
+      {muscle:'chest',exercise:'Cable Fly',          sets:3,reps:15,weight:18},
+      {muscle:'back', exercise:'Seated Cable Row',   sets:3,reps:12,weight:50},
+      {muscle:'arms', exercise:'Barbell Curl',       sets:3,reps:10,weight:28},
+      {muscle:'arms', exercise:'Skull Crusher',      sets:3,reps:10,weight:22},
+    ]},
+    { name:'Lower B — Deadlift', exercises:[
+      {muscle:'back',exercise:'Deadlift',      sets:4,reps:5, weight:120},
+      {muscle:'legs',exercise:'Front Squat',   sets:3,reps:8, weight:70},
+      {muscle:'legs',exercise:'Leg Extension', sets:3,reps:15,weight:45},
+      {muscle:'legs',exercise:'Hip Thrust',    sets:3,reps:12,weight:80},
+      {muscle:'legs',exercise:'Calf Raise',    sets:3,reps:15,weight:60},
+      {muscle:'core', exercise:'Ab Wheel',     sets:3,reps:10,weight:0},
+    ]},
+  ],
+  powerlifting: [
+    { name:'Squat Day', exercises:[
+      {muscle:'legs',exercise:'Squat',             sets:5,reps:5,weight:120},
+      {muscle:'legs',exercise:'Leg Press',         sets:3,reps:10,weight:140},
+      {muscle:'legs',exercise:'Romanian Deadlift', sets:3,reps:8, weight:80},
+      {muscle:'legs',exercise:'Leg Curl',          sets:3,reps:10,weight:45},
+      {muscle:'core', exercise:'Ab Wheel',         sets:4,reps:10,weight:0},
+    ]},
+    { name:'Bench Day', exercises:[
+      {muscle:'chest',exercise:'Bench Press',           sets:5,reps:5, weight:90},
+      {muscle:'arms', exercise:'Close Grip Bench Press',sets:3,reps:8, weight:70},
+      {muscle:'arms', exercise:'Tricep Pushdown',       sets:4,reps:12,weight:28},
+      {muscle:'arms', exercise:'Skull Crusher',         sets:3,reps:10,weight:24},
+      {muscle:'back', exercise:'Face Pull',             sets:3,reps:15,weight:20},
+    ]},
+    { name:'Deadlift Day', exercises:[
+      {muscle:'back',exercise:'Deadlift',    sets:5,reps:3,weight:140},
+      {muscle:'back',exercise:'Rack Pull',   sets:3,reps:5,weight:160},
+      {muscle:'back',exercise:'Barbell Row', sets:4,reps:8,weight:80},
+      {muscle:'back',exercise:'Lat Pulldown',sets:3,reps:10,weight:60},
+      {muscle:'core', exercise:'Ab Wheel',  sets:3,reps:12,weight:0},
+    ]},
+    { name:'Accessory Day', exercises:[
+      {muscle:'legs',    exercise:'Front Squat',              sets:3,reps:5, weight:80},
+      {muscle:'chest',   exercise:'Incline Bench Press',      sets:3,reps:8, weight:70},
+      {muscle:'legs',    exercise:'Sumo Deadlift',            sets:3,reps:5, weight:100},
+      {muscle:'arms',    exercise:'Overhead Tricep Extension',sets:3,reps:12,weight:22},
+      {muscle:'arms',    exercise:'Barbell Curl',             sets:3,reps:10,weight:30},
+      {muscle:'core',    exercise:'Pallof Press',             sets:3,reps:12,weight:15},
+    ]},
+  ],
+  fat_loss: [
+    { name:'Full Body A', exercises:[
+      {muscle:'legs',    exercise:'Squat',         sets:4,reps:15,weight:60},
+      {muscle:'chest',   exercise:'Bench Press',   sets:3,reps:12,weight:60},
+      {muscle:'back',    exercise:'Barbell Row',   sets:3,reps:12,weight:55},
+      {muscle:'shoulders',exercise:'Overhead Press',sets:3,reps:12,weight:35},
+      {muscle:'core',    exercise:'Plank',         sets:3,reps:45,weight:0},
+    ]},
+    { name:'Upper Body', exercises:[
+      {muscle:'chest',   exercise:'Incline Bench Press',sets:3,reps:15,weight:50},
+      {muscle:'back',    exercise:'Lat Pulldown',      sets:3,reps:15,weight:45},
+      {muscle:'shoulders',exercise:'Lateral Raise',    sets:4,reps:20,weight:8},
+      {muscle:'arms',    exercise:'Dumbbell Curl',     sets:3,reps:15,weight:12},
+      {muscle:'arms',    exercise:'Tricep Pushdown',   sets:3,reps:15,weight:18},
+    ]},
+    { name:'Lower Body', exercises:[
+      {muscle:'legs',exercise:'Romanian Deadlift',     sets:4,reps:12,weight:60},
+      {muscle:'legs',exercise:'Leg Press',             sets:3,reps:15,weight:90},
+      {muscle:'legs',exercise:'Bulgarian Split Squat', sets:3,reps:12,weight:15},
+      {muscle:'legs',exercise:'Leg Extension',         sets:3,reps:20,weight:35},
+      {muscle:'legs',exercise:'Calf Raise',            sets:4,reps:20,weight:40},
+    ]},
+    { name:'Full Body B', exercises:[
+      {muscle:'back',exercise:'Deadlift',        sets:3,reps:10,weight:70},
+      {muscle:'chest',exercise:'Push-up',        sets:3,reps:20,weight:0},
+      {muscle:'back', exercise:'Pull-ups',        sets:3,reps:10,weight:0},
+      {muscle:'legs', exercise:'Goblet Squat',   sets:3,reps:15,weight:20},
+      {muscle:'core', exercise:'Ab Wheel',       sets:3,reps:12,weight:0},
+      {muscle:'core', exercise:'Hanging Leg Raise',sets:3,reps:15,weight:0},
+    ]},
+  ],
+  athlete: [
+    { name:'Power — Lower', exercises:[
+      {muscle:'legs',exercise:'Squat',             sets:5,reps:5, weight:100},
+      {muscle:'legs',exercise:'Romanian Deadlift', sets:3,reps:8, weight:80},
+      {muscle:'legs',exercise:'Hip Thrust',        sets:4,reps:10,weight:90},
+      {muscle:'legs',exercise:'Calf Raise',        sets:4,reps:15,weight:50},
+      {muscle:'core', exercise:'Pallof Press',     sets:3,reps:12,weight:15},
+    ]},
+    { name:'Upper Power', exercises:[
+      {muscle:'chest',   exercise:'Bench Press',   sets:4,reps:5,weight:80},
+      {muscle:'back',    exercise:'Barbell Row',   sets:4,reps:5,weight:70},
+      {muscle:'shoulders',exercise:'Overhead Press',sets:3,reps:8,weight:50},
+      {muscle:'back',    exercise:'Pull-ups',       sets:3,reps:8,weight:0},
+      {muscle:'core',    exercise:'Ab Wheel',      sets:3,reps:10,weight:0},
+    ]},
+    { name:'Strength Day', exercises:[
+      {muscle:'back',exercise:'Deadlift',     sets:4,reps:5,weight:120},
+      {muscle:'legs',exercise:'Front Squat',  sets:3,reps:5,weight:80},
+      {muscle:'back',exercise:'Barbell Row',  sets:3,reps:6,weight:75},
+      {muscle:'arms',exercise:'Barbell Curl', sets:3,reps:8,weight:35},
+      {muscle:'core', exercise:'Hanging Leg Raise',sets:3,reps:12,weight:0},
+    ]},
+    { name:'Conditioning', exercises:[
+      {muscle:'legs',    exercise:'Bulgarian Split Squat',sets:3,reps:10,weight:20},
+      {muscle:'chest',   exercise:'Incline Bench Press', sets:3,reps:10,weight:65},
+      {muscle:'back',    exercise:'Lat Pulldown',        sets:3,reps:10,weight:55},
+      {muscle:'shoulders',exercise:'Lateral Raise',      sets:3,reps:15,weight:10},
+      {muscle:'arms',    exercise:'Hammer Curl',         sets:3,reps:12,weight:14},
+      {muscle:'core',    exercise:'Dragon Flag',         sets:3,reps:8, weight:0},
+    ]},
+  ],
+  general: [
+    { name:'Push Day', exercises:[
+      {muscle:'chest',   exercise:'Bench Press',    sets:3,reps:10,weight:60},
+      {muscle:'chest',   exercise:'Incline Bench Press',sets:3,reps:10,weight:50},
+      {muscle:'shoulders',exercise:'Overhead Press', sets:3,reps:10,weight:35},
+      {muscle:'shoulders',exercise:'Lateral Raise',  sets:3,reps:15,weight:8},
+      {muscle:'arms',    exercise:'Tricep Pushdown', sets:3,reps:12,weight:20},
+    ]},
+    { name:'Pull Day', exercises:[
+      {muscle:'back',exercise:'Deadlift',       sets:3,reps:8, weight:80},
+      {muscle:'back',exercise:'Barbell Row',    sets:3,reps:10,weight:60},
+      {muscle:'back',exercise:'Lat Pulldown',   sets:3,reps:12,weight:50},
+      {muscle:'back',exercise:'Seated Cable Row',sets:3,reps:12,weight:45},
+      {muscle:'arms',exercise:'Barbell Curl',   sets:3,reps:10,weight:28},
+    ]},
+    { name:'Legs Day', exercises:[
+      {muscle:'legs',exercise:'Squat',             sets:4,reps:10,weight:70},
+      {muscle:'legs',exercise:'Romanian Deadlift', sets:3,reps:10,weight:60},
+      {muscle:'legs',exercise:'Leg Press',         sets:3,reps:12,weight:90},
+      {muscle:'legs',exercise:'Leg Extension',     sets:3,reps:15,weight:40},
+      {muscle:'legs',exercise:'Calf Raise',        sets:3,reps:15,weight:50},
+    ]},
+    { name:'Upper Day', exercises:[
+      {muscle:'back',    exercise:'Pull-ups',              sets:3,reps:8, weight:0},
+      {muscle:'shoulders',exercise:'Dumbbell Shoulder Press',sets:3,reps:10,weight:15},
+      {muscle:'arms',    exercise:'Barbell Curl',          sets:3,reps:12,weight:28},
+      {muscle:'arms',    exercise:'Skull Crusher',         sets:3,reps:12,weight:20},
+      {muscle:'core',    exercise:'Ab Wheel',              sets:3,reps:10,weight:0},
+      {muscle:'core',    exercise:'Hanging Leg Raise',     sets:3,reps:12,weight:0},
+    ]},
+  ],
+}
+
 const DAYS_OF_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 const AVATAR_COLORS = ['#EF4444','#F59E0B','#10B981','#3B82F6','#8B5CF6','#EC4899','#06B6D4','#84CC16']
 
@@ -724,7 +926,24 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   useEffect(()=>{if(tab==='community') fetchCommunity()},[tab,fetchCommunity])
   useEffect(()=>{fetchBodyWeights()},[fetchBodyWeights])
   useEffect(()=>{
-    try{const s=JSON.parse(localStorage.getItem(`arise_templates_${currentUser.id}`)||'[]');setTemplates(s)}catch{}
+    try{
+      const saved=JSON.parse(localStorage.getItem(`arise_templates_${currentUser.id}`)||'[]')
+      if(saved.length===0){
+        // First time — load defaults for their goal
+        const goal=currentUser.goal||'general'
+        const defaults=(DEFAULT_TEMPLATES[goal]||DEFAULT_TEMPLATES.general).map((t,i)=>({
+          id:Date.now()+i,
+          name:t.name,
+          exercises:t.exercises,
+          created:new Date().toISOString(),
+          isDefault:true,
+        }))
+        setTemplates(defaults)
+        localStorage.setItem(`arise_templates_${currentUser.id}`,JSON.stringify(defaults))
+      } else {
+        setTemplates(saved)
+      }
+    }catch{}
   },[currentUser.id])
 
   function saveTemplates(t){setTemplates(t);localStorage.setItem(`arise_templates_${currentUser.id}`,JSON.stringify(t))}
@@ -1026,7 +1245,13 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                           )
                         })}
                         {todayPlan.exercises.length>4&&<div style={{fontSize:12,color:T.text3,textAlign:'center',paddingTop:8}}>+{todayPlan.exercises.length-4} more</div>}
-                        <button className="btn" onClick={()=>setTab('workouts')} style={{width:'100%',marginTop:12,background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,borderRadius:12,color:'#fff',padding:13,fontSize:15,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 14px ${T.accent}33`}}>
+                        <button className="btn" onClick={()=>{
+                          // Find matching template and open it
+                          const matchName=todayPlan.label
+                          const matchTmpl=templates.find(t=>t.name.toLowerCase().includes(matchName.toLowerCase().replace(' day','').toLowerCase()))
+                          if(matchTmpl){setActiveTemplate(matchTmpl);setChecked({});setTab('workouts')}
+                          else setTab('workouts')
+                        }} style={{width:'100%',marginTop:12,background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,borderRadius:12,color:'#fff',padding:13,fontSize:15,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 14px ${T.accent}33`}}>
                           Start Workout →
                         </button>
                       </div>
@@ -1060,6 +1285,28 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                     {lastWeekW.length>0&&<div style={{fontSize:11,color:T.text3,marginTop:4}}>{Math.round(cvt(lastWeekW.reduce((s,w)=>s+w.weight*w.reps*w.sets,0),unit)/1000*10)/10}k {unit} volume</div>}
                   </Card>
                 </div>
+
+                {/* Training days picker */}
+                <Section title="My Training Days">
+                  <Card style={{padding:14}}>
+                    <div style={{display:'flex',gap:6,marginBottom:8}}>
+                      {DAYS_OF_WEEK.map(day=>{
+                        const active=(settings.trainingDays||[]).includes(day)
+                        return(
+                          <button key={day} className="btn press" onClick={()=>setSettings(s=>{
+                            const days=(s.trainingDays||[]).includes(day)
+                              ?(s.trainingDays||[]).filter(d=>d!==day)
+                              :[...(s.trainingDays||[]),day]
+                            return{...s,trainingDays:days}
+                          })} style={{flex:1,padding:'10px 2px',border:`2px solid ${active?T.accent:T.border}`,borderRadius:10,background:active?T.accentDim:'transparent',color:active?T.accent:T.text3,fontSize:11,fontWeight:800,cursor:'pointer',transition:'all .15s'}}>
+                            {day}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <div style={{fontSize:12,color:T.text3}}>{(settings.trainingDays||[]).length} days selected · tap to toggle</div>
+                  </Card>
+                </Section>
 
                 {/* Muscle rank grid — compact */}
                 <Section title="Muscle Ranks" action={<button onClick={()=>{setTab('progress');setProgressSection('ranks')}} style={{background:'none',border:'none',color:T.accent,fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Nunito'}}>See all →</button>}>
