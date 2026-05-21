@@ -746,7 +746,8 @@ function CalibrationScreen({user,T,cssVars,onDone,onSkip}){
 function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,onRecalibrate}){
   const [tab,setTab]                 = useState('dashboard')
   const [showMore,setShowMore]           = useState(false)
-  const [perHand,setPerHand]             = useState(false) // dumbbell per-hand toggle
+  const [perHand,setPerHand]             = useState(false)
+  const [viewingProfile,setViewingProfile] = useState(null) // user object to view profile of
   const [workouts,setWorkouts]       = useState([])
   const [allWorkouts,setAllWorkouts] = useState([])
   const [loading,setLoading]         = useState(true)
@@ -2539,8 +2540,8 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                         return(
                           <div key={u.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
                             <div style={{fontSize:24}}>{medals[i]}</div>
-                            <div style={{width:52,height:52,borderRadius:26,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:700,color:'#fff',border:`3px solid ${mColors[i]}`,boxShadow:`0 0 14px ${mColors[i]}55`,fontFamily:'Bebas Neue',letterSpacing:1}}>{u.name[0].toUpperCase()}</div>
-                            <div style={{fontSize:13,fontWeight:700,textAlign:'center',color:T.text}}>{u.name}</div>
+                            <div onClick={()=>setViewingProfile(u)} style={{width:52,height:52,borderRadius:26,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:700,color:'#fff',border:`3px solid ${mColors[i]}`,boxShadow:`0 0 14px ${mColors[i]}55`,fontFamily:'Bebas Neue',letterSpacing:1,cursor:'pointer'}}>{u.name[0].toUpperCase()}</div>
+                            <div style={{fontSize:13,fontWeight:700,textAlign:'center',color:T.text,cursor:'pointer'}} onClick={()=>setViewingProfile(u)}>{u.name}</div>
                             <div style={{fontSize:11,color:u.rank.color}}>{u.rank.icon} {u.rank.name}</div>
                             <div style={{width:'100%',height:heights[i],background:isMe?T.accentDim:T.bg2,border:`2px solid ${mColors[i]}55`,borderRadius:'10px 10px 0 0',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',overflow:'hidden'}}>
                               <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,transparent,${mColors[i]},transparent)`}} />
@@ -2561,7 +2562,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   {leaderboard.map((u,i)=>{
                     const isMe=u.id===currentUser.id
                     return(
-                      <div key={u.id} style={{background:isMe?T.accentDim:T.bg2,border:`1px solid ${isMe?T.accent+'44':T.border}`,borderRadius:14,padding:'12px 14px',position:'relative',overflow:'hidden'}}>
+                      <div key={u.id} onClick={()=>setViewingProfile(u)} style={{background:isMe?T.accentDim:T.bg2,border:`1px solid ${isMe?T.accent+'44':T.border}`,borderRadius:14,padding:'12px 14px',position:'relative',overflow:'hidden',cursor:'pointer'}}>
                         {isMe&&<div style={{position:'absolute',top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`}} />}
                         <div style={{display:'flex',alignItems:'center',gap:12}}>
                           <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text3,width:26,textAlign:'center'}}>#{i+1}</div>
@@ -2705,7 +2706,345 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
       </div>
 
       {/* Bottom accent line */}
+
+      {/* ── PROFILE MODAL ── */}
+      {viewingProfile&&(
+        <div style={{position:'fixed',inset:0,zIndex:400,background:'rgba(0,0,0,0.75)',display:'flex',flexDirection:'column',justifyContent:'flex-end'}} onClick={()=>setViewingProfile(null)}>
+          <div className="slide-up" onClick={e=>e.stopPropagation()}
+            style={{background:T.bg2,borderRadius:'24px 24px 0 0',padding:'0 0 32px',maxHeight:'90vh',overflowY:'auto'}}>
+
+            {/* Handle bar */}
+            <div style={{display:'flex',justifyContent:'center',padding:'12px 0 0'}}>
+              <div style={{width:36,height:4,borderRadius:2,background:T.border}} />
+            </div>
+
+            {(()=>{
+              const u = viewingProfile
+              const isMe = u.id === currentUser.id
+              const uWorkouts = allWorkouts.filter(w=>w.user_id===u.id)
+              const uScores = MUSCLE_GROUPS.reduce((acc,mg)=>({...acc,[mg.id]:calcScore(uWorkouts.filter(w=>w.muscle===mg.id))}),{})
+              const uOverall = MUSCLE_GROUPS.reduce((s,mg)=>s+uScores[mg.id],0)/MUSCLE_GROUPS.length
+              const uRank = getRank(uOverall)
+              const uGoal = GOALS.find(g=>g.id===(u.goal||'general'))
+              const uTotalVol = uWorkouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
+              const uSessions = uWorkouts.length
+              // PRs
+              const uPRs = uWorkouts.reduce((acc,w)=>{
+                const rm=calc1RM(w.weight,w.reps)
+                if(!acc[w.exercise]||rm>acc[w.exercise]) acc[w.exercise]=rm
+                return acc
+              },{})
+              const uPRCount = Object.keys(uPRs).length
+              // Streak
+              const getWeek=d=>{const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toDateString()}
+              const uWeeks=[...new Set(uWorkouts.map(w=>getWeek(w.created_at)))].sort((a,b)=>new Date(b)-new Date(a))
+              let uStreak=0,cur=new Date()
+              cur.setDate(cur.getDate()-cur.getDay()+(cur.getDay()===0?-6:1))
+              for(let i=0;i<uWeeks.length;i++){const wk=new Date(uWeeks[i]);const diff=Math.round((cur-wk)/(7*24*60*60*1000));if(diff===i)uStreak++;else break}
+
+              // vs me comparison
+              const myScores = scores // already computed
+              const myOverall = totalScore
+
+              return (
+                <div style={{padding:'16px 20px'}}>
+                  {/* Header */}
+                  <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:20}}>
+                    <div style={{width:72,height:72,borderRadius:36,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue',letterSpacing:2,boxShadow:`0 0 24px ${avatarColor(u.name)}55`,flexShrink:0}}>
+                      {u.name[0].toUpperCase()}
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{display:'flex',alignItems:'center',gap:8}}>
+                        <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,lineHeight:1}}>{u.name}</div>
+                        {isMe&&<span style={{background:T.accent,color:'#fff',fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:20,letterSpacing:1}}>YOU</span>}
+                      </div>
+                      <div style={{fontSize:13,color:T.text3,marginTop:3}}>{uGoal?.icon} {uGoal?.label}</div>
+                      <div style={{display:'flex',alignItems:'center',gap:6,marginTop:6}}>
+                        <div style={{background:uRank.gradient,borderRadius:8,padding:'3px 10px',display:'flex',alignItems:'center',gap:4}}>
+                          <span style={{fontSize:13}}>{uRank.icon}</span>
+                          <span style={{fontSize:13,fontWeight:700,color:'#fff'}}>{uRank.name}</span>
+                        </div>
+                        <span style={{fontSize:12,color:T.text3}}>{Math.round(uOverall)} pts</span>
+                      </div>
+                    </div>
+                    <button onClick={()=>setViewingProfile(null)}
+                      style={{background:T.bg3,border:'none',borderRadius:12,width:36,height:36,fontSize:18,color:T.text3,cursor:'pointer',flexShrink:0}}>✕</button>
+                  </div>
+
+                  {/* Stats row */}
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:20}}>
+                    {[
+                      ['Sessions', uSessions, '📝'],
+                      ['PRs', uPRCount, '⭐'],
+                      ['Streak', `${uStreak}w`, '🔥'],
+                      ['Volume', `${Math.round(cvt(uTotalVol,unit)/1000)}k`, '📦'],
+                    ].map(([label,val,icon])=>(
+                      <div key={label} style={{background:T.bg3,borderRadius:14,padding:'10px 6px',textAlign:'center'}}>
+                        <div style={{fontSize:18,marginBottom:2}}>{icon}</div>
+                        <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text,lineHeight:1}}>{val}</div>
+                        <div style={{fontSize:10,color:T.text3,fontWeight:600,marginTop:2}}>{label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Muscle breakdown + vs Me */}
+                  <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:12}}>
+                    {isMe ? 'Your Muscle Ranks' : `${u.name.split(' ')[0]} vs You`}
+                  </div>
+                  <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
+                    {MUSCLE_GROUPS.map(mg=>{
+                      const theirScore = uScores[mg.id]
+                      const myScore = myScores[mg.id]
+                      const theirRank = getRank(theirScore)
+                      const myRank = getRank(myScore)
+                      const diff = theirScore - myScore
+                      const pct = Math.min((theirScore/100)*100, 100)
+                      const theyWin = diff > 2
+                      const iWin = diff < -2
+                      const tied = Math.abs(diff) <= 2
+                      return(
+                        <div key={mg.id} style={{background:T.bg3,borderRadius:14,padding:'12px 14px',border:`1.5px solid ${isMe||tied?T.border:theyWin?theirRank.color+'44':'#10B98133'}`}}>
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                            <div style={{display:'flex',alignItems:'center',gap:8}}>
+                              <div style={{width:30,height:30,borderRadius:10,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>{mg.icon}</div>
+                              <div style={{fontSize:14,fontWeight:700,color:T.text}}>{mg.name}</div>
+                            </div>
+                            <div style={{display:'flex',alignItems:'center',gap:8}}>
+                              <div style={{textAlign:'right'}}>
+                                <div style={{fontSize:13,fontWeight:700,color:theirRank.color}}>{theirRank.icon} {theirRank.name}</div>
+                                <div style={{fontSize:11,color:T.text3}}>{Math.round(theirScore)} pts</div>
+                              </div>
+                              {!isMe&&(
+                                <div style={{width:28,height:28,borderRadius:14,background:tied?T.bg2:theyWin?theirRank.color+'22':'#10B98122',border:`1.5px solid ${tied?T.border:theyWin?theirRank.color:'#10B981'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13}}>
+                                  {tied?'≈':theyWin?'↑':'↓'}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div style={{background:T.bg2,borderRadius:6,height:6,overflow:'hidden',position:'relative'}}>
+                            <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}88)`,borderRadius:6}} />
+                            {!isMe&&myScore>0&&(
+                              <div style={{position:'absolute',top:0,bottom:0,left:`${Math.min((myScore/100)*100,100)}%`,width:2,background:'#fff',opacity:0.6,transform:'translateX(-50%)'}} />
+                            )}
+                          </div>
+                          {!isMe&&!tied&&(
+                            <div style={{fontSize:11,color:theyWin?theirRank.color:'#10B981',fontWeight:600,marginTop:4}}>
+                              {theyWin
+                                ? `${u.name.split(' ')[0]} leads by ${Math.round(Math.abs(diff))} pts`
+                                : `You lead by ${Math.round(Math.abs(diff))} pts`
+                              }
+                            </div>
+                          )}
+                          {!isMe&&tied&&<div style={{fontSize:11,color:T.text3,marginTop:4}}>Neck and neck</div>}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Overall comparison bar */}
+                  {!isMe&&(
+                    <div style={{background:T.bg3,borderRadius:14,padding:14}}>
+                      <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Overall Score</div>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                        <div style={{textAlign:'center'}}>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:T.accent}}>{Math.round(myOverall)}</div>
+                          <div style={{fontSize:11,color:T.text3}}>You</div>
+                        </div>
+                        <div style={{flex:1,margin:'0 12px'}}>
+                          <div style={{background:T.bg2,borderRadius:8,height:10,overflow:'hidden',position:'relative'}}>
+                            <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${Math.min((myOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${T.accent},${T.accent}99)`,borderRadius:8}} />
+                            <div style={{position:'absolute',right:0,top:0,bottom:0,width:`${Math.min((uOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${uRank.color}99,${uRank.color})`,borderRadius:8}} />
+                          </div>
+                          <div style={{textAlign:'center',fontSize:11,color:T.text3,marginTop:4}}>
+                            {Math.abs(Math.round(uOverall-myOverall))===0?'Tied!'
+                              :uOverall>myOverall?`${u.name.split(' ')[0]} leads by ${Math.round(uOverall-myOverall)} pts`
+                              :`You lead by ${Math.round(myOverall-uOverall)} pts`}
+                          </div>
+                        </div>
+                        <div style={{textAlign:'center'}}>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:uRank.color}}>{Math.round(uOverall)}</div>
+                          <div style={{fontSize:11,color:T.text3}}>{u.name.split(' ')[0]}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
+          </div>
+        </div>
+      )}
+
       {/* ── BOTTOM NAV BAR ── */}
+
+      {/* ── PROFILE MODAL ── */}
+      {viewingProfile&&(
+        <div style={{position:'fixed',inset:0,zIndex:400,background:'rgba(0,0,0,0.75)',display:'flex',flexDirection:'column',justifyContent:'flex-end'}} onClick={()=>setViewingProfile(null)}>
+          <div className="slide-up" onClick={e=>e.stopPropagation()}
+            style={{background:T.bg2,borderRadius:'24px 24px 0 0',padding:'0 0 32px',maxHeight:'90vh',overflowY:'auto'}}>
+
+            {/* Handle bar */}
+            <div style={{display:'flex',justifyContent:'center',padding:'12px 0 0'}}>
+              <div style={{width:36,height:4,borderRadius:2,background:T.border}} />
+            </div>
+
+            {(()=>{
+              const u = viewingProfile
+              const isMe = u.id === currentUser.id
+              const uWorkouts = allWorkouts.filter(w=>w.user_id===u.id)
+              const uScores = MUSCLE_GROUPS.reduce((acc,mg)=>({...acc,[mg.id]:calcScore(uWorkouts.filter(w=>w.muscle===mg.id))}),{})
+              const uOverall = MUSCLE_GROUPS.reduce((s,mg)=>s+uScores[mg.id],0)/MUSCLE_GROUPS.length
+              const uRank = getRank(uOverall)
+              const uGoal = GOALS.find(g=>g.id===(u.goal||'general'))
+              const uTotalVol = uWorkouts.reduce((s,w)=>s+w.weight*w.reps*w.sets,0)
+              const uSessions = uWorkouts.length
+              // PRs
+              const uPRs = uWorkouts.reduce((acc,w)=>{
+                const rm=calc1RM(w.weight,w.reps)
+                if(!acc[w.exercise]||rm>acc[w.exercise]) acc[w.exercise]=rm
+                return acc
+              },{})
+              const uPRCount = Object.keys(uPRs).length
+              // Streak
+              const getWeek=d=>{const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toDateString()}
+              const uWeeks=[...new Set(uWorkouts.map(w=>getWeek(w.created_at)))].sort((a,b)=>new Date(b)-new Date(a))
+              let uStreak=0,cur=new Date()
+              cur.setDate(cur.getDate()-cur.getDay()+(cur.getDay()===0?-6:1))
+              for(let i=0;i<uWeeks.length;i++){const wk=new Date(uWeeks[i]);const diff=Math.round((cur-wk)/(7*24*60*60*1000));if(diff===i)uStreak++;else break}
+
+              // vs me comparison
+              const myScores = scores // already computed
+              const myOverall = totalScore
+
+              return (
+                <div style={{padding:'16px 20px'}}>
+                  {/* Header */}
+                  <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:20}}>
+                    <div style={{width:72,height:72,borderRadius:36,background:avatarColor(u.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue',letterSpacing:2,boxShadow:`0 0 24px ${avatarColor(u.name)}55`,flexShrink:0}}>
+                      {u.name[0].toUpperCase()}
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{display:'flex',alignItems:'center',gap:8}}>
+                        <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:2,color:T.text,lineHeight:1}}>{u.name}</div>
+                        {isMe&&<span style={{background:T.accent,color:'#fff',fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:20,letterSpacing:1}}>YOU</span>}
+                      </div>
+                      <div style={{fontSize:13,color:T.text3,marginTop:3}}>{uGoal?.icon} {uGoal?.label}</div>
+                      <div style={{display:'flex',alignItems:'center',gap:6,marginTop:6}}>
+                        <div style={{background:uRank.gradient,borderRadius:8,padding:'3px 10px',display:'flex',alignItems:'center',gap:4}}>
+                          <span style={{fontSize:13}}>{uRank.icon}</span>
+                          <span style={{fontSize:13,fontWeight:700,color:'#fff'}}>{uRank.name}</span>
+                        </div>
+                        <span style={{fontSize:12,color:T.text3}}>{Math.round(uOverall)} pts</span>
+                      </div>
+                    </div>
+                    <button onClick={()=>setViewingProfile(null)}
+                      style={{background:T.bg3,border:'none',borderRadius:12,width:36,height:36,fontSize:18,color:T.text3,cursor:'pointer',flexShrink:0}}>✕</button>
+                  </div>
+
+                  {/* Stats row */}
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:20}}>
+                    {[
+                      ['Sessions', uSessions, '📝'],
+                      ['PRs', uPRCount, '⭐'],
+                      ['Streak', `${uStreak}w`, '🔥'],
+                      ['Volume', `${Math.round(cvt(uTotalVol,unit)/1000)}k`, '📦'],
+                    ].map(([label,val,icon])=>(
+                      <div key={label} style={{background:T.bg3,borderRadius:14,padding:'10px 6px',textAlign:'center'}}>
+                        <div style={{fontSize:18,marginBottom:2}}>{icon}</div>
+                        <div style={{fontFamily:'Bebas Neue',fontSize:20,letterSpacing:1,color:T.text,lineHeight:1}}>{val}</div>
+                        <div style={{fontSize:10,color:T.text3,fontWeight:600,marginTop:2}}>{label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Muscle breakdown + vs Me */}
+                  <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:12}}>
+                    {isMe ? 'Your Muscle Ranks' : `${u.name.split(' ')[0]} vs You`}
+                  </div>
+                  <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
+                    {MUSCLE_GROUPS.map(mg=>{
+                      const theirScore = uScores[mg.id]
+                      const myScore = myScores[mg.id]
+                      const theirRank = getRank(theirScore)
+                      const myRank = getRank(myScore)
+                      const diff = theirScore - myScore
+                      const pct = Math.min((theirScore/100)*100, 100)
+                      const theyWin = diff > 2
+                      const iWin = diff < -2
+                      const tied = Math.abs(diff) <= 2
+                      return(
+                        <div key={mg.id} style={{background:T.bg3,borderRadius:14,padding:'12px 14px',border:`1.5px solid ${isMe||tied?T.border:theyWin?theirRank.color+'44':'#10B98133'}`}}>
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                            <div style={{display:'flex',alignItems:'center',gap:8}}>
+                              <div style={{width:30,height:30,borderRadius:10,background:mg.colorDim,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>{mg.icon}</div>
+                              <div style={{fontSize:14,fontWeight:700,color:T.text}}>{mg.name}</div>
+                            </div>
+                            <div style={{display:'flex',alignItems:'center',gap:8}}>
+                              <div style={{textAlign:'right'}}>
+                                <div style={{fontSize:13,fontWeight:700,color:theirRank.color}}>{theirRank.icon} {theirRank.name}</div>
+                                <div style={{fontSize:11,color:T.text3}}>{Math.round(theirScore)} pts</div>
+                              </div>
+                              {!isMe&&(
+                                <div style={{width:28,height:28,borderRadius:14,background:tied?T.bg2:theyWin?theirRank.color+'22':'#10B98122',border:`1.5px solid ${tied?T.border:theyWin?theirRank.color:'#10B981'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13}}>
+                                  {tied?'≈':theyWin?'↑':'↓'}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div style={{background:T.bg2,borderRadius:6,height:6,overflow:'hidden',position:'relative'}}>
+                            <div className="bar-fill" style={{'--pct':`${pct}%`,height:'100%',background:`linear-gradient(90deg,${mg.color},${mg.color}88)`,borderRadius:6}} />
+                            {!isMe&&myScore>0&&(
+                              <div style={{position:'absolute',top:0,bottom:0,left:`${Math.min((myScore/100)*100,100)}%`,width:2,background:'#fff',opacity:0.6,transform:'translateX(-50%)'}} />
+                            )}
+                          </div>
+                          {!isMe&&!tied&&(
+                            <div style={{fontSize:11,color:theyWin?theirRank.color:'#10B981',fontWeight:600,marginTop:4}}>
+                              {theyWin
+                                ? `${u.name.split(' ')[0]} leads by ${Math.round(Math.abs(diff))} pts`
+                                : `You lead by ${Math.round(Math.abs(diff))} pts`
+                              }
+                            </div>
+                          )}
+                          {!isMe&&tied&&<div style={{fontSize:11,color:T.text3,marginTop:4}}>Neck and neck</div>}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Overall comparison bar */}
+                  {!isMe&&(
+                    <div style={{background:T.bg3,borderRadius:14,padding:14}}>
+                      <div style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:'uppercase',letterSpacing:1,marginBottom:10}}>Overall Score</div>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                        <div style={{textAlign:'center'}}>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:T.accent}}>{Math.round(myOverall)}</div>
+                          <div style={{fontSize:11,color:T.text3}}>You</div>
+                        </div>
+                        <div style={{flex:1,margin:'0 12px'}}>
+                          <div style={{background:T.bg2,borderRadius:8,height:10,overflow:'hidden',position:'relative'}}>
+                            <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${Math.min((myOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${T.accent},${T.accent}99)`,borderRadius:8}} />
+                            <div style={{position:'absolute',right:0,top:0,bottom:0,width:`${Math.min((uOverall/Math.max(myOverall,uOverall))*100,100)}%`,background:`linear-gradient(90deg,${uRank.color}99,${uRank.color})`,borderRadius:8}} />
+                          </div>
+                          <div style={{textAlign:'center',fontSize:11,color:T.text3,marginTop:4}}>
+                            {Math.abs(Math.round(uOverall-myOverall))===0?'Tied!'
+                              :uOverall>myOverall?`${u.name.split(' ')[0]} leads by ${Math.round(uOverall-myOverall)} pts`
+                              :`You lead by ${Math.round(myOverall-uOverall)} pts`}
+                          </div>
+                        </div>
+                        <div style={{textAlign:'center'}}>
+                          <div style={{fontFamily:'Bebas Neue',fontSize:28,letterSpacing:1,color:uRank.color}}>{Math.round(uOverall)}</div>
+                          <div style={{fontSize:11,color:T.text3}}>{u.name.split(' ')[0]}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
+          </div>
+        </div>
+      )}
+
       {/* ── BOTTOM NAV BAR ── */}
       <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:200,background:T.navBg||T.bg2,borderTop:`1.5px solid ${T.border}`,paddingBottom:'env(safe-area-inset-bottom)',backdropFilter:'blur(12px)'}}>
         {/* Primary row */}
