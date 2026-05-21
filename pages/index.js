@@ -745,6 +745,8 @@ function CalibrationScreen({user,T,cssVars,onDone,onSkip}){
 // ─── Main App ─────────────────────────────────────────────────────────────────
 function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,onRecalibrate}){
   const [tab,setTab]                 = useState('dashboard')
+  const [showMore,setShowMore]           = useState(false)
+  const [perHand,setPerHand]             = useState(false) // dumbbell per-hand toggle
   const [workouts,setWorkouts]       = useState([])
   const [allWorkouts,setAllWorkouts] = useState([])
   const [loading,setLoading]         = useState(true)
@@ -964,7 +966,8 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
     const{muscle,exercise,weight,reps,sets}=logForm
     if(!exercise||!weight||!reps||!sets){setLogMsg('⚠ Fill in all fields.');return}
     setLogLoading(true)
-    const wKg=unit==='lbs'?parseFloat(weight)/2.205:parseFloat(weight)
+    const rawW = parseFloat(weight) * (perHand ? 2 : 1)
+    const wKg=unit==='lbs'?rawW/2.205:rawW
     const{error}=await supabase.from('workouts').insert([{user_id:currentUser.id,muscle,exercise,weight:Math.round(wKg*10)/10,reps:parseInt(reps),sets:parseInt(sets)}])
     if(error){console.error(error);setLogMsg(`✗ Error: ${error.message}`)}
     else{
@@ -1594,15 +1597,28 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                   </div>
                 ))}
               </div>
+              {/* Per-hand toggle for dumbbells */}
+              <div style={{background:T.bg2,border:`1.5px solid ${T.border}`,borderRadius:14,padding:'12px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div>
+                  <div style={{fontSize:14,fontWeight:700,color:T.text}}>Dumbbell / Per Hand?</div>
+                  <div style={{fontSize:12,color:T.text3,marginTop:2}}>{perHand?`Logging ${logForm.weight}${unit} per hand = ${Math.round(parseFloat(logForm.weight||0)*2*10)/10}${unit} total`:'Logging total weight (barbell / machine)'}</div>
+                </div>
+                <button onClick={()=>setPerHand(p=>!p)}
+                  style={{width:50,height:28,borderRadius:14,border:'none',cursor:'pointer',position:'relative',background:perHand?T.accent:T.bg3,transition:'background 0.2s',flexShrink:0}}>
+                  <div style={{position:'absolute',top:4,left:perHand?26:4,width:20,height:20,borderRadius:10,background:'#fff',transition:'left 0.2s',boxShadow:'0 1px 4px rgba(0,0,0,0.25)'}} />
+                </button>
+              </div>
+
               {logForm.weight&&logForm.reps&&(
                 <div style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:14,padding:14,textAlign:'center',position:'relative',overflow:'hidden'}}>
                   <div style={{position:'absolute',top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${T.accent},transparent)`}} />
-                  <div style={{fontSize:11,color:T.text3,letterSpacing:2,marginBottom:4}}>ESTIMATED 1RM</div>
+                  <div style={{fontSize:11,color:T.text3,letterSpacing:2,marginBottom:4}}>ESTIMATED 1RM{perHand?' (total)':''}</div>
                   <div style={{fontFamily:'Bebas Neue',fontSize:40,letterSpacing:2,color:T.accent,textShadow:T.darkMode?`0 0 20px ${T.accent}44`:'none'}}>
-                    {Math.round(calc1RM(parseFloat(logForm.weight),parseInt(logForm.reps)))} {unit}
+                    {Math.round(calc1RM(parseFloat(logForm.weight)*(perHand?2:1),parseInt(logForm.reps)))} {unit}
                   </div>
+                  {perHand&&<div style={{fontSize:12,color:T.text3,marginBottom:4}}>{logForm.weight}{unit} × 2 hands</div>}
                   <div style={{fontSize:11,color:T.text3,marginTop:2}}>
-                    {getRank(Math.min((calc1RM(parseFloat(logForm.weight),parseInt(logForm.reps))/200)*100*0.6+Math.min((parseFloat(logForm.weight)*parseInt(logForm.reps)*(parseInt(logForm.sets)||1)/10000)*100,100)*0.4,100)).icon} {getRank(Math.min((calc1RM(parseFloat(logForm.weight),parseInt(logForm.reps))/200)*100*0.6+Math.min((parseFloat(logForm.weight)*parseInt(logForm.reps)*(parseInt(logForm.sets)||1)/10000)*100,100)*0.4,100)).name} level
+                    {getRank(Math.min((calc1RM(parseFloat(logForm.weight)*(perHand?2:1),parseInt(logForm.reps))/200)*100*0.6+Math.min((parseFloat(logForm.weight)*(perHand?2:1)*parseInt(logForm.reps)*(parseInt(logForm.sets)||1)/10000)*100,100)*0.4,100)).icon} {getRank(Math.min((calc1RM(parseFloat(logForm.weight)*(perHand?2:1),parseInt(logForm.reps))/200)*100*0.6+Math.min((parseFloat(logForm.weight)*(perHand?2:1)*parseInt(logForm.reps)*(parseInt(logForm.sets)||1)/10000)*100,100)*0.4,100)).name} level
                   </div>
                 </div>
               )}
@@ -2701,20 +2717,23 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
             {id:'plan',      icon:'📅', label:'Plan'},
             {id:'more',      icon:'☰',  label:'More'},
           ].map(({id,icon,label})=>(
-            <button key={id} onClick={()=>setTab(id)}
+            <button key={id} onClick={()=>{
+              if(id==='more'){setShowMore(m=>!m)}
+              else{setTab(id);setShowMore(false)}
+            }}
               style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'4px 2px',border:'none',background:'transparent',cursor:'pointer',position:'relative'}}>
               {id==='log'?(
                 <div style={{width:50,height:50,borderRadius:25,background:`linear-gradient(135deg,${T.accent},${T.accent}CC)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,fontWeight:900,color:'#fff',marginTop:-18,boxShadow:`0 6px 20px ${T.accent}55`}}>＋</div>
               ):(
-                <div style={{width:36,height:36,borderRadius:12,background:tab===id?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,transition:'all 0.2s'}}>{icon}</div>
+                <div style={{width:36,height:36,borderRadius:12,background:(id==='more'?showMore:tab===id)?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,transition:'all 0.2s'}}>{id==='more'&&showMore?'✕':icon}</div>
               )}
-              <div style={{fontSize:10,fontWeight:700,color:tab===id||id==='log'?T.accent:T.text3,marginTop:id==='log'?4:0,transition:'color 0.2s'}}>{label}</div>
+              <div style={{fontSize:10,fontWeight:700,color:(id==='more'?showMore:tab===id)||id==='log'?T.accent:T.text3,marginTop:id==='log'?4:0,transition:'color 0.2s'}}>{label}</div>
             </button>
           ))}
         </div>
 
-        {/* More drawer */}
-        {(tab==='more'||['body','history','stats','charts','achievements','challenges','leaderboard','settings'].includes(tab))&&(
+        {/* More drawer — only shows when showMore is true */}
+        {showMore&&(
           <div style={{borderTop:`1px solid ${T.border}`,display:'grid',gridTemplateColumns:'repeat(4,1fr)',padding:'10px 4px 8px',background:T.bg3}}>
             {[
               {id:'body',         icon:'⚖️',  label:'Body'},
@@ -2726,7 +2745,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
               {id:'leaderboard',  icon:'🏆',  label:'Leaders'},
               {id:'settings',     icon:'⚙️',  label:'Settings'},
             ].map(({id,icon,label})=>(
-              <button key={id} onClick={()=>setTab(id)}
+              <button key={id} onClick={()=>{setTab(id);setShowMore(false)}}
                 style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'6px 4px',border:'none',background:'transparent',cursor:'pointer'}}>
                 <div style={{width:34,height:34,borderRadius:10,background:tab===id?T.accentDim:'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,transition:'all 0.2s'}}>{icon}</div>
                 <div style={{fontSize:10,fontWeight:700,color:tab===id?T.accent:T.text3,transition:'color 0.2s'}}>{label}</div>
