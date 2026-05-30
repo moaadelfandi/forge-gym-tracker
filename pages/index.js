@@ -478,6 +478,122 @@ const DEFAULT_TEMPLATES = {
   ],
 }
 
+
+// ─── Auto-Progression Engine ─────────────────────────────────────────────────
+const PROG_KEY = (userId) => `arise_progression_${userId}`
+const DELOAD_DAYS = 10
+const DELOAD_CAP = 0.20   // max 20% reduction from absence
+const DELOAD_WEEK = 0.80  // deload week = 80% of working weight
+const FAIL_STREAK_TRIGGER = 2
+
+// Muscle group type affects increment size
+const MUSCLE_TYPE = {
+  chest:'upper', back:'upper', shoulders:'upper', arms:'upper',
+  legs:'lower', core:'core'
+}
+
+// Base increment scales with weight (heavier = smaller %)
+function calcIncrement(weightKg, muscleId, performance) {
+  const isLower = MUSCLE_TYPE[muscleId] === 'lower'
+  const baseRate = isLower ? 0.04 : 0.025 // 4% lower, 2.5% upper
+  // Adjust by performance
+  let multiplier = 1
+  if (performance === 'crushed')  multiplier = 1.5   // did more reps than prescribed
+  if (performance === 'hit')      multiplier = 1.0   // hit exactly
+  if (performance === 'close')    multiplier = 0     // missed 1-2 reps, hold
+  if (performance === 'failed')   multiplier = -0.5  // missed 3+ reps, reduce
+  const raw = weightKg * baseRate * multiplier
+  // Round to nearest 1.25kg for dumbbells, 2.5kg for barbells
+  const step = weightKg < 30 ? 1.25 : 2.5
+  return Math.round(raw / step) * step
+}
+
+function getPerformance(targetReps, actualReps) {
+  const diff = actualReps - targetReps
+  if (diff >= 2)  return 'crushed'
+  if (diff >= 0)  return 'hit'
+  if (diff >= -2) return 'close'
+  return 'failed'
+}
+
+function calcDeloadReduction(weightKg, daysMissed) {
+  if (daysMissed < DELOAD_DAYS) return 0
+  const weeksOver = Math.floor((daysMissed - DELOAD_DAYS) / 7)
+  const reduction = Math.min(weeksOver * 0.05, DELOAD_CAP) // 5% per missed week
+  return weightKg * reduction
+}
+
+function loadProgression(userId) {
+  try { return JSON.parse(localStorage.getItem(PROG_KEY(userId)) || '{}') }
+  catch { return {} }
+}
+
+function saveProgression(userId, data) {
+  localStorage.setItem(PROG_KEY(userId), JSON.stringify(data))
+}
+
+// Get suggested weight for an exercise
+function getSuggestedWeight(userId, exercise, baseWeightKg, muscleId, targetReps) {
+  const prog = loadProgression(userId)
+  const key = exercise.toLowerCase().trim()
+  const record = prog[key]
+
+  if (!record) {
+    // No history — use template weight
+    return { weight: baseWeightKg, reason: null, isDeload: false }
+  }
+
+  const daysMissed = Math.floor((Date.now() - record.lastDate) / (1000 * 60 * 60 * 24))
+  let suggested = record.suggestedNext || record.lastWeight
+  let reason = null
+  let isDeload = false
+
+  // Check for deload from absence
+  const reduction = calcDeloadReduction(suggested, daysMissed)
+  if (reduction > 0) {
+    suggested = Math.max(suggested - reduction, baseWeightKg * 0.6)
+    const weeks = Math.floor((daysMissed - DELOAD_DAYS) / 7) + 1
+    reason = `${daysMissed} days since last session — reduced by ${Math.round(reduction * 10) / 10}kg`
+    isDeload = true
+  }
+
+  // Check for deload week from consecutive failures
+  if (record.failStreak >= FAIL_STREAK_TRIGGER) {
+    suggested = Math.round(suggested * DELOAD_WEEK * 4) / 4
+    reason = `Failed ${record.failStreak}x in a row — deload week at 80%`
+    isDeload = true
+  }
+
+  // Round to nearest 1.25
+  suggested = Math.round(suggested * 4) / 4
+
+  return { weight: suggested, reason, isDeload }
+}
+
+// Update progression after a logged set
+function recordProgression(userId, exercise, muscleId, weightKg, reps, targetReps) {
+  const prog = loadProgression(userId)
+  const key = exercise.toLowerCase().trim()
+  const record = prog[key] || { lastWeight: weightKg, suggestedNext: weightKg, failStreak: 0, successStreak: 0 }
+
+  const performance = getPerformance(targetReps, reps)
+  const increment = calcIncrement(weightKg, muscleId, performance)
+  const newSuggested = Math.max(weightKg + increment, 1)
+
+  prog[key] = {
+    lastWeight: weightKg,
+    lastReps: reps,
+    lastDate: Date.now(),
+    suggestedNext: newSuggested,
+    failStreak: performance === 'failed' ? (record.failStreak || 0) + 1 : 0,
+    successStreak: (performance === 'hit' || performance === 'crushed') ? (record.successStreak || 0) + 1 : 0,
+    performance,
+  }
+
+  saveProgression(userId, prog)
+  return prog[key]
+}
+
 const DAYS_OF_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 const AVATAR_COLORS = ['#EF4444','#F59E0B','#10B981','#3B82F6','#8B5CF6','#EC4899','#06B6D4','#84CC16']
 
@@ -505,6 +621,7 @@ function avatarColor(name){ let h=0;for(let i=0;i<name.length;i++)h=name.charCod
 
 const SETTINGS_KEY='arise_settings_v1'
 const SESSION_KEY='arise_session_v1'
+const ACTIVE_SESSION_KEY=(uid)=>`arise_active_session_${uid}`
 function loadSettings(){
   try{
     const s=JSON.parse(localStorage.getItem(SETTINGS_KEY))
@@ -850,6 +967,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   const [templates,setTemplates]       = useState([])
   const [activeTemplate,setActiveTemplate] = useState(null)
   const [checked,setChecked]           = useState({})
+  const [sessionRestored,setSessionRestored] = useState(false)
   const [confirmEx,setConfirmEx]       = useState(null)
   const [confirmW,setConfirmW]         = useState('')
   const [confirmR,setConfirmR]         = useState('')
@@ -893,6 +1011,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   // Onboarding
   const [obStep,setObStep]             = useState(0)
   const [showMore,setShowMore]         = useState(false)
+  const [progressionData,setProgressionData] = useState({}) // exercise key -> record
 
   const unit = settings.unit
 
@@ -926,10 +1045,26 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
   useEffect(()=>{if(tab==='community') fetchCommunity()},[tab,fetchCommunity])
   useEffect(()=>{fetchBodyWeights()},[fetchBodyWeights])
   useEffect(()=>{
+    setProgressionData(loadProgression(currentUser.id))
+  },[currentUser.id])
+
+  // Persist active session so it survives app close/refresh
+  useEffect(()=>{
+    if(activeTemplate){
+      localStorage.setItem(ACTIVE_SESSION_KEY(currentUser.id),JSON.stringify({
+        templateId:activeTemplate.id,
+        checked,
+        savedAt:Date.now(),
+      }))
+    } else {
+      localStorage.removeItem(ACTIVE_SESSION_KEY(currentUser.id))
+    }
+  },[activeTemplate,checked,currentUser.id])
+  useEffect(()=>{
     try{
       const saved=JSON.parse(localStorage.getItem(`arise_templates_${currentUser.id}`)||'[]')
+      let finalTemplates=saved
       if(saved.length===0){
-        // First time — load defaults for their goal
         const goal=currentUser.goal||'general'
         const defaults=(DEFAULT_TEMPLATES[goal]||DEFAULT_TEMPLATES.general).map((t,i)=>({
           id:Date.now()+i,
@@ -938,11 +1073,26 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
           created:new Date().toISOString(),
           isDefault:true,
         }))
+        finalTemplates=defaults
         setTemplates(defaults)
         localStorage.setItem(`arise_templates_${currentUser.id}`,JSON.stringify(defaults))
       } else {
         setTemplates(saved)
       }
+      // Restore active session if one was in progress
+      try{
+        const savedSession=JSON.parse(localStorage.getItem(ACTIVE_SESSION_KEY(currentUser.id))||'null')
+        if(savedSession&&savedSession.templateId){
+          const tmpl=finalTemplates.find(t=>t.id===savedSession.templateId)
+          if(tmpl){
+            setActiveTemplate(tmpl)
+            setChecked(savedSession.checked||{})
+            setTab('workouts')
+            setSessionRestored(true)
+            setTimeout(()=>setSessionRestored(false),4000)
+          }
+        }
+      }catch{}
     }catch{}
   },[currentUser.id])
 
@@ -983,7 +1133,15 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
     if(!confirmEx||!activeTemplate) return
     const wKg=unit==='lbs'?parseFloat(confirmW)/2.205:parseFloat(confirmW)
     const{error}=await supabase.from('workouts').insert([{user_id:currentUser.id,muscle:confirmEx.ex.muscle,exercise:confirmEx.ex.exercise,weight:Math.round(wKg*10)/10,reps:parseInt(confirmR),sets:parseInt(confirmS)}])
-    if(!error){setChecked(p=>({...p,[confirmEx.i]:true}));updateExWeight(activeTemplate.id,confirmEx.i,wKg);fetchWorkouts()}
+    if(!error){
+      setChecked(p=>({...p,[confirmEx.i]:true}))
+      updateExWeight(activeTemplate.id,confirmEx.i,wKg)
+      // Record progression
+      const targetReps=parseInt(confirmEx.ex.reps)||parseInt(String(confirmEx.ex.reps).split('-')[1])||8
+      recordProgression(currentUser.id,confirmEx.ex.exercise,confirmEx.ex.muscle,wKg,parseInt(confirmR),targetReps)
+      setProgressionData(loadProgression(currentUser.id))
+      fetchWorkouts()
+    }
     setConfirmEx(null)
   }
   async function handleJoinChallenge(id){
@@ -1368,6 +1526,12 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                     <div style={{fontFamily:'Bebas Neue',fontSize:22,letterSpacing:1,color:T.text,lineHeight:1}}>{activeTemplate.name}</div>
                     <div style={{fontSize:12,color:T.text3}}>{Object.values(checked).filter(Boolean).length} / {activeTemplate.exercises.length} done</div>
                   </div>
+                  {sessionRestored&&(
+                    <div style={{position:'absolute',top:60,left:16,right:16,background:'#052218',border:'1px solid #10B981',borderRadius:10,padding:'8px 12px',display:'flex',alignItems:'center',gap:8,zIndex:10}}>
+                      <span style={{fontSize:16}}>✅</span>
+                      <span style={{fontSize:13,color:'#10B981',fontWeight:700}}>Session restored — pick up where you left off</span>
+                    </div>
+                  )}
                 </div>
                 <div style={{background:T.bg3,borderRadius:6,height:8,overflow:'hidden',marginBottom:16,position:'relative'}}>
                   <div className="bar" style={{'--w':`${(Object.values(checked).filter(Boolean).length/activeTemplate.exercises.length)*100}%`,height:'100%',background:`linear-gradient(90deg,${T.accent},#10B981)`,borderRadius:6}} />
@@ -1381,7 +1545,7 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                       <Card key={i} style={{opacity:done?.6:1,transition:'all .2s',border:`1.5px solid ${done?T.border:mg?.color+'33'}`,position:'relative',overflow:'hidden',padding:14}}>
                         {!done&&<div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${mg?.color},${mg?.color}66)`}} />}
                         <div style={{display:'flex',alignItems:'center',gap:12}}>
-                          <button onClick={()=>!done&&(()=>{setConfirmEx({i,ex});setConfirmW(String(cvt(ex.weight,unit)));setConfirmR(String(ex.reps));setConfirmS(String(ex.sets))})()}
+                          <button onClick={()=>{if(!done){const{weight:sugW}=getSuggestedWeight(currentUser.id,ex.exercise,ex.weight,ex.muscle,parseInt(String(ex.reps).split('-').pop())||8);setConfirmEx({i,ex});setConfirmW(String(Math.round(cvt(sugW,unit)*10)/10));setConfirmR(String(ex.reps).split('-').pop()||String(ex.reps));setConfirmS(String(ex.sets))}}}
                             style={{width:36,height:36,borderRadius:18,border:`2px solid ${done?'#10B981':mg?.color}`,background:done?'#10B981':T.input,display:'flex',alignItems:'center',justifyContent:'center',cursor:done?'default':'pointer',flexShrink:0,transition:'all .2s'}}>
                             {done&&<span style={{color:'#fff',fontSize:16,fontWeight:700}}>✓</span>}
                             {!done&&<span style={{fontSize:15}}>{mg?.icon}</span>}
@@ -1396,12 +1560,38 @@ function MainApp({currentUser,onLogout,allUsers,settings,setSettings,T,cssVars,o
                             <div style={{fontSize:10,color:T.text3,marginTop:2}}>{unit}</div>
                           </div>
                         </div>
-                        {!done&&(
-                          <button className="btn" onClick={()=>{setConfirmEx({i,ex});setConfirmW(String(cvt(ex.weight,unit)));setConfirmR(String(ex.reps));setConfirmS(String(ex.sets))}}
-                            style={{width:'100%',marginTop:10,background:`linear-gradient(135deg,${mg?.color},${mg?.color}AA)`,borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:700,letterSpacing:1}}>
-                            Mark Done + Log
-                          </button>
-                        )}
+                        {!done&&(()=>{
+                          const targetR=parseInt(String(ex.reps).split('-').pop())||8
+                          const{weight:sugW,reason:progReason,isDeload}=getSuggestedWeight(currentUser.id,ex.exercise,ex.weight,ex.muscle,targetR)
+                          const sugDisplay=Math.round(cvt(sugW,unit)*10)/10
+                          const baseDisplay=Math.round(cvt(ex.weight,unit)*10)/10
+                          const progKey=(ex.exercise||'').toLowerCase().trim()
+                          const progRecord=progressionData[progKey]
+                          const isIncreased=!isDeload&&sugW>ex.weight+0.4&&progRecord
+                          return(<>
+                            {progReason&&(
+                              <div style={{marginTop:8,background:isDeload?'rgba(245,158,11,.15)':'rgba(16,185,129,.12)',borderRadius:8,padding:'7px 10px',display:'flex',alignItems:'center',gap:6}}>
+                                <span style={{fontSize:14}}>{isDeload?'⚠️':'📈'}</span>
+                                <div style={{fontSize:11,color:isDeload?'#F59E0B':'#10B981',fontWeight:700,lineHeight:1.4}}>{progReason}</div>
+                              </div>
+                            )}
+                            {isIncreased&&!progReason&&(
+                              <div style={{marginTop:8,background:'rgba(16,185,129,.12)',borderRadius:8,padding:'7px 10px',display:'flex',alignItems:'center',gap:6}}>
+                                <span style={{fontSize:14}}>📈</span>
+                                <div style={{fontSize:11,color:'#10B981',fontWeight:700}}>Progressive overload: {baseDisplay} → {sugDisplay}{unit}</div>
+                              </div>
+                            )}
+                            <button className="btn" onClick={()=>{
+                              setConfirmEx({i,ex})
+                              setConfirmW(String(sugDisplay))
+                              setConfirmR(String(ex.reps).split('-').pop()||String(ex.reps))
+                              setConfirmS(String(ex.sets))
+                            }}
+                              style={{width:'100%',marginTop:10,background:`linear-gradient(135deg,${mg?.color},${mg?.color}AA)`,borderRadius:10,color:'#fff',padding:10,fontSize:13,fontWeight:700,letterSpacing:1}}>
+                              Mark Done · {sugDisplay}{unit}
+                            </button>
+                          </>)
+                        })()}
                       </Card>
                     )
                   })}
