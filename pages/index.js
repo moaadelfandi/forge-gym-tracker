@@ -683,6 +683,11 @@ export default function App() {
   const [pendingUser,setPendingUser]   = useState(null)
   const [settings,setSettings]        = useState(loadSettings)
   const [showOnboarding,setShowOnboarding] = useState(false)
+  const [forgotPin,setForgotPin]           = useState(false)
+  const [resetForm,setResetForm]           = useState({newPin:'',confirmPin:''})
+  const [resetMsg,setResetMsg]             = useState('')
+  const [resetLoading,setResetLoading]     = useState(false)
+  const [resetDone,setResetDone]           = useState(false)
 
   const T = settings.darkMode ? DARK : LIGHT
   const cssVars = {'--bg':T.bg,'--bg2':T.bg2,'--bg3':T.bg3,'--border':T.border,'--text':T.text,'--text2':T.text2,'--text3':T.text3,'--accent':T.accent,'--accent-dim':T.accentDim,'--card':T.card,'--input':T.input}
@@ -698,6 +703,21 @@ export default function App() {
     else{localStorage.removeItem(SESSION_KEY);setScreen('login')}
   },[currentUser])
   useEffect(()=>{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings))},[settings])
+
+  async function handleResetPin(userId){
+    const{newPin,confirmPin}=resetForm
+    if(!newPin||newPin.length<4){setResetMsg('PIN must be at least 4 digits.');return}
+    if(newPin!==confirmPin){setResetMsg('PINs do not match.');return}
+    setResetLoading(true)
+    const{error}=await supabase.from('users').update({pin:newPin}).eq('id',userId)
+    if(error){setResetMsg('Error resetting PIN. Try again.');setResetLoading(false);return}
+    setResetDone(true)
+    setResetLoading(false)
+    setTimeout(()=>{
+      setForgotPin(false);setResetDone(false)
+      setResetForm({newPin:'',confirmPin:''});setResetMsg('')
+    },2000)
+  }
 
   async function handleRegister(){
     const{name,pin,confirmPin,goal}=authForm
@@ -793,23 +813,75 @@ export default function App() {
           </div>
         ) : (
           <div className="fade-up" style={{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:20,padding:20}}>
+            {/* User header */}
             <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:20}}>
               <div style={{width:48,height:48,borderRadius:24,background:avatarColor(selectedUser.name),display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,fontWeight:900,color:'#fff',fontFamily:'Bebas Neue'}}>{selectedUser.name[0].toUpperCase()}</div>
               <div>
                 <div style={{fontSize:20,fontWeight:800,color:T.text}}>{selectedUser.name}</div>
-                <button onClick={()=>{setSelectedUser(null);setAuthMsg('')}} style={{background:'none',border:'none',color:T.text3,fontSize:12,cursor:'pointer',padding:0,fontFamily:'Nunito'}}>← Back</button>
+                <button onClick={()=>{setSelectedUser(null);setAuthMsg('');setForgotPin(false);setResetMsg('');setResetForm({newPin:'',confirmPin:''})}} style={{background:'none',border:'none',color:T.text3,fontSize:12,cursor:'pointer',padding:0,fontFamily:'Nunito'}}>← Back</button>
               </div>
             </div>
-            <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:8}}>PIN</div>
-            <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
-              value={authForm.pin} onChange={e=>setAuthForm(f=>({...f,pin:e.target.value}))}
-              onKeyDown={e=>e.key==='Enter'&&handleLogin(selectedUser.id)}
-              style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:14,fontSize:28,letterSpacing:10,textAlign:'center',marginBottom:14}} />
-            {authMsg&&<div style={{color:T.accent,fontSize:13,marginBottom:12,textAlign:'center'}}>{authMsg}</div>}
-            <button className="btn" onClick={()=>handleLogin(selectedUser.id)} disabled={authLoading}
-              style={{width:'100%',background:T.accent,borderRadius:12,color:'#fff',padding:14,fontSize:16,fontWeight:800,letterSpacing:2,boxShadow:`0 4px 16px ${T.accent}44`}}>
-              {authLoading?<span className="spin">◈</span>:'Sign In'}
-            </button>
+
+            {!forgotPin ? (
+              /* ── Normal sign in ── */
+              <>
+                <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:8}}>PIN</div>
+                <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
+                  value={authForm.pin} onChange={e=>setAuthForm(f=>({...f,pin:e.target.value}))}
+                  onKeyDown={e=>e.key==='Enter'&&handleLogin(selectedUser.id)}
+                  style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:14,fontSize:28,letterSpacing:10,textAlign:'center',marginBottom:14}} />
+                {authMsg&&<div style={{color:T.accent,fontSize:13,marginBottom:12,textAlign:'center'}}>{authMsg}</div>}
+                <button className="btn" onClick={()=>handleLogin(selectedUser.id)} disabled={authLoading}
+                  style={{width:'100%',background:T.accent,borderRadius:12,color:'#fff',padding:14,fontSize:16,fontWeight:800,letterSpacing:2,boxShadow:`0 4px 16px ${T.accent}44`,marginBottom:10}}>
+                  {authLoading?<span className="spin">◈</span>:'Sign In'}
+                </button>
+                <button onClick={()=>{setForgotPin(true);setAuthMsg('');setResetMsg('')}}
+                  style={{display:'block',width:'100%',background:'none',border:'none',color:T.text3,fontSize:13,cursor:'pointer',fontFamily:'Nunito',textAlign:'center',padding:'4px 0'}}>
+                  Forgot PIN?
+                </button>
+              </>
+            ) : resetDone ? (
+              /* ── Success ── */
+              <div style={{textAlign:'center',padding:'10px 0'}}>
+                <div style={{fontSize:48,marginBottom:12}}>✅</div>
+                <div style={{fontSize:18,fontWeight:800,color:T.text,marginBottom:4}}>PIN Reset!</div>
+                <div style={{fontSize:13,color:T.text3}}>You can now sign in with your new PIN.</div>
+              </div>
+            ) : (
+              /* ── Reset PIN flow ── */
+              <>
+                <div style={{background:T.bg3,borderRadius:12,padding:'10px 14px',marginBottom:16,display:'flex',alignItems:'flex-start',gap:8}}>
+                  <span style={{fontSize:16}}>ℹ️</span>
+                  <div style={{fontSize:13,color:T.text2,lineHeight:1.5}}>Set a new PIN for <strong style={{color:T.text}}>{selectedUser.name}</strong>. Anyone with access to this device can do this, so only share with people you trust.</div>
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:6}}>NEW PIN</div>
+                    <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
+                      value={resetForm.newPin} onChange={e=>setResetForm(f=>({...f,newPin:e.target.value}))}
+                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:14,fontSize:28,letterSpacing:10,textAlign:'center'}} />
+                  </div>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:700,color:T.text3,letterSpacing:1,marginBottom:6}}>CONFIRM NEW PIN</div>
+                    <input type="password" inputMode="numeric" maxLength={8} placeholder="••••"
+                      value={resetForm.confirmPin} onChange={e=>setResetForm(f=>({...f,confirmPin:e.target.value}))}
+                      onKeyDown={e=>e.key==='Enter'&&handleResetPin(selectedUser.id)}
+                      style={{width:'100%',background:T.input,border:`1px solid ${T.border}`,borderRadius:12,color:T.text,padding:14,fontSize:28,letterSpacing:10,textAlign:'center'}} />
+                  </div>
+                  {resetMsg&&<div style={{color:T.accent,fontSize:13,textAlign:'center'}}>{resetMsg}</div>}
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                    <button className="btn" onClick={()=>{setForgotPin(false);setResetMsg('');setResetForm({newPin:'',confirmPin:''})}}
+                      style={{background:T.bg3,borderRadius:12,color:T.text2,padding:13,fontSize:14,fontWeight:700}}>
+                      Cancel
+                    </button>
+                    <button className="btn" onClick={()=>handleResetPin(selectedUser.id)} disabled={resetLoading}
+                      style={{background:T.accent,borderRadius:12,color:'#fff',padding:13,fontSize:14,fontWeight:800,letterSpacing:1,boxShadow:`0 4px 14px ${T.accent}44`}}>
+                      {resetLoading?'...':'Reset PIN'}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
